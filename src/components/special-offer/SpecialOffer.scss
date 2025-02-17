@@ -1,0 +1,52 @@
+.special-offer-container {
+  margin: 4rem 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .special-offer-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px;
+    background: #fbeff2;
+    color: white;
+
+    .title {
+      color: #000;
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .discount {
+      margin: 16px 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #87ceff;
+    }
+
+    .desc {
+      color: #000;
+      line-height: 24px;
+      letter-spacing: 0.25px;
+    }
+
+    .sub-title {
+      margin-top: 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #87ceff;
+      letter-spacing: 0.25px;
+      line-height: 22px;
+    }
+
+    button {
+      width: fit-content;
+      align-self: flex-end;
+    }
+  }
+
+  .special-offer-banner {
+    width: 100%;
+    height: 100%;
+  }
+}

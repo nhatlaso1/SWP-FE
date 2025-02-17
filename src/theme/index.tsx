@@ -15,6 +15,7 @@ const theme = createTheme({
         root: {
           textTransform: "none",
           fontWeight: "bold",
+          padding: "12px 24px",
         },
       },
     },

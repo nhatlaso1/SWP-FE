@@ -1,0 +1,27 @@
+.product-categories-container {
+  margin: 4rem 0;
+
+  .title {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+
+  .categories-list {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+
+    .category-item {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+
+      p {
+        font-size: 16px;
+      }
+    }
+  }
+}

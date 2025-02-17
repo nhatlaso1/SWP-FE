@@ -1,0 +1,43 @@
+.advertisement-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .advertisement-info {
+    padding: 32px 24px;
+    background: #ffbdbe;
+    color: white;
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .sub-title {
+      margin: 16px 0;
+      line-height: 26px;
+      font-size: 16px;
+    }
+
+    .scan-qr-wrap {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+
+      .scan-info {
+        b {
+          font-size: 18px;
+        }
+
+        p {
+          margin-top: 16px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+
+  .advertisement-banner {
+    width: 100%;
+    height: 100%;
+  }
+}

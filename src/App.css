@@ -5,7 +5,7 @@
 }
 
 body {
-  background: #f0f0f0;
+  background: #faf9f5;
 }
 
 :root {
@@ -19,6 +19,10 @@ body {
   --variant-containedColor: #fff !important;
   --variant-containedBg: #fe8282 !important;
 }
+
+/* .slick-slide {
+  margin-right: 15px;
+} */
 
 .slick-next {
   right: 24px;

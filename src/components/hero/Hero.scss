@@ -1,0 +1,79 @@
+.hero-container {
+  .hero-item {
+    position: relative;
+
+    img {
+      width: 100%;
+      max-height: 70vh;
+      object-fit: cover;
+    }
+
+    .hero-content {
+      position: absolute;
+      top: 65%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+
+      .title {
+        font-size: 44px;
+        font-weight: 600;
+        color: white;
+      }
+
+      button {
+        width: fit-content;
+        color: white;
+        border-color: white;
+        align-self: center;
+        font-size: 14px;
+        padding: 12px 32px;
+      }
+    }
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+    }
+  }
+
+  .react-multi-carousel-dot-list {
+    bottom: 24px;
+
+    .react-multi-carousel-dot button {
+      width: 32px;
+      height: 5px;
+      border-radius: 2px;
+      border-width: 1px;
+    }
+  }
+
+  .react-multiple-carousel__arrow--left {
+    height: 100%;
+    border-radius: 0;
+    left: 0;
+    width: 56px;
+
+    &::before {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
+
+  .react-multiple-carousel__arrow--right {
+    height: 100%;
+    border-radius: 0;
+    right: 0;
+    width: 56px;
+
+    &::before {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  }
+}
