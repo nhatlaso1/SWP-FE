@@ -1,0 +1,21 @@
+/* src/components/common/Button.css */
+.custom-button {
+    background-color: #007bff;
+    /* Màu chính */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.custom-button:hover {
+    background-color: #0056b3;
+    /* Màu tối hơn khi hover */
+}
+
+.custom-button:focus {
+    outline: none;
+    /* Bỏ viền mặc định khi focus */
+}

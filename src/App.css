@@ -1,47 +1,48 @@
-* {
-  box-sizing: border-box;
+/* src/App.css */
+.app {
+  font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
 }
 
+main {
+  padding: 20px;
+}
+
+footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #f8f9fa;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+}
+
+.App {
+  min-height: 100vh;
+}
+
+/* Reset CSS */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
-  background: #f0f0f0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  line-height: 1.6;
+  color: #333;
 }
 
-:root {
-  --color-primary: #fe8282;
-  --color-secondary: #eb3f5e;
-
-  /* Customine variables themes */
-  --variant-textColor: #fe8282 !important;
-  --variant-outlinedColor: #fe8282 !important;
-  --variant-outlinedBorder: #fe828280 !important;
-  --variant-containedColor: #fff !important;
-  --variant-containedBg: #fe8282 !important;
+button {
+  cursor: pointer;
 }
 
-.slick-next {
-  right: 24px;
-}
-
-.slick-next::before {
-  font-size: 28px;
-}
-
-.slick-prev {
-  z-index: 9;
-  left: 16px;
-}
-
-.slick-prev::before {
-  font-size: 28px;
-}
-
-.letter-detail-content p {
-  line-height: 22px;
-}
-
-.letter-detail-content p span {
-  font-size: 12px;
-  font-weight: 600;
+/* Utility classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
 }
