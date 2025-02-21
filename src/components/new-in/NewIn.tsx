@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Carousel from "react-multi-carousel";
+
+import { useStore } from "../../store";
+import { Product } from "../../store/product";
 
 import "./NewIn.scss";
 
 const NewIn: React.FC = () => {
+  const fetchNewInProducts = useStore((state) => state.fetchNewInProducts);
+  const newInProducts = useStore((state) => state.products.newInProducts);
+
+  useEffect(() => {
+    fetchNewInProducts();
+  }, []);
+
   return (
     <div className="new-in-container">
       <h2 className="title">New In</h2>
@@ -62,7 +72,18 @@ const NewIn: React.FC = () => {
           slidesToSlide={1}
           swipeable
         >
-          <div className="product-item">
+          {newInProducts &&
+            newInProducts.map((product: Product) => (
+              <div className="product-item" key={product.$id}>
+                <img src="/products/product-5.png" alt="category-item" />
+                <div className="product-info">
+                  <p className="name">{product.productName}</p>
+                  <p className="desc">{product.summary}</p>
+                  <p className="price">${product.price}</p>
+                </div>
+              </div>
+            ))}
+          {/* <div className="product-item">
             <img src="/products/product-5.png" alt="category-item" />
             <div className="product-info">
               <p className="name">
@@ -113,7 +134,7 @@ const NewIn: React.FC = () => {
               </p>
               <p className="price">$76.00</p>
             </div>
-          </div>
+          </div> */}
         </Carousel>
       </div>
     </div>

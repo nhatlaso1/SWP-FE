@@ -2,12 +2,11 @@ import React, { useEffect } from "react";
 import Carousel from "react-multi-carousel";
 import Slider from "react-slick";
 
-import { Product } from "../../store/product";
 import { useStore } from "../../store";
 
 import "./OurBestSeller.scss";
 
-const OurBestSeller: React.FC = () => {
+const OurBestSeller = () => {
   const fetchBestSellersProducts = useStore(
     (state) => state.fetchBestSellersProducts
   );
@@ -78,7 +77,7 @@ const OurBestSeller: React.FC = () => {
           swipeable
         >
           {bestSellersProducts &&
-            bestSellersProducts.map((product: Product) => (
+            bestSellersProducts.map((product) => (
               <div className="product-item" key={product.$id}>
                 <img src="/products/product-1.png" alt="category-item" />
                 <div className="product-info">

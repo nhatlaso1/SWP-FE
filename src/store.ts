@@ -20,15 +20,25 @@ import {
   notificationActions,
   NotificationState,
 } from "./store/notification";
+import {
+  initialProducts,
+  ProductsActions,
+  productsActions,
+  ProductsState,
+} from "./store/product";
 
 export interface State {
   loading: LoadingState;
   notification: NotificationState;
   profile: ProfileState;
   users: UsersState;
+  products: ProductsState;
 }
 
-export type Actions = ProfileActions & UsersActions & NotificationActions;
+export type Actions = ProfileActions &
+  UsersActions &
+  ProductsActions &
+  NotificationActions;
 
 export type Store = State & Actions;
 export type StoreGet = () => Store;
@@ -40,6 +50,8 @@ export const useStore = create<Store, [["zustand/immer", never]]>(
     ...profileActions(set, get),
     users: initialUsers,
     ...usersActions(set, get),
+    products: initialProducts,
+    ...productsActions(set, get),
     notification: initialNotification,
     ...notificationActions(set, get),
     loading: initialLoading,

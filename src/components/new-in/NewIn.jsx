@@ -1,29 +1,23 @@
 import React, { useEffect } from "react";
 import Carousel from "react-multi-carousel";
-import Slider from "react-slick";
 
-import { Product } from "../../store/product";
 import { useStore } from "../../store";
 
-import "./OurBestSeller.scss";
+import "./NewIn.scss";
 
-const OurBestSeller: React.FC = () => {
-  const fetchBestSellersProducts = useStore(
-    (state) => state.fetchBestSellersProducts
-  );
-  const bestSellersProducts = useStore(
-    (state) => state.products.bestSellersProducts
-  );
+const NewIn = () => {
+  const fetchNewInProducts = useStore((state) => state.fetchNewInProducts);
+  const newInProducts = useStore((state) => state.products.newInProducts);
 
   useEffect(() => {
-    fetchBestSellersProducts();
+    fetchNewInProducts();
   }, []);
 
   return (
-    <div className="our-best-seller-container">
-      <h2 className="title">Our Best Sellers</h2>
+    <div className="new-in-container">
+      <h2 className="title">New In</h2>
 
-      <div className="our-best-seller-list">
+      <div className="new-in-list">
         <Carousel
           additionalTransfrom={0}
           arrows
@@ -77,10 +71,10 @@ const OurBestSeller: React.FC = () => {
           slidesToSlide={1}
           swipeable
         >
-          {bestSellersProducts &&
-            bestSellersProducts.map((product: Product) => (
+          {newInProducts &&
+            newInProducts.map((product) => (
               <div className="product-item" key={product.$id}>
-                <img src="/products/product-1.png" alt="category-item" />
+                <img src="/products/product-5.png" alt="category-item" />
                 <div className="product-info">
                   <p className="name">{product.productName}</p>
                   <p className="desc">{product.summary}</p>
@@ -89,7 +83,7 @@ const OurBestSeller: React.FC = () => {
               </div>
             ))}
           {/* <div className="product-item">
-            <img src="/products/product-1.png" alt="category-item" />
+            <img src="/products/product-5.png" alt="category-item" />
             <div className="product-info">
               <p className="name">
                 Beautya Capture Total Dreamskin Care & Perfect
@@ -102,7 +96,7 @@ const OurBestSeller: React.FC = () => {
             </div>
           </div>
           <div className="product-item">
-            <img src="/products/product-2.png" alt="category-item" />
+            <img src="/products/product-6.png" alt="category-item" />
             <div className="product-info">
               <p className="name">
                 Beautya Capture Total Dreamskin Care & Perfect
@@ -115,7 +109,7 @@ const OurBestSeller: React.FC = () => {
             </div>
           </div>
           <div className="product-item">
-            <img src="/products/product-3.png" alt="category-item" />
+            <img src="/products/product-7.png" alt="category-item" />
             <div className="product-info">
               <p className="name">
                 Beautya Capture Total Dreamskin Care & Perfect
@@ -128,7 +122,7 @@ const OurBestSeller: React.FC = () => {
             </div>
           </div>
           <div className="product-item">
-            <img src="/products/product-4.png" alt="category-item" />
+            <img src="/products/product-8.png" alt="category-item" />
             <div className="product-info">
               <p className="name">
                 Beautya Capture Total Dreamskin Care & Perfect
@@ -141,64 +135,9 @@ const OurBestSeller: React.FC = () => {
             </div>
           </div> */}
         </Carousel>
-
-        {/* <Slider {...settings}>
-          <div className="product-item">
-            <img src="/products/product-1.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-2.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-3.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-4.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-        </Slider> */}
       </div>
     </div>
   );
 };
 
-export default OurBestSeller;
+export default NewIn;
