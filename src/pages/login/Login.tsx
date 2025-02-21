@@ -29,6 +29,7 @@ const Login: React.FC = () => {
     onSubmit: async (values) => {
       const { username, password } = values;
       if (username === "admin" && password === "admin") {
+        localStorage.setItem("role", "ROLE_ADMIN");
         navigate("/admin/dashboard");
       } else {
         onLogin(username, password);
@@ -39,9 +40,15 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (user) {
       const { role } = user;
-      role === "ROLE_USER" ? navigate("/") : navigate("/admin/dashboard");
+      console.log("User role:", role); // Kiểm tra giá trị của role
+  
+      if (role === "ROLE_ADMIN") {
+        navigate("/admin/dashboard");
+      } else if (role === "ROLE_USER") {
+        navigate("/");
+      }
     }
-  }, [user]);
+  }, [user, navigate]);
 
   return (
     <div className="login-page">

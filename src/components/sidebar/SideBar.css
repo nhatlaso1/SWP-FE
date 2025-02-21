@@ -1,0 +1,19 @@
+.sidebar {
+    width: 200px;
+    background: #282c34;
+    height:97.5vh;
+    color: white;
+    padding: 10px;
+  }
+  
+  .sidebar-item {
+    cursor: pointer;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+  }
+  
+  .sidebar-title {
+    margin-left: 10px;
+  }
+  
