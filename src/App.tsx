@@ -1,6 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
-
 import theme from "./theme";
 import Home from "./pages/home/Home";
 import Login from "./pages/login/Login";
@@ -8,12 +7,13 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import { useStore } from "./store";
 import { useMemo } from "react";
-import DashboardPage from "./pages/admin//dashboard/Dashboard"; // Đổi đường dẫn
-import CreateSkinTests from "./pages/admin/skin-test/SkinTest"; // Đổi đường dẫn
+import DashboardPage from "./pages/admin/dashboard/Dashboard"; // Đổi đường dẫn
+import CreateSkinTests from "./pages/admin/skin-test/CreateSkinTest"; // Đổi đường dẫn
 import AdminLayout from "./layouts/AdminLayout"; // Import layout Admin
 import OrderPage from "./pages/OrderPage";
 import CreateSkinQuestion from "./pages/UpdateSkinTest";
 import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
+import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail"; // Import SkinTestDetail
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -36,6 +36,7 @@ function App() {
         { path: "allskintest", element: <ListSkinTest /> },
         { path: "orderpage", element: <OrderPage /> },
         { path: "updateskintest", element: <CreateSkinQuestion /> },
+        { path: "skintest/:id", element: <SkinTestDetail /> }, // Thêm route chi tiết SkinTest
       ],
     },
   ]);

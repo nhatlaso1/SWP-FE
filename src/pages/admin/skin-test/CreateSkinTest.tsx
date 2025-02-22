@@ -40,7 +40,6 @@ const skinTypes = [
   { id: 3, name: "Da hỗn hợp" },
   { id: 4, name: "Da nhạy cảm" },
 ];
-
 const CreateSkinTests: React.FC = () => {
   const [testName, setTestName] = useState<string>("");
   const [status, setStatus] = useState<boolean>(true);
