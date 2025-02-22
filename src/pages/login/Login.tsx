@@ -8,31 +8,29 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 
 import { useStore } from "../../store";
-
 import "./Login.scss";
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const onLogin = useStore((store) => store.login);
   const user = useStore((store) => store.profile.user);
-  const error = useStore((store) => store.profile.error);
+  const setError = useStore((store) => store.setError);
 
   const formik = useFormik({
     initialValues: {
-      username: "",
+      email: "",
       password: "",
     },
     validationSchema: Yup.object({
-      username: Yup.string().required("Username is required"),
+      email: Yup.string().email("Invalid email").required("Email is required"),
       password: Yup.string().required("Password is required"),
     }),
     onSubmit: async (values) => {
-      const { username, password } = values;
-      if (username === "admin" && password === "admin") {
-        localStorage.setItem("role", "ROLE_ADMIN");
-        navigate("/admin/dashboard");
-      } else {
-        onLogin(username, password);
+      try {
+        await onLogin(values.email, values.password, navigate);
+      } catch (error) {
+        console.error("Login error:", error);
+        setError("Invalid email or password");
       }
     },
   });
@@ -40,9 +38,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     if (user) {
       const { role } = user;
-      console.log("User role:", role); // Kiểm tra giá trị của role
-  
-      if (role === "ROLE_ADMIN") {
+      if (role === "Manager") {
         navigate("/admin/dashboard");
       } else if (role === "ROLE_USER") {
         navigate("/");
@@ -59,54 +55,47 @@ const Login: React.FC = () => {
           src="/beauty-logo.svg"
           alt="logo"
           onClick={() => navigate("/")}
-          style={{marginBottom: "12px"}}
+          style={{ marginBottom: "12px" }}
         />
-        {/* <h4 className="title">Đăng nhập</h4> */}
 
         <form onSubmit={formik.handleSubmit}>
           <div>
             <TextField
               fullWidth
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <PersonIcon />
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <PersonIcon />
+                  </InputAdornment>
+                ),
               }}
-              id="username"
-              name="username"
-              // label="Username"
+              id="email"
+              name="email"
+              placeholder="Email"
               variant="outlined"
-              placeholder="Username"
-              value={formik.values.username}
+              value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
           </div>
 
           <div style={{ marginTop: "16px" }}>
             <TextField
               fullWidth
-              slotProps={{
-                input: {
-                  startAdornment: (
-                    <InputAdornment position="start">
-                      <LockIcon />
-                    </InputAdornment>
-                  ),
-                },
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <LockIcon />
+                  </InputAdornment>
+                ),
               }}
               id="password"
               name="password"
-              // label="Password"
               type="password"
-              variant="outlined"
               placeholder="Password"
+              variant="outlined"
               value={formik.values.password}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
@@ -114,11 +103,7 @@ const Login: React.FC = () => {
               helperText={formik.touched.password && formik.errors.password}
             />
           </div>
-          {error && (
-            <div style={{ marginTop: "16px" }}>
-              <p style={{ color: "red" }}>{error}</p>
-            </div>
-          )}
+
           <Button
             color="primary"
             variant="contained"
@@ -129,34 +114,6 @@ const Login: React.FC = () => {
             Login
           </Button>
         </form>
-
-        <div className="register">
-          <Button
-            color="primary"
-            variant="text"
-            onClick={() => navigate("/register")}
-          >
-            Forgot password?
-          </Button>
-        </div>
-
-        <div className="sign-up-w-line">
-          <span></span>
-          <p>Or sign up with</p>
-          <span></span>
-        </div>
-
-        <div className="other-login">
-          <div className="login-item">
-            <img src="/icons/fb-icon.svg" alt="fb" />
-          </div>
-          <div className="login-item">
-            <img src="/icons/google-icon.svg" alt="google" />
-          </div>
-          <div className="login-item">
-            <img src="/icons/apple-icon.svg" alt="apple" />
-          </div>
-        </div>
       </div>
     </div>
   );

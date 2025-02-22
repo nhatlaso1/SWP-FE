@@ -1,10 +1,11 @@
 import type { StoreGet, StoreSet } from "../store";
 import axios from "../utils/axiosConfig";
+import { NavigateFunction } from "react-router-dom";
 
 export interface User {
   role: string;
   token: string;
-  username: string;
+  email: string;
 }
 
 export interface UserProfile {
@@ -14,6 +15,7 @@ export interface UserProfile {
   phone: string;
   address: string;
 }
+
 export interface ProfileState {
   user: User | undefined;
   userProfile: UserProfile | undefined;
@@ -22,11 +24,13 @@ export interface ProfileState {
 
 export interface ProfileActions {
   fetchProfile: () => Promise<void>;
-  updateProfile: (values: any) => Promise<void>;
-  register: (userBody: any, type: string) => Promise<void>;
-  login: (username: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  updateProfile: (values: Record<string, unknown>) => Promise<void>;
+  register: (userBody: Record<string, unknown>) => Promise<void>;
+  login: (email: string, password: string, navigate: NavigateFunction) => Promise<void>;
+  logout: (navigate: NavigateFunction) => Promise<void>;
+  refreshToken: () => Promise<void>;
   changePassword: (oldPassword: string, newPassword: string) => Promise<void>;
+  setError: (error: string | undefined) => void;
 }
 
 export const initialProfile: ProfileState = {
@@ -35,207 +39,145 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
+const BASE_URL = "https://localhost:7130/api/Authentication";
+
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
-  const BASE_URL = "https://spacesport.pro/api";
+  const handleError = (error: any) => {
+    const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
+    set((state) => {
+      state.profile.error = message;
+      state.notification.data.push({
+        status: "ERROR",
+        content: message,
+      });
+    });
+  };
+
+  const handleSuccess = (message: string) => {
+    set((state) => {
+      state.notification.data.push({
+        status: "SUCCESS",
+        content: message,
+      });
+    });
+  };
 
   return {
-    fetchProfile: async () => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
+    login: async (email, password, navigate) => {
+      set((state) => { state.loading.isLoading = true; });
       try {
-        const response = await axios.post(`${BASE_URL}/users/profile`);
-        const profile = response.data?.data || undefined;
-        set((state) => {
-          state.profile.userProfile = profile;
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    updateProfile: async (values) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const response = await axios.post(
-          `${BASE_URL}/users/profile/update`,
-          values
-        );
-        const profile = response.data?.data || undefined;
-        set((state) => {
-          // state.profile.userProfile = profile;
-          state.notification.data.push({
-            status: "SUCCESS",
-            content: "Update profile successfully",
-          });
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    register: async (userBody: any, type: string) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        let response;
-        const body = userBody;
-        if (type === "volunteer") {
-          response = await axios.post(
-            `${BASE_URL}/public/volunteers/register`,
-            body
-          );
-        } else {
-          response = await axios.post(`${BASE_URL}/register`, body);
-        }
-        const status = response?.data?.code;
-        const message = response?.data?.message;
-        set((state) => {
-          if (status === "USER_ALREADY_EXIST") {
-            state.notification.data.push({
-              status: "ERROR",
-              content: message,
-            });
-          } else {
-            state.notification.data.push({
-              status: "SUCCESS",
-              content: "Register successfully",
-            });
-          }
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    login: async (username: string, password: string) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const response = await axios.post(`${BASE_URL}/login`, {
-          username,
-          password,
-        });
-        const token = response.data?.data?.token;
-        const role = response.data?.data?.role;
-        const user = response.data?.data;
+        const response = await axios.post(`${BASE_URL}/login`, { email, password });
+        const { token } = response.data || {};
+    
         if (token) {
-          localStorage.setItem("role", role);
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          const role = payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"];
+    
+          set((state) => {
+            state.profile.user = { email, token, role };
+          });
+
           localStorage.setItem("token", token);
-        }
-        set((state) => {
-          state.profile.user = user;
-          state.notification.data.push({
-            content: response.data.message,
-            status: "SUCCESS",
-          });
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    logout: async () => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const response = await axios.post(`${BASE_URL}/logout`);
-        set((state) => {
-          if (response.data.code === "LOGOUT_SUCCESS") {
-            localStorage.setItem("token", "");
-            localStorage.setItem("role", "");
-            state.profile.user = undefined;
+          localStorage.setItem("role", role);
+          
+          // Điều hướng sau khi login
+          if (role === "Manager") {
+            navigate("/admin/dashboard");
+          } else {
+            navigate("/");
           }
-          state.notification.data.push({
-            content: response.data.message,
-            status: "SUCCESS",
-          });
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
+
+          handleSuccess("Login successful");
+        } else {
+          throw new Error("Invalid token received");
+        }
+      } catch (error) {
+        handleError(error);
       } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
+        set((state) => { state.loading.isLoading = false; });
       }
     },
-    changePassword: async (oldPassword: string, newPassword: string) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
+
+    logout: async (navigate) => {
+      set((state) => { state.loading.isLoading = true; });
       try {
-        const body = {
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-          confirmPassword: newPassword,
-        };
-        await axios.post(`${BASE_URL}/users/changePassword`, body);
-        set((state) => {
-          state.notification.data.push({
-            status: "SUCCESS",
-            content: "Change password successfully",
-          });
-        });
-      } catch (error: any) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
+        await axios.delete(`${BASE_URL}/logout`);
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
+        set((state) => { state.profile.user = undefined; });
+
+        navigate("/login"); // Chuyển hướng về login page
+        handleSuccess("Logout successful");
+      } catch (error) {
+        handleError(error);
       } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
+        set((state) => { state.loading.isLoading = false; });
       }
+    },
+
+    fetchProfile: async () => {
+      set((state) => { state.loading.isLoading = true; });
+      try {
+        const response = await axios.get(`${BASE_URL}/profile`);
+        set((state) => { state.profile.userProfile = response.data || undefined; });
+        handleSuccess("Profile fetched successfully");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        set((state) => { state.loading.isLoading = false; });
+      }
+    },
+
+    updateProfile: async (values) => {
+      set((state) => { state.loading.isLoading = true; });
+      try {
+        await axios.put(`${BASE_URL}/profile`, values);
+        handleSuccess("Profile updated successfully");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        set((state) => { state.loading.isLoading = false; });
+      }
+    },
+
+    register: async (userBody) => {
+      set((state) => { state.loading.isLoading = true; });
+      try {
+        const response = await axios.post(`${BASE_URL}/register`, userBody);
+        handleSuccess(response?.data?.message || "Registration successful");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        set((state) => { state.loading.isLoading = false; });
+      }
+    },
+
+    refreshToken: async () => {
+      set((state) => { state.loading.isLoading = true; });
+      try {
+        await axios.put(`${BASE_URL}/refresh`);
+        handleSuccess("Token refreshed successfully");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        set((state) => { state.loading.isLoading = false; });
+      }
+    },
+
+    changePassword: async (oldPassword, newPassword) => {
+      set((state) => { state.loading.isLoading = true; });
+      try {
+        await axios.put(`${BASE_URL}/change-password`, { oldPassword, newPassword });
+        handleSuccess("Password changed successfully");
+      } catch (error) {
+        handleError(error);
+      } finally {
+        set((state) => { state.loading.isLoading = false; });
+      }
+    },
+
+    setError: (error) => {
+      set((state) => { state.profile.error = error; });
     },
   };
 }

@@ -13,6 +13,7 @@ import CreateSkinTests from "./pages/admin/skin-test/SkinTest"; // Đổi đư�
 import AdminLayout from "./layouts/AdminLayout"; // Import layout Admin
 import OrderPage from "./pages/OrderPage";
 import CreateSkinQuestion from "./pages/UpdateSkinTest";
+import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -25,13 +26,14 @@ function App() {
     {
       path: "admin",
       element: (
-        <ProtectedRoute isAllowed={role === "ROLE_ADMIN"} redirectPath="/">
+        <ProtectedRoute isAllowed={isAuthenticated && role === "Manager"} redirectPath="/">
           <AdminLayout /> 
         </ProtectedRoute>
       ),
       children: [
         { path: "dashboard", element: <DashboardPage /> },
         { path: "skintest", element: <CreateSkinTests /> },
+        { path: "allskintest", element: <ListSkinTest /> },
         { path: "orderpage", element: <OrderPage /> },
         { path: "updateskintest", element: <CreateSkinQuestion /> },
       ],

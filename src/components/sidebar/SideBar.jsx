@@ -48,10 +48,22 @@ const NAVIGATION = [
     icon: <LayersIcon />,
     navigate: "/admin/skintest",
   },
+  {
+    segment: "integrations",
+    title: "All Skin Question",
+    icon: <LayersIcon />,
+    navigate: "/admin/allskintest",
+  },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ onPageChange }) {
   const navigate = useNavigate(); // Điều hướng
+
+  const handlePageChange = (title) => {
+    if (onPageChange) {
+      onPageChange(title);
+    }
+  };
 
   return (
     <div className="sidebar">
@@ -59,7 +71,12 @@ export default function Sidebar() {
       {NAVIGATION.map((item, index) => (
         <div
           key={index}
-          onClick={() => item.navigate && navigate(item.navigate)}
+          onClick={() => {
+            if (item.navigate) {
+              navigate(item.navigate);
+              handlePageChange(item.title);
+            }
+          }}
           className="sidebar-item"
         >
           {item.icon} <span className="sidebar-title">{item.title}</span>
