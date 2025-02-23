@@ -5,17 +5,28 @@
   padding: 0;
 }
 
-main {
-  padding: 20px;
+body {
+  /* background: #faf9f5; */
 }
 
-footer {
-  text-align: center;
-  padding: 10px;
-  background-color: #f8f9fa;
-  position: relative;
-  bottom: 0;
-  width: 100%;
+:root {
+  --color-primary: #fe8282;
+  --color-secondary: #eb3f5e;
+
+  /* Customine variables themes */
+  --variant-textColor: #fe8282 !important;
+  --variant-outlinedColor: #fe8282 !important;
+  --variant-outlinedBorder: #fe828280 !important;
+  --variant-containedColor: #fff !important;
+  --variant-containedBg: #fe8282 !important;
+}
+
+/* .slick-slide {
+  margin-right: 15px;
+} */
+
+.slick-next {
+  right: 24px;
 }
 
 .App {

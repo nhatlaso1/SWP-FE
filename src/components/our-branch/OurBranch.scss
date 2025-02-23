@@ -1,0 +1,30 @@
+.our-branch-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .our-branch-info {
+    padding: 32px 24px;
+    background: #ffbdbe;
+    color: white;
+
+    .title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .sub-title {
+      margin: 16px 0;
+      line-height: 26px;
+      font-size: 16px;
+    }
+
+    button {
+      width: fit-content;
+    }
+  }
+
+  .our-branch-banner {
+    width: 100%;
+    height: 100%;
+  }
+}

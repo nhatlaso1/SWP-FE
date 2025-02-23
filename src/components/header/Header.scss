@@ -1,33 +1,60 @@
 .header {
   position: sticky;
-  z-index: 999;
+  z-index: 999999;
   top: 0;
   display: grid;
-  grid-template-columns: max-content max-content 1fr;
+  grid-template-columns: max-content 1fr max-content;
   align-items: center;
   gap: 1rem;
   padding: 1rem 2rem;
-  background: var(--color-primary);
-  box-shadow: 1px 0px 4px var(--color-primary);
+  background: #f2e0de;
+  transition: transform 0.3s ease-in-out;
+
+  &.hidden {
+    transform: translateY(-100%);
+  }
+
+  &.visible {
+    transform: translateY(0);
+  }
 
   .branch-wrap {
     display: flex;
-    gap: 1rem;
+    flex-direction: column;
+    gap: 8px;
     align-items: center;
     cursor: pointer;
 
     img {
       width: 42px;
+      max-height: 37px;
     }
 
     h4 {
-      font-size: 18px;
-      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      color: #87ceff;
+    }
+  }
+
+  .nav-wrap {
+    display: flex;
+    gap: 32px;
+    align-self: center;
+    justify-self: center;
+
+    a {
+      text-decoration: none;
+      color: #000;
+      font-size: 16px;
+      font-weight: 600;
     }
   }
 
   .searchbar-wrap {
-    margin-left: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
   }
 
   .action-group-wrap {
