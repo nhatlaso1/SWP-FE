@@ -82,58 +82,6 @@ const NewIn = () => {
                 </div>
               </div>
             ))}
-          {/* <div className="product-item">
-            <img src="/products/product-5.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-6.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-7.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-8.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div> */}
         </Carousel>
       </div>
     </div>

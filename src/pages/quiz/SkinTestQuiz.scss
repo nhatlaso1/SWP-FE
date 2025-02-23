@@ -1,35 +1,244 @@
-.quiz-container {
-  max-width: 600px;
-  margin: auto;
-  text-align: left;
+// .quiz-container {
+//   max-width: 600px;
+//   margin: auto;
+//   text-align: left;
+//   background: url("../../../public/quiz-bg.png");
+// }
+
+// .question-block {
+//   margin-bottom: 15px;
+// }
+
+// .option-label {
+//   display: block;
+//   margin-left: 10px;
+// }
+
+// .error-message {
+//   color: red;
+//   font-size: 12px;
+// }
+
+// button {
+//   margin-top: 10px;
+//   padding: 10px;
+//   background: #6200ea;
+//   color: white;
+//   border: none;
+//   cursor: pointer;
+//   border-radius: 5px;
+// }
+
+// .score-result {
+//   margin-top: 20px;
+//   font-weight: bold;
+//   font-size: 18px;
+// }
+
+.loading-quiz-result {
+  min-height: 100vh;
+  margin-top: 20%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 32px;
+
+  img {
+    width: 196px;
+  }
 }
 
-.question-block {
-  margin-bottom: 15px;
-}
+.quiz-result-container {
+  max-width: 75%;
+  margin: 32px auto;
+  background: white;
 
-.option-label {
-  display: block;
-  margin-left: 10px;
-}
+  button {
+    padding: 12px 48px;
+    font-size: 16px;
+    text-transform: uppercase;
+  }
 
-.error-message {
-  color: red;
-  font-size: 12px;
-}
+  .quiz-result-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 24px;
 
-button {
-  margin-top: 10px;
-  padding: 10px;
-  background: #6200ea;
-  color: white;
-  border: none;
-  cursor: pointer;
-  border-radius: 5px;
-}
+    img {
+      width: 100%;
+      border-radius: 16px;
+    }
 
-.score-result {
-  margin-top: 20px;
-  font-weight: bold;
-  font-size: 18px;
+    .greeting-wrap {
+      h3 {
+        margin-top: 24px;
+        font-size: 32px;
+        color: var(--color-primary);
+      }
+
+      h4 {
+        font-size: 32px;
+        line-height: 42px;
+      }
+
+      p {
+        letter-spacing: 0.25px;
+        font-size: 16px;
+
+        &:first-of-type {
+          margin: 16px 0;
+        }
+      }
+    }
+  }
+
+  .quiz-result-content {
+    .recommended-wrap {
+      display: grid;
+      place-content: center;
+      padding: 32px 48px;
+      background: #e4eaee;
+      border-radius: 16px;
+      margin-top: 32px;
+    }
+
+    .heading {
+      font-size: 32px;
+      text-align: center;
+    }
+
+    .recommended-list {
+      margin-top: 32px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+
+      img {
+        width: 100%;
+      }
+
+      .recommended-text {
+        h4 {
+          font-size: 24px;
+        }
+
+        p {
+          font-size: 16px;
+        }
+
+        ul {
+          margin: 16px 0;
+          margin-left: 16px;
+          font-size: 16px;
+          line-height: 28px;
+        }
+
+        button {
+          margin-top: 24px;
+        }
+      }
+    }
+
+    .guide-to-use-wrap {
+      .divider {
+        margin-top: 24px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 16px 0;
+        font-size: 26px;
+        font-weight: 600;
+        border-bottom: 1px solid #d0d0d0;
+
+        img {
+          width: 28px;
+        }
+      }
+
+      .section-use {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 32px;
+        margin: 32px 16px 48px 16px;
+
+        .product-item {
+          img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 1px solid #d0d0d0;
+          }
+
+          .product-name {
+            margin: 16px 0;
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .product-price {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+          }
+        }
+
+        .how-to-use {
+          .title {
+            font-size: 20px;
+            font-weight: 500;
+            margin-bottom: 16px;
+          }
+
+          .sub-title {
+            font-size: 16px;
+            letter-spacing: 0.4px;
+            line-height: 20px;
+          }
+        }
+
+        .other-products {
+          margin-top: 32px;
+
+          .title {
+            font-size: 20px;
+            margin-bottom: 24px;
+          }
+
+          .other-products-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 16px;
+
+            .other-product-item {
+              img {
+                width: 150px;
+                aspect-ratio: 1 / 1;
+                object-fit: cover;
+                border-radius: 16px;
+              }
+
+              .product-info {
+                padding: 16px;
+
+                .name {
+                  color: #87ceff;
+                  font-size: 16px;
+                  font-weight: 600;
+                  line-height: 22px;
+                }
+
+                .price {
+                  margin-top: 12px;
+                  font-size: 18px;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }

@@ -108,13 +108,13 @@ export function profileActions(set, get) {
         });
       }
     },
-    login: async (username, password) => {
+    login: async (email, password) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
         const response = await axios.post(`${BASE_URL}/Authentication/login`, {
-          username,
+          email,
           password,
         });
         const token = response.data?.token;
@@ -125,9 +125,11 @@ export function profileActions(set, get) {
         }
         set((state) => {
           state.notification.data.push({
-            content: response.data.message,
+            content: 'Login succesfully',
             status: "SUCCESS",
           });
+          state.profile.user = true;
+          state.profile.error = false;
         });
       } catch (error) {
         set((state) => {
@@ -136,8 +138,6 @@ export function profileActions(set, get) {
             status: "ERROR",
             content: message,
           });
-          state.profile.error = false;
-          console.log(error, state.profile.error);
         });
       } finally {
         set((state) => {
@@ -150,15 +150,13 @@ export function profileActions(set, get) {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/logout`);
+        // const response = await axios.post(`${BASE_URL}/logout`);
         set((state) => {
-          if (response.data.code === "LOGOUT_SUCCESS") {
-            localStorage.setItem("token", "");
-            localStorage.setItem("role", "");
-            state.profile.user = undefined;
-          }
+          localStorage.setItem("token", "");
+          localStorage.setItem("role", "");
+          state.profile.user = undefined;
           state.notification.data.push({
-            content: response.data.message,
+            content: 'Logout successfully',
             status: "SUCCESS",
           });
         });

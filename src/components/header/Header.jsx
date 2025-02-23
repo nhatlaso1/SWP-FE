@@ -23,6 +23,7 @@ const Header = () => {
   const [visible, setVisible] = useState(true);
 
   const changePassword = useStore((store) => store.changePassword);
+  const user = useStore((store) => store.profile.user);
 
   const token = localStorage.getItem("token");
   const openMenu = Boolean(anchorEl);
@@ -97,9 +98,22 @@ const Header = () => {
             <img src="" alt="" />
             US <span>(EN)</span>
           </div>
-          <Button variant="text" href="/login">
-            Login
-          </Button>
+          {
+            user ?
+              (
+                <Button variant="text" onClick={() => {
+                  logout();
+                }}>
+                  Logout
+                </Button>
+              ) : (
+                <Button variant="text" href="/login">
+                  Login
+                </Button>
+              )
+          }
+
+
         </div>
       </nav>
 
