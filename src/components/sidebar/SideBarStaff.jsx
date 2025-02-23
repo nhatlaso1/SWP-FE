@@ -2,9 +2,9 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import BarChartIcon from "@mui/icons-material/BarChart";
+import CategoryIcon from "@mui/icons-material/Category";
 import LayersIcon from "@mui/icons-material/Layers";
-import "./SideBar.css";
+import "./SideBarStaff.css";
 
 const NAVIGATION = [
   {
@@ -13,50 +13,31 @@ const NAVIGATION = [
   },
   {
     segment: "dashboard",
-    title: "Userdetail",
-    icon: <DashboardIcon />,
-    navigate: "/admin/dashboard",
-  },
-  {
-    segment: "dashboard",
     title: "Dashboard",
     icon: <DashboardIcon />,
-    navigate: "/admin/dashboard",
+    navigate: "/staff/dashboard",
   },
   {
     segment: "orders",
     title: "Orders",
     icon: <ShoppingCartIcon />,
-    navigate: "/admin/orderpage",
+    navigate: "/staff/order",
   },
   {
-    kind: "divider",
+    segment: "categories",
+    title: "Categories",
+    icon: <CategoryIcon />,
+    navigate: "/staff/categories",
   },
   {
-    kind: "header",
-    title: "Analytics",
-  },
-  {
-    segment: "question",
-    title: "Question",
-    icon: <BarChartIcon />,
-    navigate: "/admin/updateskintest",
-  },
-  {
-    segment: "integrations",
-    title: "Skin Question",
+    segment: "products",
+    title: "Products",
     icon: <LayersIcon />,
-    navigate: "/admin/skintest",
-  },
-  {
-    segment: "integrations",
-    title: "All Skin Question",
-    icon: <LayersIcon />,
-    navigate: "/admin/allskintest",
+    navigate: "/staff/products",
   },
 ];
 
-export default function Sidebar({ onPageChange }) {
+export default function SidebarStaff({ onPageChange }) {
   const navigate = useNavigate(); // Điều hướng
 
   const handlePageChange = (title) => {
@@ -67,7 +48,7 @@ export default function Sidebar({ onPageChange }) {
 
   return (
     <div className="sidebar">
-      <h2>Sidebar</h2>
+      <h2>BeautySC</h2>
       {NAVIGATION.map((item, index) => (
         <div
           key={index}

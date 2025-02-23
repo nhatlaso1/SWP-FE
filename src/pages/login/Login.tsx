@@ -40,7 +40,9 @@ const Login: React.FC = () => {
       const { role } = user;
       if (role === "Manager") {
         navigate("/admin/dashboard");
-      } else if (role === "ROLE_USER") {
+      } else if (role === "Staff") {
+        navigate("/staff/dashboard");
+      } else if (role === "Customer") {
         navigate("/");
       }
     }

@@ -1,4 +1,9 @@
 
+export interface ListSkinTest {
+  id?: number;
+  skinTestName: string;
+  status: boolean;
+}
 export interface SkinTest {
     id?: number;
     skinTestName: string;

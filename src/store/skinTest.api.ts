@@ -51,3 +51,18 @@ export const updateSkinTest = async (skinTest: SkinTest, token: string): Promise
     throw error;
   }
 };
+// Hàm lấy tất cả Skin Tests
+export const getAllSkinTests = async (token: string): Promise<SkinTest[]> => {
+  try {
+    const response = await apiClient.get(`${apiEndpoints.SkinTest}/get-all-skin-test`, {
+      headers: {
+        Authorization: `Bearer ${token}`, // Thêm token vào header để xác thực người dùng
+      }
+    });
+    return response.data; // Trả về danh sách Skin Tests
+  } catch (error) {
+    console.error("Error fetching all skin tests:", error); // Xử lý lỗi nếu có
+    throw error;
+  }
+};
+

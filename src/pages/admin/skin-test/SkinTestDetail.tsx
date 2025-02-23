@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Paper, Typography, Button, Box, CircularProgress, IconButton, TextField, Stack } from '@mui/material';
-import { getSkinTestById, updateSkinTest } from '../../../apis/skinTest.api'; // Import hàm lấy và cập nhật Skin Test
+import { getSkinTestById, updateSkinTest } from '../../../store/skinTest.api'; // Import hàm lấy và cập nhật Skin Test
 import { SkinTest, SkinTypeQuestion, SkinTypeAnswer } from '../../../types/SkinTest'; // Import interface SkinTest
 import DeleteIcon from '@mui/icons-material/Delete';
 

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
   Box, 
@@ -14,51 +14,59 @@ import {
   TableRow, 
   Pagination 
 } from "@mui/material";
+import { getAllSkinTests } from "../../../store/skinTest.api";
+import { useStore } from "../../../store";
 
 interface SkinTest {
-  id: number;
+  skinTestId: number;
   skinTestName: string;
   status: boolean;
 }
 
-const mockSkinTests: SkinTest[] = [
-  { id: 1, skinTestName: "Bộ câu hỏi Da dầu", status: true },
-  { id: 2, skinTestName: "Bộ câu hỏi Da khô", status: false },
-  { id: 3, skinTestName: "Bộ câu hỏi Da hỗn hợp", status: true },
-  { id: 4, skinTestName: "Bộ câu hỏi Da nhạy cảm", status: false },
-  { id: 5, skinTestName: "Bộ câu hỏi Da thường", status: true },
-  { id: 6, skinTestName: "Bộ câu hỏi Da nhờn", status: true },
-  { id: 7, skinTestName: "Bộ câu hỏi Da khô mẫn cảm", status: false },
-  { id: 8, skinTestName: "Bộ câu hỏi Da nhạy cảm khô", status: true },
-  { id: 9, skinTestName: "Bộ câu hỏi Da hỗn hợp thiên khô", status: false },
-  { id: 10, skinTestName: "Bộ câu hỏi Da hỗn hợp thiên dầu", status: true },
-  { id: 11, skinTestName: "Bộ câu hỏi Da mất nước", status: true },
-  { id: 12, skinTestName: "Bộ câu hỏi Da dầu mụn", status: false },
-  { id: 13, skinTestName: "Bộ câu hỏi Da khô mịn", status: true },
-  { id: 14, skinTestName: "Bộ câu hỏi Da nhạy cảm dễ kích ứng", status: true },
-  { id: 15, skinTestName: "Bộ câu hỏi Da hỗn hợp không đều màu", status: false }
-];
-
 const ListSkinTests: React.FC = () => {
   const navigate = useNavigate();
-  
-  // Trạng thái phân trang
+  const token = useStore((store) => store.profile.user?.token);
+
+  const [skinTests, setSkinTests] = useState<SkinTest[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  useEffect(() => {
+    const fetchSkinTests = async () => {
+      if (!token) {
+        console.error("Token không tồn tại!");
+        return;
+      }
+    
+      try {
+        const skinTestsData = await getAllSkinTests(token); // Trả về SkinTest[]
+        console.log("Dữ liệu trả về từ API:", skinTestsData); 
+        const extractedData = skinTestsData.map((test: any) => ({
+          skinTestId: test.skinTestId ?? 0,
+          skinTestName: test.skinTestName ?? "Không có tên",
+          status: test.status ?? false,
+        }));
+        setSkinTests(extractedData);
+      } catch (error) {
+        console.error("Lỗi khi lấy dữ liệu bộ câu hỏi:", error);
+      }
+    };
+    
+
+    fetchSkinTests();
+  }, [token]);
+
   const handleRowClick = (test: SkinTest) => {
-    navigate(`/admin/skintest/${test.id}`);  // Điều hướng tới chi tiết bộ câu hỏi
+    navigate(`/admin/skintest/${test.skinTestId}`);
   };
 
   const handleCreateNewTest = () => {
-    navigate("/admin/skintest");
+    navigate("/admin/createskintest");
   };
 
-  // Tính toán dữ liệu hiển thị cho trang hiện tại
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = mockSkinTests.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = skinTests.slice(startIndex, startIndex + itemsPerPage);
 
-  // Thay đổi trang khi người dùng thay đổi phân trang
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setCurrentPage(value);
   };
@@ -85,12 +93,12 @@ const ListSkinTests: React.FC = () => {
             {currentData.length > 0 ? (
               currentData.map((test) => (
                 <TableRow 
-                  key={test.id} 
+                  key={test.skinTestId} 
                   hover 
                   onClick={() => handleRowClick(test)} 
                   style={{ cursor: "pointer" }}
                 >
-                  <TableCell>{test.id}</TableCell>
+                  <TableCell>{test.skinTestId}</TableCell>
                   <TableCell>{test.skinTestName}</TableCell>
                   <TableCell>{test.status ? "Hoạt động" : "Không hoạt động"}</TableCell>
                 </TableRow>
@@ -108,7 +116,7 @@ const ListSkinTests: React.FC = () => {
 
       <Box display="flex" justifyContent="center" marginTop={2}>
         <Pagination
-          count={Math.ceil(mockSkinTests.length / itemsPerPage)}
+          count={Math.ceil(skinTests.length / itemsPerPage)}
           page={currentPage}
           onChange={handlePageChange}
           color="primary"

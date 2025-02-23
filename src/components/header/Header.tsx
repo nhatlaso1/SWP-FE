@@ -103,7 +103,7 @@ const Header: React.FC = () => {
           <a href="">Voucher</a>
           <a href="">For Sales</a>
           <a href="">Products</a>
-          <a href="">Quiz Skin Q&A</a>
+          <a href="/take-quiz">Quiz Skin Q&A</a>
         </div>
 
         <div className="searchbar-wrap">

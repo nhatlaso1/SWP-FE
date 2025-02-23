@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createSkinTest } from "../../../apis/skinTest.api";
+import { createSkinTest } from "../../../store/skinTest.api";
 import { useStore } from "../../../store";
 
 interface Answer {
