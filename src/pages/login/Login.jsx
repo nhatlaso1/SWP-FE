@@ -14,6 +14,7 @@ import "./Login.scss";
 const Login = () => {
   const navigate = useNavigate();
   const onLogin = useStore((store) => store.login);
+  const user = useStore((store) => store.profile.user);
   const error = useStore((store) => store.profile.error);
   const token = localStorage.getItem("token");
 
@@ -28,11 +29,7 @@ const Login = () => {
     }),
     onSubmit: async (values) => {
       const { username, password } = values;
-      if (username === "admin" && password === "admin") {
-        navigate("/dashboard");
-      } else {
-        await onLogin(username, password);
-      }
+      await onLogin(username, password);
     },
   });
 
@@ -41,6 +38,12 @@ const Login = () => {
       navigate("/");
     }
   }, [error, navigate]);
+
+  useEffect(() => {
+    if (user && user.role === 'Manager') {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="login-page">

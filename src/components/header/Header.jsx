@@ -88,8 +88,8 @@ const Header = () => {
           <a href="">Voucher</a>
           <a href="">For Sales</a>
           <a href="">Products</a>
-          <a href="/take-quiz">Quiz Skin Q&A</a>
-          {/* <a href={token ? "/take-quiz" : "login"}>Quiz Skin Q&A</a> */}
+          {/* <a href="/take-quiz">Quiz Skin Q&A</a> */}
+          <a href={token ? "/take-quiz" : "/login"}>Quiz Skin Q&A</a>
         </div>
 
         <div className="searchbar-wrap">
@@ -99,11 +99,9 @@ const Header = () => {
             US <span>(EN)</span>
           </div>
           {
-            user ?
+            token ?
               (
-                <Button variant="text" onClick={() => {
-                  logout();
-                }}>
+                <Button variant="text" onClick={logout}>
                   Logout
                 </Button>
               ) : (

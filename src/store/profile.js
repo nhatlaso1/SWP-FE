@@ -1,4 +1,5 @@
 import axios from "../utils/axiosConfig";
+import { jwtDecode } from "jwt-decode";
 
 const BASE_URL = "https://localhost:7130/api";
 
@@ -9,61 +10,6 @@ export const initialProfile = {
 
 export function profileActions(set, get) {
   return {
-    fetchProfile: async () => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const response = await axios.post(`${BASE_URL}/users/profile`);
-        const profile = response.data?.data || undefined;
-        set((state) => {
-          state.profile.userProfile = profile;
-        });
-      } catch (error) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    updateProfile: async (values) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const response = await axios.post(
-          `${BASE_URL}/users/profile/update`,
-          values
-        );
-        const profile = response.data?.data || undefined;
-        set((state) => {
-          // state.profile.userProfile = profile;
-          state.notification.data.push({
-            status: "SUCCESS",
-            content: "Update profile successfully",
-          });
-        });
-      } catch (error) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
     register: async (userBody, type) => {
       set((state) => {
         state.loading.isLoading = true;
@@ -128,7 +74,20 @@ export function profileActions(set, get) {
             content: 'Login succesfully',
             status: "SUCCESS",
           });
-          state.profile.user = true;
+          if (token) {
+            try {
+              const decoded = jwtDecode(token);
+              console.log(decoded); // { id: 1, role: "admin", iat: 1697698760 }
+              state.profile.user = {
+                id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid'],
+                email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
+                role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
+              }
+              localStorage.setItem("role", decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+            } catch (error) {
+              console.error("Invalid token:", error);
+            }
+          }
           state.profile.error = false;
         });
       } catch (error) {
@@ -138,6 +97,8 @@ export function profileActions(set, get) {
             status: "ERROR",
             content: message,
           });
+          state.profile.user = undefined;
+          state.profile.error = true;
         });
       } finally {
         set((state) => {
@@ -158,37 +119,6 @@ export function profileActions(set, get) {
           state.notification.data.push({
             content: 'Logout successfully',
             status: "SUCCESS",
-          });
-        });
-      } catch (error) {
-        set((state) => {
-          const message = error?.response?.data?.message || error?.message;
-          state.notification.data.push({
-            status: "ERROR",
-            content: message,
-          });
-        });
-      } finally {
-        set((state) => {
-          state.loading.isLoading = false;
-        });
-      }
-    },
-    changePassword: async (oldPassword, newPassword) => {
-      set((state) => {
-        state.loading.isLoading = true;
-      });
-      try {
-        const body = {
-          oldPassword: oldPassword,
-          newPassword: newPassword,
-          confirmPassword: newPassword,
-        };
-        await axios.post(`${BASE_URL}/users/changePassword`, body);
-        set((state) => {
-          state.notification.data.push({
-            status: "SUCCESS",
-            content: "Change password successfully",
           });
         });
       } catch (error) {
