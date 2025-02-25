@@ -1,0 +1,33 @@
+.header-staff {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1rem;
+    background-color: #f2e0de;
+    color: #000;
+  
+    &__left {
+      display: flex;
+      align-items: center;
+    }
+  
+    &__logo {
+      height: 40px;
+      margin-right: 1rem;
+    }
+  
+    &__page-title {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+  
+    &__right {
+      display: flex;
+      align-items: center;
+    }
+  
+    &__user-icon {
+      color: white;
+    }
+  }
+  

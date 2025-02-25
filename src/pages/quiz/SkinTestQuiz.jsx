@@ -14,8 +14,6 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import Header from "../../components/header/Header";
-import Footer from "../../components/footer/Footer";
 
 import "./SkinTestQuiz.scss";
 
@@ -151,7 +149,7 @@ const SkinTestQuiz = () => {
 
   return (
     <>
-      <Header />
+      
 
       <div className="quiz-page">
         {step === 1 && (
@@ -706,7 +704,7 @@ const SkinTestQuiz = () => {
         )}
       </div>
 
-      <Footer />
+      
     </>
   );
 };

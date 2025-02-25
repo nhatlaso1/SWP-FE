@@ -20,11 +20,9 @@ import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
+import ProductList from "./pages/product/Product";
 import CustomerLayout from "./layouts/CustomerLayout";
 import Checkout from "./pages/checkout/Checkout";
-import ProductList from "./pages/product/ProductList";
-import ProductDetail from "./pages/product/ProductDetail";
-import SaleProducts from "./pages/product/SaleProducts";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -35,13 +33,11 @@ function App() {
     { path: "login", element: <Login /> },
     {
       path: "",
-      element: <CustomerLayout />,
+      element: <CustomerLayout />, 
       children: [
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
-        { path: "product/:id", element: <ProductDetail /> },
-        { path: "sales", element: <SaleProducts /> },
         {
           path: "checkout",
           element: (

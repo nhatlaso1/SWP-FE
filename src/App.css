@@ -1,12 +1,11 @@
-/* src/App.css */
-.app {
-  font-family: Arial, sans-serif;
+* {
+  box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
 body {
-  /* background: #faf9f5; */
+  background: #faf9f5;
 }
 
 :root {
@@ -29,31 +28,24 @@ body {
   right: 24px;
 }
 
-.App {
-  min-height: 100vh;
+.slick-next::before {
+  font-size: 28px;
 }
 
-/* Reset CSS */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+.slick-prev {
+  z-index: 9;
+  left: 16px;
 }
 
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  line-height: 1.6;
-  color: #333;
+.slick-prev::before {
+  font-size: 28px;
 }
 
-button {
-  cursor: pointer;
+.letter-detail-content p {
+  line-height: 22px;
 }
 
-/* Utility classes */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+.letter-detail-content p span {
+  font-size: 12px;
+  font-weight: 600;
 }
