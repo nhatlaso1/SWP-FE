@@ -10,39 +10,36 @@ export const initialProfile = {
 
 export function profileActions(set, get) {
   return {
-    register: async (userBody, type) => {
+    register: async (body) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        let response;
-        const body = userBody;
-        if (type === "volunteer") {
-          response = await axios.post(
-            `${BASE_URL}/public/volunteers/register`,
-            body
-          );
-        } else {
-          response = await axios.post(`${BASE_URL}/register`, body);
-        }
-        const status = response?.data?.code;
-        const message = response?.data?.message;
+        const response = await axios.post(
+          `${BASE_URL}/Authentication/register`,
+          body
+        );
+        const status = response?.data?.status;
+        const message = response?.data?.detail;
         set((state) => {
-          if (status === "USER_ALREADY_EXIST") {
+          if (status === 400) {
+            state.profile.error = false;
             state.notification.data.push({
               status: "ERROR",
               content: message,
             });
           } else {
+            state.profile.error = message;
             state.notification.data.push({
               status: "SUCCESS",
-              content: "Register successfully",
+              content: "Register successfully!",
             });
           }
         });
       } catch (error) {
         set((state) => {
           const message = error?.response?.data?.message || error?.message;
+          state.profile.error = message;
           state.notification.data.push({
             status: "ERROR",
             content: message,
@@ -71,7 +68,7 @@ export function profileActions(set, get) {
         }
         set((state) => {
           state.notification.data.push({
-            content: 'Login succesfully',
+            content: "Login successfully",
             status: "SUCCESS",
           });
           if (token) {
@@ -79,11 +76,23 @@ export function profileActions(set, get) {
               const decoded = jwtDecode(token);
               console.log(decoded); // { id: 1, role: "admin", iat: 1697698760 }
               state.profile.user = {
-                id: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid'],
-                email: decoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'],
-                role: decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'],
-              }
-              localStorage.setItem("role", decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']);
+                id: decoded[
+                  "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/sid"
+                ],
+                email:
+                  decoded[
+                    "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"
+                  ],
+                role: decoded[
+                  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                ],
+              };
+              localStorage.setItem(
+                "role",
+                decoded[
+                  "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+                ]
+              );
             } catch (error) {
               console.error("Invalid token:", error);
             }
@@ -111,13 +120,12 @@ export function profileActions(set, get) {
         state.loading.isLoading = true;
       });
       try {
-        // const response = await axios.post(`${BASE_URL}/logout`);
         set((state) => {
           localStorage.setItem("token", "");
           localStorage.setItem("role", "");
           state.profile.user = undefined;
           state.notification.data.push({
-            content: 'Logout successfully',
+            content: "Logout successfully",
             status: "SUCCESS",
           });
         });

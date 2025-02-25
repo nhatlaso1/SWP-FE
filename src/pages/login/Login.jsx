@@ -131,7 +131,7 @@ const Login = () => {
             variant="text"
             onClick={() => navigate("/register")}
           >
-            Forgot password?
+            Register
           </Button>
         </div>
 

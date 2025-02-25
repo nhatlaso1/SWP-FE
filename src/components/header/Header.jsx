@@ -10,6 +10,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import * as Yup from "yup";
 
 import { useStore } from "../../store";
@@ -24,6 +25,7 @@ const Header = () => {
 
   const changePassword = useStore((store) => store.changePassword);
   const user = useStore((store) => store.profile.user);
+
 
   const token = localStorage.getItem("token");
   const openMenu = Boolean(anchorEl);
@@ -86,7 +88,9 @@ const Header = () => {
         <div className="nav-wrap">
           <a href="">Home</a>
           <a href="">Voucher</a>
-          <a href="">For Sales</a>
+          <a href="">
+            For Sales
+          </a>
           <a href="">Products</a>
           {/* <a href="/take-quiz">Quiz Skin Q&A</a> */}
           <a href={token ? "/take-quiz" : "/login"}>Quiz Skin Q&A</a>
@@ -94,24 +98,18 @@ const Header = () => {
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
-          <div>
-            <img src="" alt="" />
-            US <span>(EN)</span>
+          <div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+            <ShoppingCartOutlinedIcon />
           </div>
-          {
-            token ?
-              (
-                <Button variant="text" onClick={logout}>
-                  Logout
-                </Button>
-              ) : (
-                <Button variant="text" href="/login">
-                  Login
-                </Button>
-              )
-          }
-
-
+          {token ? (
+            <Button variant="text" onClick={logout}>
+              Logout
+            </Button>
+          ) : (
+            <Button variant="text" href="/login">
+              Login
+            </Button>
+          )}
         </div>
       </nav>
 

@@ -13,6 +13,7 @@ const OurBestSeller = () => {
   const bestSellersProducts = useStore(
     (state) => state.products.bestSellersProducts
   );
+  const addItem = useStore((store) => store.addItem);
 
   useEffect(() => {
     fetchBestSellersProducts();
@@ -78,8 +79,11 @@ const OurBestSeller = () => {
         >
           {bestSellersProducts &&
             bestSellersProducts.map((product) => (
-              <div className="product-item" key={product.$id}>
-                <img src="/products/product-1.png" alt="category-item" />
+              <div className="product-item" key={product.productId} onClick={() => {
+                addItem(product);
+                alert('Add to cart successfully')
+              }}>
+                <img src={product.productImage} alt="category-item" />
                 <div className="product-info">
                   <p className="name">{product.productName}</p>
                   <p className="desc">{product.summary}</p>
@@ -87,114 +91,7 @@ const OurBestSeller = () => {
                 </div>
               </div>
             ))}
-          {/* <div className="product-item">
-            <img src="/products/product-1.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-2.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-3.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-4.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div> */}
         </Carousel>
-
-        {/* <Slider {...settings}>
-          <div className="product-item">
-            <img src="/products/product-1.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-2.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-3.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-4.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-        </Slider> */}
       </div>
     </div>
   );

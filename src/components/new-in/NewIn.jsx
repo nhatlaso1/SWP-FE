@@ -73,8 +73,8 @@ const NewIn = () => {
         >
           {newInProducts &&
             newInProducts.map((product) => (
-              <div className="product-item" key={product.$id}>
-                <img src="/products/product-5.png" alt="category-item" />
+              <div className="product-item" key={product.productId}>
+                <img src={product.productImage} alt="category-item" />
                 <div className="product-info">
                   <p className="name">{product.productName}</p>
                   <p className="desc">{product.summary}</p>

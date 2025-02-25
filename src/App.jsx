@@ -14,6 +14,8 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import Notification from "./components/notification/Notification";
+import Register from "./pages/register/Register";
+import Cart from "./pages/cart/Cart";
 
 import "./App.css";
 
@@ -36,8 +38,16 @@ function App() {
       element: <Login />,
     },
     {
+      path: "register",
+      element: <Register />,
+    },
+    {
       path: "home",
       element: <Home />,
+    },
+    {
+      path: "cart",
+      element: <Cart />,
     },
     {
       path: "take-quiz",
