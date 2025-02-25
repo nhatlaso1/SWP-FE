@@ -1,12 +1,18 @@
 {
-  "name": "staffscreen",
+  "name": "beauty-sc",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@emotion/react": "^11.14.0",
-    "@emotion/styled": "^11.14.0",
-    "@mui/icons-material": "^6.4.0",
-    "@mui/material": "^6.4.0",
+    "@cloudinary/react": "^1.13.0",
+    "@cloudinary/url-gen": "^1.21.0",
+    "@date-io/date-fns": "^3.0.0",
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.1",
+    "@mui/lab": "^6.0.0-beta.13",
+    "@mui/material": "^6.1.1",
+    "@mui/x-data-grid": "^7.18.0",
+    "@mui/x-date-pickers": "^7.21.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -15,11 +21,14 @@
     "@types/react": "^18.3.9",
     "@types/react-dom": "^18.3.0",
     "axios": "^1.7.7",
-    "beauty-sc": "file:",
+    "chart.js": "^4.4.8",
     "cloudinary": "^2.5.1",
     "dayjs": "^1.11.13",
     "formik": "^2.4.6",
+    "i": "^0.3.7",
+    "jwt-decode": "^4.0.0",
     "react": "^18.3.1",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^18.3.1",
     "react-multi-carousel": "^2.8.5",
     "react-router-dom": "^6.26.2",
@@ -39,7 +48,6 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
-  "proxy": "https://localhost:7130",
   "eslintConfig": {
     "extends": [
       "react-app",
@@ -59,6 +67,6 @@
     ]
   },
   "devDependencies": {
-    "ajv": "^7.2.4"
+    "@types/react-slick": "^0.23.13"
   }
 }
