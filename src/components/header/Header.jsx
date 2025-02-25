@@ -85,9 +85,15 @@ const Header = () => {
 
         <div className="nav-wrap">
           <a href="">Home</a>
+<<<<<<< Updated upstream:src/components/header/Header.jsx
           <a href="">Voucher</a>
           <a href="">For Sales</a>
           <a href="">Products</a>
+=======
+          <a href="/checkout">Voucher</a>
+          <a href="/sales">For Sales</a>
+          <a href="/products">Products</a>
+>>>>>>> Stashed changes:src/components/header/HeaderCustomer.tsx
           <a href="/take-quiz">Quiz Skin Q&A</a>
           {/* <a href={token ? "/take-quiz" : "login"}>Quiz Skin Q&A</a> */}
         </div>

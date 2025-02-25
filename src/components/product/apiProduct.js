@@ -52,7 +52,7 @@ export const ProductAPI = {
         if (data.$values) return data.$values;
         if (data.data) return data.data;
       }
-      
+
       return [];
     } catch (error) {
       if (error.response) {
@@ -68,6 +68,16 @@ export const ProductAPI = {
         console.warn('Error:', error.message);
       }
       return [];
+    }
+  },
+
+  getDetail: async (productId) => {
+    try {
+      const response = await api.get(`/Product/get-product-detail?productId=${productId}`);
+      return response.data;
+    } catch (error) {
+      console.warn('Error fetching product detail:', error.message);
+      throw new Error('Could not fetch product details');
     }
   },
 
