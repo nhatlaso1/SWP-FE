@@ -80,12 +80,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           localStorage.setItem("token", token);
           localStorage.setItem("role", role);
           
-          // Điều hướng sau khi login
-          if (role === "Manager") {
-            navigate("/admin/dashboard");
-          } else {
-            navigate("/");
-          }
+          
 
           handleSuccess("Login successful");
         } else {

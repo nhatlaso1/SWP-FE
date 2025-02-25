@@ -94,30 +94,30 @@ const HeaderCustomer: React.FC = () => {
     <>
       <nav className={`headercustomer ${visible ? "visible" : "hidden"}`}>
         <div className="branch-wrap" onClick={() => navigate("/")}>
-          <img src="/beauty-logo.svg" alt="" />
+          <img src="/beauty-logo.svg" alt="logo" />
           <h4>BEAUTYSC</h4>
         </div>
 
         <div className="nav-wrap">
-          <a href="">Home</a>
-          <a href="/checkout">Voucher</a>
-          <a href="">For Sales</a>
-          <a href="/products">Products</a>
-          <a href="/take-quiz">Quiz Skin Q&A</a>
+          <Button variant="text" onClick={() => navigate("/")}>Home</Button>
+          <Button variant="text" onClick={() => navigate("/checkout")}>Voucher</Button>
+          <Button variant="text" onClick={() => navigate("/sales")}>For Sales</Button>
+          <Button variant="text" onClick={() => navigate("/products")}>Products</Button>
+          <Button variant="text" onClick={() => navigate("/take-quiz")}>Quiz Skin Q&A</Button>
         </div>
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
           <div>
-            <img src="" alt="" />
+            <img src="" alt="flag" />
             US <span>(EN)</span>
           </div>
-          <Button variant="text" href="/profile">
+          <Button variant="text" onClick={() => navigate("/profile")}>
             Profile
           </Button>
         </div>
-
-        {/* <div className="action-group-wrap">
+      </nav>
+      {/* <div className="action-group-wrap">
           {(role === "ROLE_VOLUNTEER" || role === "ROLE_ADMIN") && (
             <IconButton
               style={{ color: "white", marginRight: "8px" }}
@@ -196,7 +196,7 @@ const HeaderCustomer: React.FC = () => {
             )}
           </Menu>
         </div> */}
-      </nav>
+
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Change Password</DialogTitle>

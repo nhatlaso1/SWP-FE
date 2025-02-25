@@ -39,7 +39,7 @@ const ListSkinTests: React.FC = () => {
       }
     
       try {
-        const skinTestsData = await getAllSkinTests(token); // Trả về SkinTest[]
+        const skinTestsData = await getAllSkinTests(token); 
         console.log("Dữ liệu trả về từ API:", skinTestsData); 
         const extractedData = skinTestsData.map((test: any) => ({
           skinTestId: test.skinTestId ?? 0,

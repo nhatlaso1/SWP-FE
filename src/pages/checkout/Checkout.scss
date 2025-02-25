@@ -1,0 +1,211 @@
+$primary-color: #e91e63; 
+$background-color: #fff0f5; 
+$error-color: red;
+$text-color: #333;
+$highlight-color: #ff4081; 
+
+.checkout-container {
+  font-family: Arial, sans-serif;
+  padding: 30px;
+  background-color: $background-color;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  margin-top: 30px;
+
+  h2 {
+    color: $text-color;
+    margin-bottom: 15px;
+    font-size: 1.8rem;
+    font-weight: bold;
+  }
+
+  .contact-section,
+  .shipping-section,
+  .address-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    margin-bottom: 25px;
+  }
+
+  .input-group {
+    flex: 1;
+    min-width: 320px;
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: $text-color;
+    }
+
+    input,
+    select {
+      width: 95%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: $highlight-color;
+      box-shadow: 0 0 8px rgba(233, 30, 99, 0.5);
+    }
+
+    .error-message {
+      font-size: 0.9rem;
+      color: $error-color;
+      margin-top: 5px;
+    }
+  }
+
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .login-link {
+    color: $highlight-color;
+    text-decoration: none;
+    font-size: 1rem;
+
+    strong {
+      font-weight: bold;
+    }
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .save-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 25px;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+}
+
+.order-detail-container {
+  background-color: #fff;
+  border: 2px solid $highlight-color;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+
+  h2 {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: $highlight-color;
+    text-align: center;
+  }
+}
+
+.order-summary-container {
+  padding: 24px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  margin-bottom: 30px;
+  margin-top: 30px;
+}
+
+.order-summary h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.order-summary {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.order-summary input {
+  padding: 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  width: 100%;
+}
+
+.order-summary button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.order-summary button:hover {
+  background-color: #e057a1;
+}
+
+.price-end {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.price-end:last-child {
+  border-bottom: none;
+}
+
+.price-end .MuiListItemText-primary {
+  font-weight: 500;
+  color: #555;
+}
+
+.price-end .MuiListItemText-secondary {
+  font-weight: 600;
+  color: #000;
+}
+
+.total-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #ff69b4;
+}
+
+.total-section h6 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.total-section button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  background-color: #ff69b4;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.total-section button:hover {
+  background-color: #e057a1;
+}
+
+
+
