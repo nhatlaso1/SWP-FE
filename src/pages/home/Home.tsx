@@ -1,7 +1,5 @@
 import React from "react";
 
-import Header from "../../components/header/Header";
-import Footer from "../../components/footer/Footer";
 import Hero from "../../components/hero/Hero";
 import ProductCategories from "../../components/categories/product-categories/ProductCategories";
 import Advertisement from "../../components/advertisement/Advertisement";
@@ -16,7 +14,6 @@ import "./Home.scss";
 const Home: React.FC = () => {
   return (
     <>
-      <Header />
 
       <div className="home-page">
         <Hero />
@@ -33,7 +30,7 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      <Footer />
+
     </>
   );
 };

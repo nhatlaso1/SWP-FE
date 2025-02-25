@@ -23,7 +23,7 @@ import { useFormik } from "formik";
 
 import { useStore } from "../../store";
 
-import "./Header.scss";
+import "./HeaderCustomer.scss";
 
 interface IChangePasswordForm {
   oldPassword: string;
@@ -31,7 +31,7 @@ interface IChangePasswordForm {
   confirmPassword: string;
 }
 
-const Header: React.FC = () => {
+const HeaderCustomer: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
@@ -92,7 +92,7 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <nav className={`header ${visible ? "visible" : "hidden"}`}>
+      <nav className={`headercustomer ${visible ? "visible" : "hidden"}`}>
         <div className="branch-wrap" onClick={() => navigate("/")}>
           <img src="/beauty-logo.svg" alt="" />
           <h4>BEAUTYSC</h4>
@@ -100,9 +100,9 @@ const Header: React.FC = () => {
 
         <div className="nav-wrap">
           <a href="">Home</a>
-          <a href="">Voucher</a>
+          <a href="/checkout">Voucher</a>
           <a href="">For Sales</a>
-          <a href="">Products</a>
+          <a href="/products">Products</a>
           <a href="/take-quiz">Quiz Skin Q&A</a>
         </div>
 
@@ -112,8 +112,8 @@ const Header: React.FC = () => {
             <img src="" alt="" />
             US <span>(EN)</span>
           </div>
-          <Button variant="text" href="/login">
-            Login
+          <Button variant="text" href="/profile">
+            Profile
           </Button>
         </div>
 
@@ -278,4 +278,4 @@ const Header: React.FC = () => {
   );
 };
 
-export default Header;
+export default HeaderCustomer;

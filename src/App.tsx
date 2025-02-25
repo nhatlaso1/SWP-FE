@@ -9,7 +9,7 @@ import { useStore } from "./store";
 import { useMemo } from "react";
 import CreateSkinTests from "./pages/admin/skin-test/CreateSkinTest"; // Đổi đường dẫn
 import AdminLayout from "./layouts/AdminLayout";
-import OrderPage from "./pages/OrderPage";
+import OrderPage from "./pages/checkout/Checkout";
 import CreateSkinQuestion from "./pages/UpdateSkinTest";
 import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
 import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail"; // Import SkinTestDetail
@@ -20,6 +20,9 @@ import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
+import ProductList from "./pages/product/Product";
+import CustomerLayout from "./layouts/CustomerLayout";
+import Checkout from "./pages/checkout/Checkout";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -27,14 +30,29 @@ function App() {
   const isAuthenticated = !!localStorage.getItem("token");
 
   const router = createBrowserRouter([
-    { path: "/", element: <Home /> },
     { path: "login", element: <Login /> },
-    { path: "take-quiz", element: <SkinTestQuiz /> },
+    {
+      path: "",
+      element: <CustomerLayout />, 
+      children: [
+        { path: "/", element: <Home /> },
+        { path: "take-quiz", element: <SkinTestQuiz /> },
+        { path: "products", element: <ProductList /> },
+        {
+          path: "checkout",
+          element: (
+            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+              <Checkout />
+            </ProtectedRoute>
+          )
+        },
+      ],
+    },
     {
       path: "admin",
       element: (
         <ProtectedRoute isAllowed={isAuthenticated && role === "Manager"} redirectPath="/">
-          <AdminLayout /> 
+          <AdminLayout />
         </ProtectedRoute>
       ),
       children: [
@@ -43,13 +61,13 @@ function App() {
         { path: "skintests", element: <ListSkinTest /> },
         { path: "routines", element: <OrderPage /> },
         { path: "updateskintest", element: <CreateSkinQuestion /> },
-        { path: "skintest/:id", element: <SkinTestDetail /> }, 
+        { path: "skintest/:id", element: <SkinTestDetail /> },
       ],
-    },{
+    }, {
       path: "staff",
       element: (
         <ProtectedRoute isAllowed={isAuthenticated && role === "Staff"} redirectPath="/">
-          <StaffLayout /> 
+          <StaffLayout />
         </ProtectedRoute>
       ),
       children: [
