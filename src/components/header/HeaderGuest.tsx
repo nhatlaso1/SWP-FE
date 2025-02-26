@@ -107,7 +107,7 @@ const HeaderGuest: React.FC = () => {
             Voucher
           </Button>
           <Button variant="text" onClick={() => navigate("/sales")}>
-          For Sales
+            For Sales
           </Button>
           <Button variant="text" onClick={() => navigate("/products")}>
             Products

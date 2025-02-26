@@ -36,8 +36,11 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem("token");
+    if (user && token) {
       const { role } = user;
+      console.log("Role hiện tại:", role); // Log để kiểm tra role
+  
       if (role === "Manager") {
         navigate("/admin/dashboard");
       } else if (role === "Staff") {
@@ -47,6 +50,7 @@ const Login: React.FC = () => {
       }
     }
   }, [user, navigate]);
+  
 
   return (
     <div className="login-page">
