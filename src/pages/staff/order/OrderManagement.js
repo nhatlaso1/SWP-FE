@@ -24,7 +24,7 @@ import {
 } from '@mui/material';
 import { Search as SearchIcon } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import { orderApi } from '../../../store/apiOrderManagement';
+import { OrderAPI } from '../../../store/apiOrder';
 
 const SearchContainer = styled(Box)(({ theme }) => ({
   display: 'flex',
@@ -72,10 +72,13 @@ const OrderManagement = () => {
 
   const fetchOrders = async () => {
     try {
-      const data = await orderApi.getAllOrders();
-      setOrders(data);
+      console.log('Fetching orders...');
+      const ordersData = await OrderAPI.getAll();
+      console.log('Fetched orders:', ordersData);
+      setOrders(ordersData);
     } catch (error) {
       console.error('Error fetching orders:', error);
+      setOrders([]); // Set empty array on error
     }
   };
 
@@ -91,7 +94,7 @@ const OrderManagement = () => {
         address: newOrder.address,
       };
       
-      const data = await orderApi.createOrder(orderData);
+      const data = await OrderAPI.createOrder(orderData);
       setOrders([...orders, data]);
       setOpenNewOrderDialog(false);
       setNewOrder({ customerName: '', email: '', items: '', total: '', address: '' });
@@ -103,9 +106,9 @@ const OrderManagement = () => {
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
       if (newStatus === 'delivered') {
-        await orderApi.completeOrder(orderId);
+        await OrderAPI.completeOrder(orderId);
       } else if (newStatus === 'cancelled') {
-        await orderApi.cancelOrder(orderId);
+        await OrderAPI.cancelOrder(orderId);
       }
       setOrders(orders.map(order => 
         order.id === orderId ? { ...order, status: newStatus } : order
@@ -117,18 +120,24 @@ const OrderManagement = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      pending: 'warning',
-      processing: 'info',
-      shipped: 'primary',
-      delivered: 'success',
-      cancelled: 'error',
+      Pending: 'warning',
+      Processing: 'info',
+      Shipped: 'primary',
+      Complete: 'success',
+      Cancelled: 'error',
     };
     return colors[status] || 'default';
   };
 
   const filteredOrders = orders.filter(order => {
     if (orderFilter !== 'all' && order.status !== orderFilter) return false;
-    if (searchOrder && !order.customerName.toLowerCase().includes(searchOrder.toLowerCase())) return false;
+    if (searchOrder) {
+      // Tìm kiếm trong danh sách sản phẩm
+      const hasMatchingProduct = order.details?.some(detail =>
+        detail.productName.toLowerCase().includes(searchOrder.toLowerCase())
+      );
+      if (!hasMatchingProduct) return false;
+    }
     return true;
   });
 
@@ -144,7 +153,7 @@ const OrderManagement = () => {
       <SearchContainer>
         <TextField
           size="small"
-          placeholder="Search orders..."
+          placeholder="Search products..."
           value={searchOrder}
           onChange={(e) => setSearchOrder(e.target.value)}
           InputProps={{ startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} /> }}
@@ -154,11 +163,11 @@ const OrderManagement = () => {
           <InputLabel>Filter Status</InputLabel>
           <Select value={orderFilter} label="Filter Status" onChange={(e) => setOrderFilter(e.target.value)}>
             <MenuItem value="all">All Orders</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
-            <MenuItem value="processing">Processing</MenuItem>
-            <MenuItem value="shipped">Shipped</MenuItem>
-            <MenuItem value="delivered">Delivered</MenuItem>
-            <MenuItem value="cancelled">Cancelled</MenuItem>
+            <MenuItem value="Pending">Pending</MenuItem>
+            <MenuItem value="Processing">Processing</MenuItem>
+            <MenuItem value="Shipped">Shipped</MenuItem>
+            <MenuItem value="Complete">Complete</MenuItem>
+            <MenuItem value="Cancelled">Cancelled</MenuItem>
           </Select>
         </FormControl>
       </SearchContainer>
@@ -168,9 +177,9 @@ const OrderManagement = () => {
           <TableHead>
             <TableRow>
               <TableCell>Order ID</TableCell>
-              <TableCell>Customer</TableCell>
+              <TableCell>Products</TableCell>
               <TableCell>Date</TableCell>
-              <TableCell>Total</TableCell>
+              <TableCell>Total Amount</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
@@ -180,24 +189,30 @@ const OrderManagement = () => {
               <TableRow key={order.id}>
                 <TableCell>{order.id}</TableCell>
                 <TableCell>
-                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Avatar sx={{ width: 24, height: 24 }}>{order.customerName[0]}</Avatar>
-                    {order.customerName}
+                  <Box>
+                    {order.details?.map((detail, index) => (
+                      <Typography key={detail.id} variant="body2" sx={{ mb: 0.5 }}>
+                        {detail.productName} ({detail.size}) x{detail.quantity}
+                      </Typography>
+                    ))}
                   </Box>
                 </TableCell>
                 <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                <TableCell>${parseFloat(order.total).toFixed(2)}</TableCell>
+                <TableCell>${order.total.toLocaleString()}</TableCell>
                 <TableCell>
                   <StyledChip label={order.status} color={getStatusColor(order.status)} size="small" />
                 </TableCell>
                 <TableCell>
                   <FormControl size="small" sx={{ minWidth: 120 }}>
-                    <Select value={order.status} onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}>
-                      <MenuItem value="pending">Pending</MenuItem>
-                      <MenuItem value="processing">Processing</MenuItem>
-                      <MenuItem value="shipped">Shipped</MenuItem>
-                      <MenuItem value="delivered">Delivered</MenuItem>
-                      <MenuItem value="cancelled">Cancelled</MenuItem>
+                    <Select 
+                      value={order.status} 
+                      onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                    >
+                      <MenuItem value="Pending">Pending</MenuItem>
+                      <MenuItem value="Processing">Processing</MenuItem>
+                      <MenuItem value="Shipped">Shipped</MenuItem>
+                      <MenuItem value="Complete">Complete</MenuItem>
+                      <MenuItem value="Cancelled">Cancelled</MenuItem>
                     </Select>
                   </FormControl>
                 </TableCell>

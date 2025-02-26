@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import PersonIcon from "@mui/icons-material/Person";
 import "./HeaderStaff.scss";
+import { useStore } from "../../store";
 
 interface HeaderStaffProps {
   currentPage: string;
@@ -11,6 +12,7 @@ interface HeaderStaffProps {
 const HeaderStaff: React.FC<HeaderStaffProps> = ({ currentPage }) => {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const navigate = useNavigate();
+  const logout = useStore((store) => store.logout);
 
   const handleOpenMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -21,8 +23,7 @@ const HeaderStaff: React.FC<HeaderStaffProps> = ({ currentPage }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/");
+    logout(navigate);
   };
 
   return (

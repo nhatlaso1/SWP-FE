@@ -11,7 +11,7 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import * as Yup from "yup";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -99,11 +99,11 @@ const HeaderGuest: React.FC = () => {
         </div>
 
         <div className="nav-wrap">
-          <a href="">Home</a>
-          <a href="checkout">Voucher</a>
-          <a href="">For Sales</a>
-          <a href="/products">Products</a>
-          <a href="/take-quiz">Quiz Skin Q&A</a>
+          <Link to="/">Home</Link>
+          <Link to="/checkout">Voucher</Link>
+          <Link to="/for-sales">For Sales</Link>
+          <Link to="/products">Products</Link>
+          <Link to="/take-quiz">Quiz Skin Q&A</Link>
         </div>
 
         <div className="searchbar-wrap">

@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://localhost:7130/api';
+const BASE_URL = 'https://localhost:7130/api/Order';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -11,72 +11,98 @@ const api = axios.create({
   }
 });
 
+// Add request interceptor
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Add response interceptor
 api.interceptors.response.use(
-  response => response,
-  error => {
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+      window.location.href = '/';
+    }
     if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') {
-      console.warn('Không thể kết nối đến server');
-      return Promise.resolve({ data: [] });
+      console.warn('Cannot connect to server');
+      return Promise.resolve({ data: { $values: [] } });
     }
     return Promise.reject(error);
   }
 );
 
 export const OrderAPI = {
-  // Lấy tất cả đơn hàng với phân trang
-  getAll: async (pageIndex = 1, pageSize = 10) => {
+  // Get all orders
+  getAll: async () => {
     try {
-      const response = await api.get('/Order/get-all-orders', {
-        params: {
-          pageIndex,
-          pageSize
-        }
-      });
-
-      if (response?.data) {
-        const data = response.data;
-        if (Array.isArray(data)) return data;
-        if (data.$values) return data.$values;
-        if (data.data) return data.data;
-      }
-      
-      return [];
+      console.log('Calling API get_all_order...');
+      const response = await api.get('/get_all_order');
+      console.log('API Response:', response.data);
+      const orders = response.data.$values || [];
+      console.log('Processed Orders:', orders);
+      return orders.map(order => ({
+        id: order.orderId,
+        customerName: order.details.$values[0]?.productName || 'Unknown',
+        date: order.createdDate,
+        total: order.totalAmount,
+        status: order.status,
+        details: order.details.$values.map(detail => ({
+          id: detail.orderDetailId,
+          productId: detail.productId,
+          productName: detail.productName,
+          size: detail.size,
+          quantity: detail.quantity,
+          price: detail.price,
+          discount: detail.discount
+        }))
+      }));
     } catch (error) {
-      console.warn('Lỗi khi lấy danh sách đơn hàng:', error.message);
-      throw new Error('Không thể lấy danh sách đơn hàng');
+      console.error('Error in getAll:', error);
+      throw error;
     }
   },
 
-  // Lấy chi tiết đơn hàng
+  // Get order details
   getDetail: async (orderId) => {
     try {
-      const response = await api.get(`/Order/get-order-detail/${orderId}`);
+      const response = await api.get(`/get-order-detail/${orderId}`);
       return response.data;
     } catch (error) {
-      console.warn('Lỗi khi lấy chi tiết đơn hàng:', error.message);
-      throw new Error('Không thể lấy chi tiết đơn hàng');
+      console.error('Error getting order details:', error);
+      throw error;
     }
   },
 
-  // Cập nhật trạng thái đơn hàng
+  // Update order status
   updateStatus: async (orderId, status) => {
     try {
-      const response = await api.patch(`/Order/update-status/${orderId}`, { status });
+      const response = await api.patch(`/update-status/${orderId}`, { status });
       return response.data;
     } catch (error) {
-      console.warn('Lỗi khi cập nhật trạng thái đơn hàng:', error.message);
-      throw new Error('Không thể cập nhật trạng thái đơn hàng');
+      console.error('Error updating order status:', error);
+      throw error;
     }
   },
 
-  // Hủy đơn hàng
+  // Cancel order
   cancel: async (orderId) => {
     try {
-      const response = await api.patch(`/Order/cancel-order/${orderId}`);
+      const response = await api.patch(`/cancel-order/${orderId}`);
       return response.data;
     } catch (error) {
-      console.warn('Lỗi khi hủy đơn hàng:', error.message);
-      throw new Error('Không thể hủy đơn hàng');
+      console.error('Error canceling order:', error);
+      throw error;
     }
   }
 }; 

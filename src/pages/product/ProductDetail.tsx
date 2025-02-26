@@ -25,6 +25,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { ProductAPI } from '../../store/apiProduct';
+import styles from './ProductDetail.module.css';
 
 interface Brand {
   $id: string;
@@ -115,12 +116,27 @@ const ProductDetail: React.FC = () => {
     const fetchProductDetail = async () => {
       try {
         setLoading(true);
-        if (id) {
-          const data = await ProductAPI.getDetail(parseInt(id));
-          setProduct(data);
-          if (data.productImages.$values.length > 0) {
-            setSelectedImage(data.productImages.$values[0].productImage);
-          }
+        setError(null); // Reset error state
+        if (!id) {
+          setError('Product ID is required');
+          return;
+        }
+        
+        const productId = parseInt(id);
+        if (isNaN(productId)) {
+          setError('Invalid product ID');
+          return;
+        }
+
+        const data = await ProductAPI.getDetail(productId);
+        if (!data) {
+          setError('Product not found');
+          return;
+        }
+
+        setProduct(data);
+        if (data.productImages.$values.length > 0) {
+          setSelectedImage(data.productImages.$values[0].productImage);
         }
       } catch (error) {
         console.error('Error fetching product detail:', error);
@@ -163,171 +179,188 @@ const ProductDetail: React.FC = () => {
     : 0;
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={6}>
-          <Card>
-            <CardMedia
-              component="img"
-              height="400"
-              image={selectedImage || product.productImages.$values[0].productImage}
-              alt={product.productName}
-              sx={{ objectFit: 'contain' }}
-            />
-          </Card>
-          <ImageList sx={{ mt: 2 }} cols={4} rowHeight={100}>
-            {product.productImages.$values.map((image) => (
-              <ImageListItem 
-                key={image.productImageId}
-                sx={{ 
-                  cursor: 'pointer',
-                  border: selectedImage === image.productImage ? '2px solid primary.main' : 'none'
-                }}
-                onClick={() => setSelectedImage(image.productImage)}
-              >
-                <img
-                  src={image.productImage}
-                  alt={`${product.productName}-${image.productImageId}`}
-                  loading="lazy"
-                  style={{ height: '100%', objectFit: 'cover' }}
-                />
-              </ImageListItem>
-            ))}
-          </ImageList>
-        </Grid>
+    <div className={styles.productDetailContainer}>
+      <Container maxWidth="lg">
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={6}>
+            <Card className={styles.mainImage}>
+              <CardMedia
+                component="img"
+                height="400"
+                image={selectedImage || product.productImages.$values[0].productImage}
+                alt={product.productName}
+                sx={{ objectFit: 'contain' }}
+              />
+            </Card>
+            <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
+              {product.productImages.$values.map((image) => (
+                <ImageListItem 
+                  key={image.productImageId}
+                  className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''}`}
+                  onClick={() => setSelectedImage(image.productImage)}
+                >
+                  <img
+                    src={image.productImage}
+                    alt={`${product.productName}-${image.productImageId}`}
+                    loading="lazy"
+                    style={{ height: '100%', objectFit: 'cover' }}
+                  />
+                </ImageListItem>
+              ))}
+            </ImageList>
+          </Grid>
 
-        <Grid item xs={12} md={6}>
-          <Typography variant="h4" gutterBottom>
-            {product.productName}
-          </Typography>
-
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-            <Rating value={averageRating} precision={0.1} readOnly />
-            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-              ({averageRating.toFixed(1)}) · {product.feedbacks.$values.length} reviews
+          <Grid item xs={12} md={6}>
+            <Typography variant="h4" className={styles.productTitle}>
+              {product.productName}
             </Typography>
-          </Box>
-          
-          <Typography variant="h5" color="primary" gutterBottom>
-            ${product.price.toLocaleString()}
-            {product.discount > 0 && (
-              <Typography
-                component="span"
-                variant="h6"
-                sx={{
-                  color: 'error.main',
-                  ml: 2,
-                  textDecoration: 'line-through'
-                }}
-              >
-                ${(product.price * (1 + product.discount)).toLocaleString()}
+
+            <div className={styles.ratingContainer}>
+              <Rating value={averageRating} precision={0.1} readOnly />
+              <Typography variant="body2" color="text.secondary">
+                ({averageRating.toFixed(1)}) · {product.feedbacks.$values.length} reviews
               </Typography>
-            )}
-          </Typography>
+            </div>
+            
+            <div className={styles.priceContainer}>
+              <Typography variant="h4" className={styles.currentPrice}>
+                ${product.price.toLocaleString()}
+              </Typography>
+              {product.discount > 0 && (
+                <Typography variant="h6" className={styles.discountPrice}>
+                  ${(product.price * (1 + product.discount)).toLocaleString()}
+                </Typography>
+              )}
+            </div>
 
-          <Typography variant="body1" paragraph>
-            {product.summary}
-          </Typography>
+            <Typography variant="body1" className={styles.summary}>
+              {product.summary}
+            </Typography>
 
-          <List>
-            <ListItem>
-              <ListItemText primary="Size" secondary={product.size} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Brand" secondary={product.brand.brandName} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Category" secondary={product.category.categoryName} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="Available Quantity" secondary={product.quantity} />
-            </ListItem>
-          </List>
+            <List>
+              <ListItem>
+                <ListItemText primary="Size" secondary={product.size} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="Brand" secondary={product.brand.brandName} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="Category" secondary={product.category.categoryName} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="Available Quantity" secondary={product.quantity} />
+              </ListItem>
+            </List>
 
-          <Box sx={{ my: 2 }}>
-            <Typography variant="subtitle1" gutterBottom>Quantity:</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-              <IconButton onClick={() => handleQuantityChange(-1)} disabled={quantity <= 1}>
+            <div className={styles.quantityContainer}>
+              <Typography variant="subtitle1">Quantity:</Typography>
+              <IconButton 
+                onClick={() => handleQuantityChange(-1)} 
+                disabled={quantity <= 1}
+                className={styles.quantityButton}
+              >
                 <RemoveIcon />
               </IconButton>
               <Typography>{quantity}</Typography>
-              <IconButton onClick={() => handleQuantityChange(1)} disabled={quantity >= product.quantity}>
+              <IconButton 
+                onClick={() => handleQuantityChange(1)} 
+                disabled={quantity >= product.quantity}
+                className={styles.quantityButton}
+              >
                 <AddIcon />
               </IconButton>
-            </Box>
-          </Box>
+            </div>
 
-          <Button 
-            variant="contained" 
-            size="large" 
-            fullWidth 
-            sx={{ mt: 2 }}
-          >
-            Add to Cart
-          </Button>
-        </Grid>
+            <Button 
+              variant="contained" 
+              size="large" 
+              fullWidth 
+              className={styles.addToCartButton}
+            >
+              Add to Cart
+            </Button>
+          </Grid>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3, mt: 4 }}>
-            <Typography variant="h6" gutterBottom>Suitable Skin Types</Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-              {product.skinTypes.$values.map((type) => (
-                <Chip key={type.skinTypeId} label={type.skinTypeName} />
-              ))}
-            </Stack>
+          <Grid item xs={12}>
+            <Paper className={styles.infoSection}>
+              <Typography variant="h6" className={styles.sectionTitle}>
+                Suitable Skin Types
+              </Typography>
+              <div className={styles.chipContainer}>
+                {product.skinTypes.$values.map((type) => (
+                  <Chip 
+                    key={type.skinTypeId} 
+                    label={type.skinTypeName}
+                    className={styles.chip}
+                  />
+                ))}
+              </div>
 
-            <Divider sx={{ my: 3 }} />
+              <Divider />
 
-            <Typography variant="h6" gutterBottom>Functions</Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-              {product.functions.$values.map((func) => (
-                <Chip key={func.functionId} label={func.functionName} />
-              ))}
-            </Stack>
+              <Typography variant="h6" className={styles.sectionTitle}>
+                Functions
+              </Typography>
+              <div className={styles.chipContainer}>
+                {product.functions.$values.map((func) => (
+                  <Chip 
+                    key={func.functionId} 
+                    label={func.functionName}
+                    className={styles.chip}
+                  />
+                ))}
+              </div>
 
-            <Divider sx={{ my: 3 }} />
+              <Divider />
 
-            <Typography variant="h6" gutterBottom>Ingredients</Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 3 }}>
-              {product.ingredients.$values.map((ingredient) => (
-                <Chip key={ingredient.ingredientId} label={ingredient.ingredientName} />
-              ))}
-            </Stack>
-          </Paper>
-        </Grid>
+              <Typography variant="h6" className={styles.sectionTitle}>
+                Ingredients
+              </Typography>
+              <div className={styles.chipContainer}>
+                {product.ingredients.$values.map((ingredient) => (
+                  <Chip 
+                    key={ingredient.ingredientId} 
+                    label={ingredient.ingredientName}
+                    className={styles.chip}
+                  />
+                ))}
+              </div>
+            </Paper>
+          </Grid>
 
-        <Grid item xs={12}>
-          <Paper sx={{ p: 3, mt: 4 }}>
-            <Typography variant="h6" gutterBottom>
-              Customer Feedback & Ratings
-            </Typography>
-            {product.feedbacks.$values.length > 0 ? (
-              <List>
-                {product.feedbacks.$values.map((feedback) => (
-                  <ListItem key={feedback.feedbackId} divider>
-                    <Box sx={{ width: '100%' }}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                        <Rating value={feedback.rating} precision={0.1} readOnly size="small" />
-                        <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                          {new Date(feedback.createdDate).toLocaleDateString()}
+          <Grid item xs={12}>
+            <Paper className={styles.reviewSection}>
+              <Typography variant="h6" className={styles.sectionTitle}>
+                Customer Feedback & Ratings
+              </Typography>
+              {product.feedbacks.$values.length > 0 ? (
+                <List>
+                  {product.feedbacks.$values.map((feedback) => (
+                    <ListItem key={feedback.feedbackId} className={styles.reviewItem}>
+                      <Box sx={{ width: '100%' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                          <Rating value={feedback.rating} precision={0.1} readOnly size="small" />
+                          <Typography variant="body2" className={styles.reviewDate}>
+                            {new Date(feedback.createdDate).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body1" className={styles.reviewText}>
+                          {feedback.comment}
                         </Typography>
                       </Box>
-                      <Typography variant="body1">
-                        {feedback.comment}
-                      </Typography>
-                    </Box>
-                  </ListItem>
-                ))}
-              </List>
-            ) : (
-              <Typography variant="body1" color="text.secondary">
-                No reviews yet.
-              </Typography>
-            )}
-          </Paper>
+                    </ListItem>
+                  ))}
+                </List>
+              ) : (
+                <Typography variant="body1" className={styles.noReviews}>
+                  No reviews yet.
+                </Typography>
+              )}
+            </Paper>
+          </Grid>
         </Grid>
-      </Grid>
-    </Container>
+      </Container>
+    </div>
   );
 };
 
