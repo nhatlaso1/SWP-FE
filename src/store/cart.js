@@ -27,6 +27,10 @@ export function cartActions(set, get) {
 
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         state.cart.cart = updatedCart;
+        state.notification.data.push({
+          status: "SUCCESS",
+          content: "Add to cart successfully!",
+        });
       });
     },
 
@@ -49,6 +53,10 @@ export function cartActions(set, get) {
 
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         state.cart.cart = updatedCart;
+        state.notification.data.push({
+          status: "SUCCESS",
+          content: "Remote to cart successfully!",
+        });
       });
     },
 

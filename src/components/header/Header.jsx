@@ -25,7 +25,7 @@ const Header = () => {
 
   const changePassword = useStore((store) => store.changePassword);
   const user = useStore((store) => store.profile.user);
-
+  const addItem = useStore((store) => store.addItem);
 
   const token = localStorage.getItem("token");
   const openMenu = Boolean(anchorEl);
@@ -88,7 +88,18 @@ const Header = () => {
         <div className="nav-wrap">
           <a href="">Home</a>
           <a href="">Voucher</a>
-          <a href="">
+          <a
+            href=""
+            onClick={() => {
+              addItem({
+                productId: 1,
+                productName:
+                  'Màn hình ASUS TUF GAMING VG27AQ1A 27" IPS 2K 170Hz G-Sync HDR chuyên game',
+                price: 4890000,
+                productImage: "/products/product-1.png",
+              });
+            }}
+          >
             For Sales
           </a>
           <a href="">Products</a>

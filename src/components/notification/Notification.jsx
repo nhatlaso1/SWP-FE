@@ -22,7 +22,7 @@ const Notification = () => {
     <Snackbar
       anchorOrigin={{ vertical: "top", horizontal: "center" }}
       open={open}
-      autoHideDuration={5000}
+      autoHideDuration={2000}
       onClose={() => setOpen(false)}
     >
       {item?.status === "ERROR" ? (

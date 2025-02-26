@@ -201,7 +201,7 @@ const Cart = () => {
                       image={product.productImage}
                       alt={product.productName}
                     />
-                    <CardContent sx={{ flex: 1, display: "flex", justifyContent: "space-between", gap: 2 }}>
+                    <CardContent sx={{ flex: 1, display: "flex", gap: 2 }}>
                       <Typography fontWeight={"bold"} variant="subtitle1">
                         {product.productName}
                       </Typography>

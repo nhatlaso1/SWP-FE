@@ -5,6 +5,7 @@ import { initialProfile, profileActions } from "./store/profile";
 import { initialNotification, notificationActions } from "./store/notification";
 import { initialProducts, productsActions } from "./store/product";
 import { cartActions, initialCart } from "./store/cart";
+import { initialRoutine, routineActions } from "./store/routine";
 
 export const useStore = create(
   immer((set, get) => ({
@@ -18,5 +19,7 @@ export const useStore = create(
     ...notificationActions(set, get),
     cart: initialCart,
     ...cartActions(set, get),
+    routine: initialRoutine,
+    ...routineActions(set, get),
   }))
 );
