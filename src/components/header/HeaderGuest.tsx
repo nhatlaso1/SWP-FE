@@ -19,6 +19,7 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useFormik } from "formik";
 
 import { useStore } from "../../store";
@@ -118,10 +119,8 @@ const HeaderGuest: React.FC = () => {
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />
-          |
-          <div>
-            <img src="" alt="flag" />
-            US <span>(EN)</span>
+          |<div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+            <ShoppingCartOutlinedIcon />
           </div>
           <Button variant="text" onClick={() => navigate("/login")}>
             Login

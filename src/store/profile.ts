@@ -135,18 +135,47 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
       }
     },
 
-    register: async (userBody) => {
-      set((state) => { state.loading.isLoading = true; });
+    register: async (body) => {
+      set((state) => {
+        state.loading.isLoading = true;
+      });
       try {
-        const response = await axios.post(`${BASE_URL}/register`, userBody);
-        handleSuccess(response?.data?.message || "Registration successful");
-      } catch (error) {
-        handleError(error);
+        const response = await axios.post(
+          `${BASE_URL}/register`,
+          body
+        );
+        const status = response?.data?.status;
+        const message = response?.data?.detail || "Register successfully!";
+        set((state) => {
+          if (status === 400) {
+            state.profile.error = message; // Chắc chắn error luôn là string hoặc undefined
+            state.notification.data.push({
+              status: "ERROR",
+              content: message,
+            });
+          } else {
+            state.profile.error = undefined;
+            state.notification.data.push({
+              status: "SUCCESS",
+              content: "Register successfully!",
+            });
+          }
+        });
+      } catch (error: any) {
+        const message = error?.response?.data?.message || error?.message || "An unexpected error occurred";
+        set((state) => {
+          state.profile.error = message;
+          state.notification.data.push({
+            status: "ERROR",
+            content: message,
+          });
+        });
       } finally {
-        set((state) => { state.loading.isLoading = false; });
+        set((state) => {
+          state.loading.isLoading = false;
+        });
       }
-    },
-
+    },    
     refreshToken: async () => {
       set((state) => { state.loading.isLoading = true; });
       try {

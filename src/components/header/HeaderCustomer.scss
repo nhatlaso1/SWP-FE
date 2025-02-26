@@ -1,6 +1,7 @@
+// Điều chỉnh z-index theo đúng chuẩn của MUI (dialog: 1300, menu: 1200)
 .headercustomer {
   position: sticky;
-  z-index: 999999;
+  z-index: 1100; // Đủ cao nhưng không quá mức
   top: 0;
   display: grid;
   grid-template-columns: max-content 1fr max-content;
@@ -17,6 +18,7 @@
   &.visible {
     transform: translateY(0);
   }
+
 
   .branch-wrap {
     display: flex;

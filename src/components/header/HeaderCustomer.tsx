@@ -19,6 +19,7 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useFormik } from "formik";
 
 import { useStore } from "../../store";
@@ -69,7 +70,11 @@ const HeaderCustomer: React.FC = () => {
   const handleClose = () => {
     setOpen(false);
   };
-
+  const handleLogout = () => {
+    logout(navigate); // Gọi hàm logout từ Zustand
+    handleCloseMenu(); // Đóng menu sau khi logout
+  };
+  
   const formik = useFormik<IChangePasswordForm>({
     initialValues: {
       oldPassword: "",
@@ -108,13 +113,22 @@ const HeaderCustomer: React.FC = () => {
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
-          <div>
-            <img src="" alt="flag" />
-            US <span>(EN)</span>
+          <div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+            <ShoppingCartOutlinedIcon />
           </div>
-          <Button variant="text" onClick={() => navigate("/profile")}>
-            Profile
-          </Button>
+
+          <IconButton onClick={handleOpenMenu} className="header-staff__user-icon">
+            <PersonIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseMenu}
+            MenuListProps={{ "aria-labelledby": "user-menu-button" }}
+          >
+            <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
         </div>
       </nav>
       {/* <div className="action-group-wrap">

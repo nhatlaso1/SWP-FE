@@ -24,6 +24,8 @@ import CustomerLayout from "./layouts/CustomerLayout";
 import Checkout from "./pages/checkout/Checkout";
 import ProductList from "./pages/product/ProductList";
 import SaleProducts from "./pages/product/SaleProducts";
+import ProductDetail from "./pages/product/ProductDetail";
+import Register from "./pages/register/Register";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -32,6 +34,7 @@ function App() {
 
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
+    { path: "register", element: <Register /> },
     {
       path: "",
       element: <CustomerLayout />,
@@ -39,6 +42,7 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
+        { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
         {
           path: "checkout",
