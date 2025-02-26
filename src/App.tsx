@@ -22,6 +22,8 @@ import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import CustomerLayout from "./layouts/CustomerLayout";
 import Checkout from "./pages/checkout/Checkout";
+import ProductList from "./pages/product/ProductList";
+import SaleProducts from "./pages/product/SaleProducts";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -36,6 +38,8 @@ function App() {
       children: [
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
+        { path: "products", element: <ProductList /> },
+        { path: "sales", element: <SaleProducts /> },
         {
           path: "checkout",
           element: (

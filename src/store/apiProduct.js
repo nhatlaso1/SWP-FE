@@ -71,6 +71,16 @@ export const ProductAPI = {
     }
   },
 
+  getDetail: async (productId) => {
+    try {
+      const response = await api.get(`/Product/get-product-detail?productId=${productId}`);
+      return response.data;
+    } catch (error) {
+      console.warn('Error fetching product detail:', error.message);
+      throw new Error('Could not fetch product details');
+    }
+  },
+
   // Tạo sản phẩm mới
   create: async (productData) => {
     try {
