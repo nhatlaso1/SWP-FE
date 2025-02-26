@@ -58,7 +58,7 @@ const Checkout: React.FC = () => {
     setWards([]);
     getWardsByDistrict(districtCode).then(setWards).catch((error) => console.error("Error fetching wards:", error));
   };
-
+   
   const applyVoucher = () => {
     let discountValue = 0;
 
@@ -191,6 +191,7 @@ const Checkout: React.FC = () => {
                 <Button
                   variant="contained"
                   color="secondary"
+                  onClick={() => navigate("/success")}
                   style={{ backgroundColor: '#ff69b4' }}
                 >
                   Đặt hàng
