@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Field, Form, Formik, useFormik } from "formik";
 import * as Yup from "yup";
@@ -42,14 +42,15 @@ const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeStep, setActiveStep] = useState(0);
-  const [voucher, setVoucher] = useState("");
+  const [voucher, setVoucher] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-
+  const [status, setStatus] = useState('');
+  const token = localStorage.getItem("token");
   const onUpdateQuantity = useStore((store) => store.updateQuantity);
   const onRemoveItem = useStore((store) => store.removeItem);
   const onCreateOrder = useStore((store) => store.createOrder);
-
+  const orderIdRef = useRef(1);
   const cart = useStore((store) => store.cart.cart);
   const formik = useFormik({
     initialValues: {
@@ -72,13 +73,13 @@ const Cart = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-
+    const paymentStatus = searchParams.get('status');
     // Xử lý điều hướng theo kết quả thanh toán
-    if (location.pathname === "/success") {
-      setActiveStep(3); // Thành công
-    } else if (location.pathname === "/fail") {
-      navigate("/fail"); // Thất bại
+    if (paymentStatus) {
+      setStatus(paymentStatus); // Lưu trạng thái (success/fail)
+      setActiveStep(3); // Chuyển qua bước 3 bất kể trạng thái
     }
+  
 
     // Cập nhật giỏ hàng vào form
     formik.setFieldValue("products", cart);
@@ -92,23 +93,40 @@ const Cart = () => {
       .required("Phone number is required"),
   });
   const [orderIds, setOrderIds] = useState([]);
+  const handlePayLater = () => {
+    setStatus('paylater'); // Lưu trạng thái thanh toán
+    setActiveStep(3); // Chuyển qua bước 3
+  };
+  const handlePayment = async () => {
+    if (!orderIdRef.current) {
+      console.error("Missing orderId. Cannot proceed with payment.");
+      alert("Không tìm thấy mã đơn hàng.");
+      return;
+    }
 
-  const handlePayment = async (orderId) => {
     try {
-      const token = localStorage.getItem("token"); // Lấy token từ localStorage
+      const token = localStorage.getItem("token");
       if (!token) {
         console.error("No token found. Please log in.");
+        alert("Bạn cần đăng nhập để thanh toán.");
         return;
       }
 
-      const paymentUrl = await createPayment(orderId, token); // Truyền token vào API
-      if (paymentUrl) {
-        window.location.href = paymentUrl; // Chuyển hướng đến trang thanh toán
+      const paymentUrl = await createPayment(orderIdRef.current, token);
+      console.log("Received payment URL:", paymentUrl);
+
+      if (paymentUrl && paymentUrl.startsWith("http")) {
+        window.location.href = paymentUrl; // Chuyển hướng trực tiếp
       } else {
-        console.error("Failed to get payment URL.");
+        console.error("Invalid payment URL:", paymentUrl);
+        alert("Không thể lấy liên kết thanh toán. Vui lòng thử lại.");
       }
     } catch (error) {
-      console.error("Error calling payment API:", error);
+      console.error(
+        "Error calling payment API:",
+        error.response || error.message
+      );
+      alert("Đã xảy ra lỗi khi kết nối với cổng thanh toán.");
     }
   };
 
@@ -429,7 +447,7 @@ const Cart = () => {
                   type="submit"
                   sx={{ py: 1.5 }}
                 >
-                  ORDER NOW
+                  CHECKOUT
                 </Button>
               </form>
             ))}
@@ -453,15 +471,15 @@ const Cart = () => {
                     })),
                   };
 
-                  const response = await onCreateOrder(bodyCreateOrder);
+                  const response = await onCreateOrder(
+                    bodyCreateOrder,
+                    voucher
+                  );
                   console.log("Create order response:", response);
 
                   if (response && response.orderId) {
-                    setOrderIds((prevOrderIds) => [
-                      ...prevOrderIds,
-                      response.orderId,
-                    ]);
-                    await handlePayment(response.orderId);
+                    orderIdRef.current = response.orderId;
+                    setActiveStep(2); // Chuyển sang bước chọn phương thức thanh toán
                   } else {
                     console.error("Failed to get orderId:", response);
                   }
@@ -521,6 +539,7 @@ const Cart = () => {
               )}
             </Formik>
           )}
+
           {activeStep === 2 && (
             <Box
               sx={{
@@ -532,11 +551,29 @@ const Cart = () => {
               }}
             >
               <Typography variant="h4" fontWeight={"bold"}>
-                Payment container
+                Chọn phương thức thanh toán
               </Typography>
-              <CheckoutSuccess />
+
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handlePayment()}
+                sx={{ py: 1.5 }}
+              >
+                Thanh toán qua Ngân hàng
+              </Button>
+
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={handlePayLater}
+                sx={{ py: 1.5 }}
+              >
+                Thanh toán khi nhận hàng (COD)
+              </Button>
             </Box>
           )}
+
           {activeStep === 3 && (
             <Box
               sx={{

@@ -10,7 +10,7 @@ export interface CartActions {
   updateQuantity: (id: any, quantity: any) => void;
   removeItem: (id: any) => void;
   clearCart: () => void;
-  createOrder: (body: any) => Promise<void>;
+  createOrder: ( body: any, voucher: number ) => Promise<void>;
 }
 
 export const initialCart: CartState = {
@@ -81,12 +81,13 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         state.cart.cart = [];
       });
     },
-    createOrder: async (body) => {
+    createOrder: async (body,voucher) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/Order/create-order`, body);
+        const response = await axios.post(`${BASE_URL}/Order/create-order?voucherId=${voucher}`
+          , body);
         return response.data; 
       } catch (error: any) {
         set((state) => {
