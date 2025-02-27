@@ -10,6 +10,7 @@ import {
   CardMedia,
   Grid,
   IconButton,
+  MenuItem,
   Step,
   StepLabel,
   Stepper,
@@ -22,20 +23,23 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import PeopleIcon from "@mui/icons-material/People";
 import PaymentIcon from "@mui/icons-material/Payment";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ArrowBackIosNewOutlinedIcon from "@mui/icons-material/ArrowBackIosNewOutlined";
-
+import PublishedWithChangesIcon from "@mui/icons-material/PublishedWithChanges";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AccountBalanceIcon from "@mui/icons-material/AccountBalance";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { useStore } from "../../store";
 
 import "./Cart.scss";
 import CheckoutSuccess from "../checkout/CheckoutSuccess";
 import { createPayment } from "../../store/payment.api";
+import CheckoutFail from "../checkout/CheckoutFail";
 
 const steps = [
   { label: "Shopping cart", icon: <ShoppingBagIcon /> },
   { label: "Order information", icon: <PeopleIcon /> },
   { label: "Payment", icon: <PaymentIcon /> },
-  { label: "Completed", icon: <CheckCircleIcon /> },
+  { label: "Result", icon: <PublishedWithChangesIcon /> },
 ];
 
 const Cart = () => {
@@ -45,7 +49,7 @@ const Cart = () => {
   const [voucher, setVoucher] = useState(0);
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState('');
+  const [status, setStatus] = useState("");
   const token = localStorage.getItem("token");
   const onUpdateQuantity = useStore((store) => store.updateQuantity);
   const onRemoveItem = useStore((store) => store.removeItem);
@@ -73,13 +77,12 @@ const Cart = () => {
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const paymentStatus = searchParams.get('status');
+    const paymentStatus = searchParams.get("status");
     // Xử lý điều hướng theo kết quả thanh toán
     if (paymentStatus) {
       setStatus(paymentStatus); // Lưu trạng thái (success/fail)
       setActiveStep(3); // Chuyển qua bước 3 bất kể trạng thái
     }
-  
 
     // Cập nhật giỏ hàng vào form
     formik.setFieldValue("products", cart);
@@ -92,11 +95,6 @@ const Cart = () => {
       .matches(/^[0-9]{10}$/, "Phone number must be 10 digits")
       .required("Phone number is required"),
   });
-  const [orderIds, setOrderIds] = useState([]);
-  const handlePayLater = () => {
-    setStatus('paylater'); // Lưu trạng thái thanh toán
-    setActiveStep(3); // Chuyển qua bước 3
-  };
   const handlePayment = async () => {
     if (!orderIdRef.current) {
       console.error("Missing orderId. Cannot proceed with payment.");
@@ -105,7 +103,6 @@ const Cart = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
       if (!token) {
         console.error("No token found. Please log in.");
         alert("Bạn cần đăng nhập để thanh toán.");
@@ -151,35 +148,20 @@ const Cart = () => {
     let discountValue = 0;
 
     switch (voucher) {
-      case "SALE50":
+      case "1":
+        discountValue = 10000;
+        break;
+      case "2":
+        discountValue = 20000;
+        break;
+      case "3":
+        discountValue = 30000;
+        break;
+      case "4":
+        discountValue = 40000;
+        break;
+      case "5":
         discountValue = 50000;
-        break;
-      case "SALE100":
-        discountValue = 100000;
-        break;
-      case "SALE150":
-        discountValue = 150000;
-        break;
-      case "SALE200":
-        discountValue = 200000;
-        break;
-      case "PERCENT5":
-        discountValue = totalPrice * 0.05;
-        break;
-      case "PERCENT10":
-        discountValue = totalPrice * 0.1;
-        break;
-      case "PERCENT15":
-        discountValue = totalPrice * 0.15;
-        break;
-      case "PERCENT20":
-        discountValue = totalPrice * 0.2;
-        break;
-      case "PERCENT25":
-        discountValue = totalPrice * 0.25;
-        break;
-      case "PERCENT30":
-        discountValue = totalPrice * 0.3;
         break;
       default:
         discountValue = 0;
@@ -276,7 +258,15 @@ const Cart = () => {
 
           {activeStep === 0 &&
             (formik.values.products.length === 0 ? (
-              <Typography sx={{ textAlign: "center" }}>
+              <Typography
+                sx={{
+                  textAlign: "center",
+                  fontSize: "1.5rem",
+                  fontWeight: "bold",
+                  color: "#888",
+                  mt: 4,
+                }}
+              >
                 Your shopping cart is empty.
               </Typography>
             ) : (
@@ -284,15 +274,16 @@ const Cart = () => {
                 {formik.values.products.map((product, index) => (
                   <Card
                     key={index}
-                    sx={{ display: "flex", mb: 2, boxShadow: "none" }}
+                    sx={{
+                      display: "flex",
+                      mb: 2,
+                      borderRadius: "12px",
+                      boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                    }}
                   >
                     <CardMedia
                       component="img"
-                      style={{
-                        width: 150,
-                        objectFit: "cover",
-                        aspectRatio: "1/1",
-                      }}
+                      sx={{ width: 150, borderRadius: "12px 0 0 12px" }}
                       image={product.productImage}
                       alt={product.productName}
                     />
@@ -301,142 +292,141 @@ const Cart = () => {
                         flex: 1,
                         display: "flex",
                         justifyContent: "space-between",
-                        gap: 2,
+                        alignItems: "center",
                       }}
                     >
-                      <Typography fontWeight={"bold"} variant="subtitle1">
-                        {product.productName}
-                      </Typography>
-                      <Box
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "center",
-                          minWidth: 186,
-                          gap: 2,
-                        }}
-                      >
+                      <Box>
+                        <Typography variant="h6" fontWeight="bold">
+                          {product.productName}
+                        </Typography>
                         <Typography
-                          fontWeight={"bold"}
-                          color="error"
                           variant="h6"
+                          color="error"
+                          fontWeight="bold"
                         >
                           {product.price.toLocaleString()}đ
                         </Typography>
-                        <Grid
-                          container
-                          spacing={1}
-                          alignItems="center"
-                          sx={{ mt: 1 }}
+                      </Box>
+
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <IconButton
+                          onClick={() =>
+                            updateQuantity(index, product.quantity - 1)
+                          }
                         >
-                          <Grid item>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                updateQuantity(index, product.quantity - 1)
-                              }
-                            >
-                              <RemoveIcon />
-                            </IconButton>
-                          </Grid>
-                          <Grid item>
-                            <TextField
-                              size="small"
-                              sx={{ width: 50 }}
-                              type="number"
-                              slotProps={{ min: 1 }}
-                              name={`products[${index}].quantity`}
-                              value={formik.values.products[index].quantity}
-                              onChange={formik.handleChange}
-                              error={
-                                formik.touched.products &&
-                                formik.errors.products &&
-                                Boolean(formik.errors.products[index]?.quantity)
-                              }
-                              helperText={
-                                formik.errors.products &&
-                                formik.errors.products[index]?.quantity
-                              }
-                            />
-                          </Grid>
-                          <Grid item>
-                            <IconButton
-                              size="small"
-                              onClick={() =>
-                                updateQuantity(index, product.quantity + 1)
-                              }
-                            >
-                              <AddIcon />
-                            </IconButton>
-                          </Grid>
-                          <Grid item>
-                            <IconButton
-                              color="error"
-                              onClick={() => removeProduct(index)}
-                            >
-                              <DeleteIcon />
-                            </IconButton>
-                          </Grid>
-                        </Grid>
+                          <RemoveIcon />
+                        </IconButton>
+                        <TextField
+                          size="small"
+                          sx={{ width: 50 }}
+                          type="number"
+                          name={`products[${index}].quantity`}
+                          value={formik.values.products[index].quantity}
+                          onChange={formik.handleChange}
+                          inputProps={{ min: 1 }}
+                        />
+                        <IconButton
+                          onClick={() =>
+                            updateQuantity(index, product.quantity + 1)
+                          }
+                        >
+                          <AddIcon />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => removeProduct(index)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
                       </Box>
                     </CardContent>
                   </Card>
                 ))}
 
                 <Box
-                  sx={{ width: 500, maxWidth: "100%", display: "flex", gap: 1 }}
+                  sx={{ display: "flex", gap: 2, alignItems: "center", mt: 3 }}
                 >
                   <TextField
+                    select
                     fullWidth
-                    label="Nhập mã giảm giá"
+                    label="Your voucher"
                     variant="outlined"
                     value={voucher}
                     onChange={(e) => setVoucher(e.target.value)}
-                  />
-                  <button
+                    sx={{ flex: 1 }}
+                  >
+                    {["1", "2", "3", "4", "5"].map((option) => (
+                      <MenuItem key={option} value={option}>
+                        Voucher {option}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+
+                  <Button
+                    variant="contained"
+                    startIcon={<LocalOfferIcon />}
                     onClick={(e) => {
                       applyVoucher();
                       e.preventDefault();
                       e.stopPropagation();
                     }}
-                    style={{
-                      padding: "8px 16px",
+                    sx={{
                       backgroundColor: "#ff69b4",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: "4px",
-                      cursor: "pointer",
+                      "&:hover": { backgroundColor: "#d14795" },
+                      padding: "12px 20px",
                     }}
                   >
-                    Áp dụng
-                  </button>
+                    Apply
+                  </Button>
                 </Box>
 
-                <Box sx={{ textAlign: "right", my: 4 }}>
+                <Box sx={{ mt: 4, borderTop: "2px solid #ddd", pt: 2 }}>
                   <Typography
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      marginBottom: 8,
-                    }}
-                    fontWeight={"bold"}
-                  >
-                    Shipping fee: <b>Free</b>
-                  </Typography>
-                  <Typography
-                    style={{ display: "flex", justifyContent: "space-between" }}
                     variant="h6"
-                    fontWeight={"bold"}
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="space-between"
                   >
-                    Total:
-                    <Typography
-                      fontWeight={"bold"}
-                      variant="h6"
-                      component="span"
-                      color="error"
-                    >
+                    Shipping fee: <span style={{ color: "#4caf50" }}>Free</span>
+                  </Typography>
+
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="space-between"
+                  >
+                    Total:{" "}
+                    <span style={{ color: "#f44336" }}>
                       {total.toLocaleString()}đ
-                    </Typography>
+                    </span>
+                  </Typography>
+
+                  <Typography
+                    variant="h6"
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="space-between"
+                  >
+                    Discount:{" "}
+                    <span style={{ color: "#4caf50" }}>
+                      -{discount.toLocaleString()}đ
+                    </span>
+                  </Typography>
+
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    display="flex"
+                    justifyContent="space-between"
+                    mt={2}
+                  >
+                    Final amount:{" "}
+                    <span style={{ color: "#f44336" }}>
+                      {(total - discount).toLocaleString()}đ
+                    </span>
                   </Typography>
                 </Box>
 
@@ -445,7 +435,7 @@ const Cart = () => {
                   color="error"
                   fullWidth
                   type="submit"
-                  sx={{ py: 1.5 }}
+                  sx={{ mt: 3, py: 1.5, fontSize: "1.1rem" }}
                 >
                   CHECKOUT
                 </Button>
@@ -473,7 +463,8 @@ const Cart = () => {
 
                   const response = await onCreateOrder(
                     bodyCreateOrder,
-                    voucher
+                    voucher,
+                    token
                   );
                   console.log("Create order response:", response);
 
@@ -482,6 +473,11 @@ const Cart = () => {
                     setActiveStep(2); // Chuyển sang bước chọn phương thức thanh toán
                   } else {
                     console.error("Failed to get orderId:", response);
+
+                    // Kiểm tra nếu lỗi là 401 (Unauthorized) => chuyển hướng đến trang đăng nhập
+                    if (response?.status === 401) {
+                      navigate("/login");
+                    }
                   }
                 } catch (error) {
                   console.error("Error creating order:", error);
@@ -546,32 +542,66 @@ const Cart = () => {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-                gap: 2,
+                gap: 3,
                 mx: "auto",
+                maxWidth: 500,
+                padding: 4,
+                borderRadius: "20px",
+                backgroundColor: "#f3f4f6",
+                boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
               }}
             >
-              <Typography variant="h4" fontWeight={"bold"}>
-                Chọn phương thức thanh toán
+              <Typography variant="h4" fontWeight="bold" color="primary" mb={2}>
+                Choose a Payment Method
               </Typography>
 
               <Button
                 variant="contained"
-                color="primary"
-                onClick={() => handlePayment()}
-                sx={{ py: 1.5 }}
+                startIcon={<CreditCardIcon />}
+                onClick={handlePayment}
+                sx={{
+                  width: "100%",
+                  fontSize: "1.1rem",
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  backgroundColor: "#4caf50",
+                  ":hover": { backgroundColor: "#388e3c" },
+                }}
               >
-                Thanh toán qua Thẻ Nội Địa
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={() => handlePayment()}
-                sx={{ py: 1.5 }}
-              >
-                Thanh toán qua Chuyển khoản
+                Pay with Domestic Card
               </Button>
 
-              
+              <Button
+                variant="contained"
+                startIcon={<AccountBalanceIcon />}
+                onClick={handlePayment}
+                sx={{
+                  width: "100%",
+                  fontSize: "1.1rem",
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  backgroundColor: "#2196f3",
+                  ":hover": { backgroundColor: "#1976d2" },
+                }}
+              >
+                Bank Transfer
+              </Button>
+
+              <Button
+                variant="contained"
+                startIcon={<PaymentIcon />}
+                onClick={handlePayment}
+                sx={{
+                  width: "100%",
+                  fontSize: "1.1rem",
+                  padding: "12px 20px",
+                  borderRadius: "8px",
+                  backgroundColor: "#f57c00",
+                  ":hover": { backgroundColor: "#e65100" },
+                }}
+              >
+                Pay with International Card
+              </Button>
             </Box>
           )}
 
@@ -585,9 +615,27 @@ const Cart = () => {
                 mx: "auto",
               }}
             >
-              <Typography variant="h4" fontWeight={"bold"}>
-                Payment success
-              </Typography>
+              {(() => {
+                if (status === "success") {
+                  return (
+                    <Typography variant="h4" fontWeight="bold" color="green">
+                      <CheckoutSuccess />
+                    </Typography>
+                  );
+                } else if (status === "fail") {
+                  return (
+                    <Typography variant="h4" fontWeight="bold" color="red">
+                      <CheckoutFail />
+                    </Typography>
+                  );
+                } else {
+                  return (
+                    <Typography variant="h4" fontWeight="bold">
+                      Processing payment... ⏳
+                    </Typography>
+                  );
+                }
+              })()}
             </Box>
           )}
         </Box>

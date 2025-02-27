@@ -10,7 +10,7 @@ export interface CartActions {
   updateQuantity: (id: any, quantity: any) => void;
   removeItem: (id: any) => void;
   clearCart: () => void;
-  createOrder: ( body: any, voucher: number ) => Promise<void>;
+  createOrder: (body: any, voucher: number, token: string) => Promise<void>;
 }
 
 export const initialCart: CartState = {
@@ -81,17 +81,24 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         state.cart.cart = [];
       });
     },
-    createOrder: async (body,voucher) => {
+    createOrder: async (body, voucher, token) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/Order/create-order?voucherId=${voucher}`
-          , body);
-        return response.data; 
+        const response = await axios.post(
+          `${BASE_URL}/Order/create-order?voucherId=${voucher}`,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
       } catch (error: any) {
         set((state) => {
-          const message = error?.response?.data?.message || error?.message;
+          const message = error?.response?.data?.detail || error?.message;
           state.profile.error = message;
           state.notification.data.push({
             status: "ERROR",
@@ -104,5 +111,6 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         });
       }
     },
+    
   };
 }

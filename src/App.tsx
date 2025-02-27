@@ -25,9 +25,9 @@ import Checkout from "./pages/checkout/Checkout";
 import ProductList from "./pages/product/ProductList";
 import SaleProducts from "./pages/product/SaleProducts";
 import ProductDetail from "./pages/product/ProductDetail";
-import Register from "./pages/register/Register";
 import Cart from "./pages/cart/Cart";
 import CheckoutFail from "./pages/checkout/CheckoutFail";
+import Register from "./pages/register/Register";
 
 function App() {
   const user = useStore((store) => store.profile.user);
