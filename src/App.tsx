@@ -26,7 +26,8 @@ import ProductList from "./pages/product/ProductList";
 import SaleProducts from "./pages/product/SaleProducts";
 import ProductDetail from "./pages/product/ProductDetail";
 import Register from "./pages/register/Register";
-import CheckoutSuccess from "./pages/checkout/CheckoutSuccess";
+import Cart from "./pages/cart/Cart";
+import CheckoutFail from "./pages/checkout/CheckoutFail";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -49,6 +50,7 @@ function App() {
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
+    { path: "cart", element: <Cart /> },
     {
       path: "",
       element: <CustomerLayout />,
@@ -58,7 +60,7 @@ function App() {
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
-        { path: "success", element: <CheckoutSuccess /> },
+        { path: "fail", element: <CheckoutFail /> },
         {
           path: "checkout",
           element: (

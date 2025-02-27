@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Card, 
-  CardMedia, 
-  CardContent, 
-  Typography, 
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
   Button,
   Container,
   Tabs,
@@ -17,7 +17,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
 import { CategoryAPI } from '../../store/apiCategory';
-
+import { useStore } from '../../store';
 interface Category {
   $id: string;
   categoryId: number;
@@ -43,7 +43,7 @@ const ProductList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  const addItem = useStore((store) => store.addItem);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -81,9 +81,9 @@ const ProductList: React.FC = () => {
   const filteredProducts = selectedCategory === 'all'
     ? products
     : products.filter(product => {
-        console.log('Filtering product:', product);
-        return product.categoryId === selectedCategory;
-      });
+      console.log('Filtering product:', product);
+      return product.categoryId === selectedCategory;
+    });
 
   console.log('Filtered Products:', filteredProducts);
 
@@ -109,8 +109,8 @@ const ProductList: React.FC = () => {
     <Container maxWidth="lg" sx={{ py: 4 }}>
       {categories.length > 0 && (
         <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
-          <Tabs 
-            value={selectedCategory} 
+          <Tabs
+            value={selectedCategory}
             onChange={handleCategoryChange}
             variant="scrollable"
             scrollButtons="auto"
@@ -136,10 +136,10 @@ const ProductList: React.FC = () => {
         <Grid container spacing={4}>
           {filteredProducts.map((product) => (
             <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-              <Card 
-                sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
                   flexDirection: 'column',
                   '&:hover': {
                     transform: 'scale(1.02)',
@@ -180,15 +180,18 @@ const ProductList: React.FC = () => {
                       </Typography>
                     )}
                   </Typography>
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
+                    size="large"
                     fullWidth
-                    sx={{
-                      mt: 'auto',
-                      backgroundColor: 'primary.main',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark',
-                      }
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      addItem({
+                        productId: product.productId,
+                        productName: product.productName,
+                        price: product.price,
+                        productImage: product.productImage,
+                      });
                     }}
                   >
                     Add to Cart

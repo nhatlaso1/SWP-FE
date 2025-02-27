@@ -28,6 +28,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const token = useStore((store) => store.profile.user?.token);
+  const cart = useStore((store) => store.cart.cart);
   const [provinces, setProvinces] = useState<Province[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
   const [wards, setWards] = useState<Ward[]>([]);
@@ -46,6 +47,16 @@ const Checkout: React.FC = () => {
     getProvinces().then(setProvinces).catch((error) => console.error("Error fetching provinces:", error));
   }, [token, navigate]);
 
+  useEffect(() => {
+    if (cart) {
+      const totalPrice = cart.reduce(
+        (acc: any, item: any) => acc + item.price * item.quantity,
+        0
+      );
+      setSubtotal(totalPrice);
+    }
+  }, [cart]);
+
   const handleProvinceChange = (provinceCode: number) => {
     setSelectedProvince(provinceCode);
     setDistricts([]);
@@ -58,7 +69,7 @@ const Checkout: React.FC = () => {
     setWards([]);
     getWardsByDistrict(districtCode).then(setWards).catch((error) => console.error("Error fetching wards:", error));
   };
-   
+
   const applyVoucher = () => {
     let discountValue = 0;
 
@@ -158,7 +169,7 @@ const Checkout: React.FC = () => {
             </div>
           </div>
           <Paper elevation={3} className="order-summary-container">
-          <div className="order-summary">
+            <div className="order-summary">
               <h4>Nhập mã khuyến mãi hoặc thẻ quà tặng</h4>
               <Box sx={{ width: 500, maxWidth: '100%', display: 'flex', gap: 1 }}>
                 <TextField

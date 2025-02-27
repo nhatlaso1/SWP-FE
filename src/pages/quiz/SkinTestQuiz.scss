@@ -164,7 +164,8 @@
 
         .product-item {
           img {
-            width: 100%;
+            // width: 100%;
+            width: 150px;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             border-radius: 16px;

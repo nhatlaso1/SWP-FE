@@ -25,6 +25,7 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { ProductAPI } from '../../store/apiProduct';
+import { useStore } from '../../store';
 
 interface Brand {
   $id: string;
@@ -111,6 +112,8 @@ const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
 
+  const addItem = useStore((store) => store.addItem);
+
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -177,9 +180,9 @@ const ProductDetail: React.FC = () => {
           </Card>
           <ImageList sx={{ mt: 2 }} cols={4} rowHeight={100}>
             {product.productImages.$values.map((image) => (
-              <ImageListItem 
+              <ImageListItem
                 key={image.productImageId}
-                sx={{ 
+                sx={{
                   cursor: 'pointer',
                   border: selectedImage === image.productImage ? '2px solid primary.main' : 'none'
                 }}
@@ -207,7 +210,7 @@ const ProductDetail: React.FC = () => {
               ({averageRating.toFixed(1)}) · {product.feedbacks.$values.length} reviews
             </Typography>
           </Box>
-          
+
           <Typography variant="h5" color="primary" gutterBottom>
             ${product.price.toLocaleString()}
             {product.discount > 0 && (
@@ -257,11 +260,19 @@ const ProductDetail: React.FC = () => {
             </Box>
           </Box>
 
-          <Button 
-            variant="contained" 
-            size="large" 
-            fullWidth 
+          <Button
+            variant="contained"
+            size="large"
+            fullWidth
             sx={{ mt: 2 }}
+            onClick={() => {
+              addItem({
+                productId: product.productId,
+                productName: product.productName,
+                price: product.price,
+                productImage: selectedImage || product.productImages.$values[0].productImage,
+              });
+            }}
           >
             Add to Cart
           </Button>

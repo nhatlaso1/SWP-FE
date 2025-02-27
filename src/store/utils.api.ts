@@ -6,6 +6,7 @@ export const apiEndpoints = {
   SkinTest: "SkinTest",
   Customer: "Customer",
   Order: "Order",
+  Payment:"Payment",
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({

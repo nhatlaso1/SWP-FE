@@ -1,12 +1,31 @@
 import { CheckCircle } from '@mui/icons-material'
+import { Box, Container, CssBaseline, Typography } from '@mui/material'
 import React from 'react'
-
+import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 export default function CheckoutFail() {
   return (
-    <div className="h">
-      <CheckCircle className="" />
-      <h1 className="text-4xl font-extrabold text-white mb-2 drop-shadow-lg">Thanh toán thành công!</h1>
-      <p className="text-lg text-white mb-6 text-center max-w-md">Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ sớm xử lý đơn hàng của bạn và liên hệ khi hàng được giao.</p>
-    </div>
+    <React.Fragment>
+            <CssBaseline />
+            <Container fixed>
+                <Box
+                    sx={{
+                        bgcolor: '#FFCCCC',
+                        height: '60vh',
+                        margin: '50px auto',
+                        borderRadius: '30px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                    }}
+                >
+                    <ErrorOutlineIcon sx={{ color: 'red', fontSize: 233 }} />
+                    <Typography variant="h4" sx={{ color: 'red' }}>
+                        Thanh toán không thành công!
+                    </Typography>
+                </Box>
+            </Container>
+        </React.Fragment>
   )
 }

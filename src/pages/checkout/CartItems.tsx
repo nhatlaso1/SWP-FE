@@ -17,6 +17,7 @@ interface CartItem {
 const CartItems: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
+  
   useEffect(() => {
     const storedCart = sessionStorage.getItem('cart');
     if (storedCart) {
