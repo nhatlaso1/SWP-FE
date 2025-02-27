@@ -560,17 +560,18 @@ const Cart = () => {
                 onClick={() => handlePayment()}
                 sx={{ py: 1.5 }}
               >
-                Thanh toán qua Ngân hàng
+                Thanh toán qua Thẻ Nội Địa
               </Button>
-
               <Button
-                variant="outlined"
-                color="secondary"
-                onClick={handlePayLater}
+                variant="contained"
+                color="primary"
+                onClick={() => handlePayment()}
                 sx={{ py: 1.5 }}
               >
-                Thanh toán khi nhận hàng (COD)
+                Thanh toán qua Chuyển khoản
               </Button>
+
+              
             </Box>
           )}
 
