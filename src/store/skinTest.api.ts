@@ -123,6 +123,24 @@ export const mapApiToSkinTest = (apiData: any): ApiSkinTest => {
   };
 };
 
+const mapRawDataToApiSkinTest = (rawData: any): ApiSkinTest => {
+  return {
+    skinTestId: rawData.skinTestId,
+    skinTestName: rawData.skinTestName,
+    status: rawData.status,
+    skinTypeQuestions: rawData.skinTypeQuestions.$values.map((q: any) => ({
+      skinTypeQuestionId: q.skinTypeQuestionId,
+      description: q.description,
+      skinTypeAnswers: q.skinTypeAnswers.$values.map((a: any) => ({
+        skinTypeAnswerId: a.skinTypeAnswerId,
+        description: a.description,
+        skinTypeId: a.skinTypeId,
+      })),
+    })),
+  };
+};
+
+
 
 
 

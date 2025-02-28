@@ -10,9 +10,7 @@ import { useMemo, useEffect } from "react";
 import CreateSkinTests from "./pages/admin/skin-test/CreateSkinTest";
 import AdminLayout from "./layouts/AdminLayout";
 import OrderPage from "./pages/checkout/Checkout";
-import CreateSkinQuestion from "./pages/UpdateSkinTest";
 import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
-import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail";
 import StaffLayout from "./layouts/StaffLayout";
 import ProductManagement from "./pages/staff/product/ProductManagement";
 import OrderList from "./pages/staff/order/OrderList";
@@ -28,6 +26,7 @@ import ProductDetail from "./pages/product/ProductDetail";
 import Cart from "./pages/cart/Cart";
 import CheckoutFail from "./pages/checkout/CheckoutFail";
 import Register from "./pages/register/Register";
+import Profile from "./pages/profile/Profile";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -62,10 +61,10 @@ function App() {
         { path: "sales", element: <SaleProducts /> },
         { path: "fail", element: <CheckoutFail /> },
         {
-          path: "checkout",
+          path: "profile",
           element: (
             <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
-              <Checkout />
+              <Profile />
             </ProtectedRoute>
           )
         },
@@ -83,8 +82,8 @@ function App() {
         { path: "createskintest", element: <CreateSkinTests /> },
         { path: "skintests", element: <ListSkinTest /> },
         { path: "routines", element: <OrderPage /> },
-        { path: "updateskintest", element: <CreateSkinQuestion /> },
-        { path: "skintest/:id", element: <SkinTestDetail /> },
+        { path: "updateskintest", element: <OrderPage /> },
+        { path: "skintest/:id", element:<OrderPage /> },
       ],
     }, {
       path: "staff",

@@ -41,3 +41,28 @@ export type ApiSkinTypeAnswer = {
   description: string;
   skinTypeId: number;
 };
+
+export interface UpdateSkinTest {
+  skinTestId: number;
+  skinTestName: string;
+  status: boolean;
+  skinTypeQuestions: {
+    skinTypeQuestionId?: number; // Optional nếu cho phép thêm câu hỏi mới
+    description: string;
+    skinTypeAnswers: {
+      skinTypeAnswerId?: number; // Optional nếu cho phép thêm đáp án mới
+      description: string;
+      skinTypeId: number;
+    }[];
+  }[];
+}
+
+export interface UpdateSkinTypeQuestion {
+  description: string;
+  skinTypeAnswers: UpdateSkinTypeAnswer[];
+}
+
+export interface UpdateSkinTypeAnswer {
+  description: string;
+  skinTypeId: number;
+}
