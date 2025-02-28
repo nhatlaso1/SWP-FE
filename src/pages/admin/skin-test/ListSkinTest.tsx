@@ -1,31 +1,38 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { 
-  Box, 
-  Container, 
-  Paper, 
-  Typography, 
-  Button, 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableContainer, 
-  TableHead, 
-  TableRow, 
-  Pagination 
+import {
+  Box,
+  Container,
+  Paper,
+  Typography,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Pagination
 } from "@mui/material";
 import { getAllSkinTests } from "../../../store/skinTest.api";
 import { useStore } from "../../../store";
 
+
+
 interface SkinTest {
   skinTestId: number;
   skinTestName: string;
-  status: boolean;
+  status?: boolean;
 }
 
+interface ApiResponse {
+  $id: string;
+  $values: SkinTest[];
+}
 const ListSkinTests: React.FC = () => {
   const navigate = useNavigate();
   const token = useStore((store) => store.profile.user?.token);
+  console.log("Token từ store:", token);
 
   const [skinTests, setSkinTests] = useState<SkinTest[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -37,24 +44,30 @@ const ListSkinTests: React.FC = () => {
         console.error("Token không tồn tại!");
         return;
       }
-    
+  
       try {
-        const skinTestsData = await getAllSkinTests(token); 
-        console.log("Dữ liệu trả về từ API:", skinTestsData); 
-        const extractedData = skinTestsData.map((test: any) => ({
+        const skinTestsData = await getAllSkinTests(token);
+        console.log("Dữ liệu trả về từ API:", skinTestsData);
+  
+        const skinTestArray = skinTestsData?.$values ?? [];
+  
+        const extractedData: SkinTest[] = skinTestArray.map((test: any) => ({
           skinTestId: test.skinTestId ?? 0,
           skinTestName: test.skinTestName ?? "Không có tên",
           status: test.status ?? false,
         }));
+  
         setSkinTests(extractedData);
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu bộ câu hỏi:", error);
       }
     };
-    
-
+  
     fetchSkinTests();
   }, [token]);
+  
+  
+  
 
   const handleRowClick = (test: SkinTest) => {
     navigate(`/admin/skintest/${test.skinTestId}`);
@@ -86,16 +99,16 @@ const ListSkinTests: React.FC = () => {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Tên bộ câu hỏi</TableCell>
-              <TableCell>Trạng thái</TableCell>
+              <TableCell>Trạng thái</TableCell> 
             </TableRow>
           </TableHead>
           <TableBody>
             {currentData.length > 0 ? (
               currentData.map((test) => (
-                <TableRow 
-                  key={test.skinTestId} 
-                  hover 
-                  onClick={() => handleRowClick(test)} 
+                <TableRow
+                  key={test.skinTestId}
+                  hover
+                  onClick={() => handleRowClick(test)}
                   style={{ cursor: "pointer" }}
                 >
                   <TableCell>{test.skinTestId}</TableCell>
@@ -111,6 +124,7 @@ const ListSkinTests: React.FC = () => {
               </TableRow>
             )}
           </TableBody>
+
         </Table>
       </TableContainer>
 

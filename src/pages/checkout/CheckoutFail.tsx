@@ -30,7 +30,7 @@ export default function CheckoutFail() {
                     <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
                         TRANSACTION FAILED
                     </Typography>
-                    <Typography variant="h4" sx={{ maxWidth: '600px', lineHeight: 1.6, mb: 4 }}>
+                    <Typography variant="h6" sx={{ maxWidth: '600px', lineHeight: 1.6, mb: 4 }}>
                         The transaction was unsuccessful. Please check your payment information.
                         <br />
                         Thank you sincerely!
