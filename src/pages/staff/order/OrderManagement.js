@@ -1,228 +1,501 @@
 import React, { useState, useEffect } from 'react';
+
 import {
+
   Box,
+
   Typography,
+
   Table,
+
   TableBody,
+
   TableCell,
+
   TableContainer,
+
   TableHead,
+
   TableRow,
+
   Paper,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Avatar,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
+
+  Breadcrumbs,
+
+  Link,
+
+  Grid,
+
+  IconButton,
+
   Button,
+
+  Menu,
+
+  MenuItem,
+
+  Dialog,
+
+  DialogTitle,
+
+  DialogContent,
+
+  DialogActions,
+
 } from '@mui/material';
-import { Search as SearchIcon } from '@mui/icons-material';
-import { styled } from '@mui/material/styles';
-import { OrderAPI } from '../../../store/apiOrder';
 
-const SearchContainer = styled(Box)(({ theme }) => ({
-  display: 'flex',
-  gap: theme.spacing(2),
-  marginBottom: theme.spacing(3),
-  alignItems: 'center',
-  backgroundColor: '#fff',
-  padding: theme.spacing(2),
-  borderRadius: theme.spacing(1),
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
-}));
+import CloseIcon from '@mui/icons-material/Close';
 
-const StyledChip = styled(Chip)(({ theme }) => ({
-  fontWeight: 500,
-  '&.MuiChip-colorWarning': {
-    backgroundColor: '#fff3e0',
-    color: '#f57c00',
-  },
-  '&.MuiChip-colorSuccess': {
-    backgroundColor: '#e8f5e9',
-    color: '#2e7d32',
-  },
-  '&.MuiChip-colorError': {
-    backgroundColor: '#fdecea',
-    color: '#d32f2f',
-  },
-}));
+import { getAllOrders } from '../../../store/apiOrder';
+
+
 
 const OrderManagement = () => {
+
   const [orders, setOrders] = useState([]);
-  const [orderFilter, setOrderFilter] = useState('all');
-  const [searchOrder, setSearchOrder] = useState('');
-  const [openNewOrderDialog, setOpenNewOrderDialog] = useState(false);
-  const [newOrder, setNewOrder] = useState({
-    customerName: '',
-    email: '',
-    items: '',
-    total: '',
-    address: '',
-  });
+
+  const [selectedOrder, setSelectedOrder] = useState(null);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  const [confirmDialog, setConfirmDialog] = useState({ open: false, status: null });
+
+
 
   useEffect(() => {
+
     fetchOrders();
+
   }, []);
 
+
+
   const fetchOrders = async () => {
+
     try {
-      console.log('Fetching orders...');
-      const ordersData = await OrderAPI.getAll();
-      console.log('Fetched orders:', ordersData);
+
+      const ordersData = await getAllOrders('Complete');
+
       setOrders(ordersData);
+
     } catch (error) {
+
       console.error('Error fetching orders:', error);
-      setOrders([]); // Set empty array on error
+
+      setOrders([]);
+
     }
+
   };
 
-  const handleAddOrder = async () => {
-    if (!newOrder.customerName || !newOrder.total) return;
+
+
+  const handleRowClick = (order) => {
+
+    setSelectedOrder(order);
+
+  };
+
+
+
+  const handleCloseDetail = () => {
+
+    setSelectedOrder(null);
+
+  };
+
+
+
+  const handleStatusClick = (event) => {
+
+    setAnchorEl(event.currentTarget);
+
+  };
+
+
+
+  const handleStatusClose = () => {
+
+    setAnchorEl(null);
+
+  };
+
+
+
+  const getAvailableStatuses = (currentStatus) => {
+
+    switch (currentStatus) {
+
+      case 'Pending':
+
+        return ['Processing', 'Cancelled'];
+
+      case 'Processing':
+
+        return ['Complete'];
+
+      case 'Complete':
+
+      case 'Cancelled':
+
+        return [];
+
+      default:
+
+        return [];
+
+    }
+
+  };
+
+
+
+  const handleStatusSelect = (newStatus) => {
+
+    setConfirmDialog({ open: true, status: newStatus });
+
+    handleStatusClose();
+
+  };
+
+
+
+  const handleConfirmStatusChange = async () => {
 
     try {
-      const orderData = {
-        customerName: newOrder.customerName,
-        email: newOrder.email,
-        items: newOrder.items.split(',').map(item => item.trim()),
-        total: newOrder.total,
-        address: newOrder.address,
-      };
-      
-      const data = await OrderAPI.createOrder(orderData);
-      setOrders([...orders, data]);
-      setOpenNewOrderDialog(false);
-      setNewOrder({ customerName: '', email: '', items: '', total: '', address: '' });
+
+      // Implement the API call to update status here
+
+      console.log(`Updating order ${selectedOrder.orderId} to ${confirmDialog.status}`);
+
+      setConfirmDialog({ open: false, status: null });
+
+      await fetchOrders(); // Refresh the orders list
+
     } catch (error) {
-      console.error('Error creating order:', error);
+
+      console.error('Error updating order status:', error);
+
     }
+
   };
 
-  const handleUpdateOrderStatus = async (orderId, newStatus) => {
-    try {
-      if (newStatus === 'delivered') {
-        await OrderAPI.completeOrder(orderId);
-      } else if (newStatus === 'cancelled') {
-        await OrderAPI.cancelOrder(orderId);
-      }
-      setOrders(orders.map(order => 
-        order.id === orderId ? { ...order, status: newStatus } : order
-      ));
-    } catch (error) {
-      console.error(`Error updating order status: ${error}`);
-    }
-  };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      Pending: 'warning',
-      Processing: 'info',
-      Shipped: 'primary',
-      Complete: 'success',
-      Cancelled: 'error',
-    };
-    return colors[status] || 'default';
-  };
-
-  const filteredOrders = orders.filter(order => {
-    if (orderFilter !== 'all' && order.status !== orderFilter) return false;
-    if (searchOrder) {
-      // Tìm kiếm trong danh sách sản phẩm
-      const hasMatchingProduct = order.details?.some(detail =>
-        detail.productName.toLowerCase().includes(searchOrder.toLowerCase())
-      );
-      if (!hasMatchingProduct) return false;
-    }
-    return true;
-  });
 
   return (
-    <Box>
-      <Box sx={{ mb: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h5">Order Management</Typography>
-        <Button variant="contained" color="primary" onClick={() => setOpenNewOrderDialog(true)}>
-          Add New Order
-        </Button>
-      </Box>
 
-      <SearchContainer>
-        <TextField
-          size="small"
-          placeholder="Search products..."
-          value={searchOrder}
-          onChange={(e) => setSearchOrder(e.target.value)}
-          InputProps={{ startAdornment: <SearchIcon sx={{ color: 'action.active', mr: 1 }} /> }}
-          sx={{ width: 250 }}
-        />
-        <FormControl size="small" sx={{ minWidth: 150 }}>
-          <InputLabel>Filter Status</InputLabel>
-          <Select value={orderFilter} label="Filter Status" onChange={(e) => setOrderFilter(e.target.value)}>
-            <MenuItem value="all">All Orders</MenuItem>
-            <MenuItem value="Pending">Pending</MenuItem>
-            <MenuItem value="Processing">Processing</MenuItem>
-            <MenuItem value="Shipped">Shipped</MenuItem>
-            <MenuItem value="Complete">Complete</MenuItem>
-            <MenuItem value="Cancelled">Cancelled</MenuItem>
-          </Select>
-        </FormControl>
-      </SearchContainer>
+    <Box p={3}>
 
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Products</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Total Amount</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredOrders.map(order => (
-              <TableRow key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>
-                  <Box>
-                    {order.details?.map((detail, index) => (
-                      <Typography key={detail.id} variant="body2" sx={{ mb: 0.5 }}>
-                        {detail.productName} ({detail.size}) x{detail.quantity}
-                      </Typography>
-                    ))}
-                  </Box>
-                </TableCell>
-                <TableCell>{new Date(order.date).toLocaleDateString()}</TableCell>
-                <TableCell>${order.total.toLocaleString()}</TableCell>
-                <TableCell>
-                  <StyledChip label={order.status} color={getStatusColor(order.status)} size="small" />
-                </TableCell>
-                <TableCell>
-                  <FormControl size="small" sx={{ minWidth: 120 }}>
-                    <Select 
-                      value={order.status} 
-                      onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+      <Typography variant="h5" gutterBottom>Orders Management</Typography>
+
+      
+
+      <Grid container spacing={2}>
+
+        {/* Orders List - Left Side */}
+
+        <Grid item xs={selectedOrder ? 6 : 12}>
+
+          <TableContainer component={Paper}>
+
+            <Table>
+
+              <TableHead>
+
+                <TableRow>
+
+                  <TableCell>Order ID</TableCell>
+
+                  <TableCell>Date</TableCell>
+
+                  <TableCell>Total Amount</TableCell>
+
+                  <TableCell>Status</TableCell>
+
+                </TableRow>
+
+              </TableHead>
+
+              <TableBody>
+
+                {orders.map(order => (
+
+                  <TableRow 
+
+                    key={order.orderId}
+
+                    onClick={() => handleRowClick(order)}
+
+                    sx={{ 
+
+                      cursor: 'pointer',
+
+                      backgroundColor: selectedOrder?.orderId === order.orderId ? 'rgba(0, 0, 0, 0.04)' : 'inherit',
+
+                      '&:hover': {
+
+                        backgroundColor: 'rgba(0, 0, 0, 0.04)'
+
+                      }
+
+                    }}
+
+                  >
+
+                    <TableCell>{order.orderId}</TableCell>
+
+                    <TableCell>{new Date(order.createdDate).toLocaleDateString()}</TableCell>
+
+                    <TableCell>${order.totalAmount.toLocaleString()}</TableCell>
+
+                    <TableCell>{order.status}</TableCell>
+
+                  </TableRow>
+
+                ))}
+
+              </TableBody>
+
+            </Table>
+
+          </TableContainer>
+
+        </Grid>
+
+
+
+        {/* Order Details - Right Side */}
+
+        {selectedOrder && (
+
+          <Grid item xs={6}>
+
+            <Box>
+
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+
+                <Breadcrumbs>
+
+                  <Link
+
+                    component="button"
+
+                    variant="body1"
+
+                    onClick={handleCloseDetail}
+
+                    sx={{ 
+
+                      cursor: 'pointer',
+
+                      textDecoration: 'none',
+
+                      '&:hover': {
+
+                        textDecoration: 'underline'
+
+                      }
+
+                    }}
+
+                  >
+
+                    Orders Management
+
+                  </Link>
+
+                  <Typography color="text.primary">Order Detail #{selectedOrder.orderId}</Typography>
+
+                </Breadcrumbs>
+
+                <Box>
+
+                  {getAvailableStatuses(selectedOrder.status).length > 0 && (
+
+                    <Button
+
+                      variant="contained"
+
+                      onClick={handleStatusClick}
+
+                      sx={{ mr: 2 }}
+
                     >
-                      <MenuItem value="Pending">Pending</MenuItem>
-                      <MenuItem value="Processing">Processing</MenuItem>
-                      <MenuItem value="Shipped">Shipped</MenuItem>
-                      <MenuItem value="Complete">Complete</MenuItem>
-                      <MenuItem value="Cancelled">Cancelled</MenuItem>
-                    </Select>
-                  </FormControl>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+                      Update Status
+
+                    </Button>
+
+                  )}
+
+                  <IconButton onClick={handleCloseDetail} size="small">
+
+                    <CloseIcon />
+
+                  </IconButton>
+
+                </Box>
+
+              </Box>
+
+
+
+              <TableContainer component={Paper}>
+
+                <Table>
+
+                  <TableHead>
+
+                    <TableRow>
+
+                      <TableCell>Detail ID</TableCell>
+
+                      <TableCell>Product ID</TableCell>
+
+                      <TableCell>Product Name</TableCell>
+
+                      <TableCell>Size</TableCell>
+
+                      <TableCell>Quantity</TableCell>
+
+                      <TableCell>Price</TableCell>
+
+                      <TableCell>Discount</TableCell>
+
+                    </TableRow>
+
+                  </TableHead>
+
+                  <TableBody>
+
+                    {selectedOrder.details.map((detail) => (
+
+                      <TableRow key={detail.orderDetailId}>
+
+                        <TableCell>{detail.orderDetailId}</TableCell>
+
+                        <TableCell>{detail.productId}</TableCell>
+
+                        <TableCell>{detail.productName}</TableCell>
+
+                        <TableCell>{detail.size}</TableCell>
+
+                        <TableCell>{detail.quantity}</TableCell>
+
+                        <TableCell>${detail.price.toLocaleString()}</TableCell>
+
+                        <TableCell>{(detail.discount * 100).toFixed(0)}%</TableCell>
+
+                      </TableRow>
+
+                    ))}
+
+                  </TableBody>
+
+                </Table>
+
+              </TableContainer>
+
+
+
+              <Box sx={{ mt: 3, textAlign: 'right' }}>
+
+                <Typography variant="h6">
+
+                  Total Amount: ${selectedOrder.totalAmount.toLocaleString()}
+
+                </Typography>
+
+                <Typography variant="body1">
+
+                  Status: {selectedOrder.status}
+
+                </Typography>
+
+                <Typography variant="body1">
+
+                  Created Date: {new Date(selectedOrder.createdDate).toLocaleDateString()}
+
+                </Typography>
+
+              </Box>
+
+            </Box>
+
+          </Grid>
+
+        )}
+
+      </Grid>
+
+
+
+      {/* Status Update Menu */}
+
+      <Menu
+
+        anchorEl={anchorEl}
+
+        open={Boolean(anchorEl)}
+
+        onClose={handleStatusClose}
+
+      >
+
+        {selectedOrder && getAvailableStatuses(selectedOrder.status).map((status) => (
+
+          <MenuItem key={status} onClick={() => handleStatusSelect(status)}>
+
+            {status}
+
+          </MenuItem>
+
+        ))}
+
+      </Menu>
+
+
+
+      {/* Confirmation Dialog */}
+
+      <Dialog
+
+        open={confirmDialog.open}
+
+        onClose={() => setConfirmDialog({ open: false, status: null })}
+
+      >
+
+        <DialogTitle>Confirm Status Update</DialogTitle>
+
+        <DialogContent>
+
+          Are you sure you want to update the order status to {confirmDialog.status}?
+
+        </DialogContent>
+
+        <DialogActions>
+
+          <Button onClick={() => setConfirmDialog({ open: false, status: null })}>Cancel</Button>
+
+          <Button onClick={handleConfirmStatusChange} variant="contained" color="primary">
+
+            Confirm
+
+          </Button>
+
+        </DialogActions>
+
+      </Dialog>
+
     </Box>
+
   );
+
 };
 
+
+
 export default OrderManagement;
+
+

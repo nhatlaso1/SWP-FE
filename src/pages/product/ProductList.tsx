@@ -11,11 +11,6 @@ import {
   CircularProgress,
   Alert,
   Rating,
-  Checkbox,
-  FormControlLabel,
-  FormGroup,
-  Switch,
-  Divider,
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
@@ -44,50 +39,7 @@ const ProductList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showOutOfStock, setShowOutOfStock] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSkinConditions, setSelectedSkinConditions] = useState<string[]>([]);
-  const [selectedFeatured, setSelectedFeatured] = useState<string[]>([]);
-  const [selectedPriceRange, setSelectedPriceRange] = useState<string[]>([]);
   const navigate = useNavigate();
-
-  // Hardcoded filter options
-  const filterOptions = {
-    categories: [
-      'Cleansers',
-      'Exfoliators',
-      'Toners',
-      'Retinols',
-      'Peels And Masques',
-      'Moisturiser',
-      'Night Cream',
-      'Face Oil',
-      'Sunscreen',
-    ],
-    skinConditions: [
-      'Brightening',
-      'Hydration',
-      'Acne',
-      'Anti-Ageing',
-      'Redness',
-      'Sensitive Skin',
-      'Sun Protection',
-    ],
-    featured: [
-      'New',
-      'Best Sellers',
-      'Travel Size',
-      'Professional Treatments',
-      'Daily Defense',
-    ],
-    priceRanges: [
-      '$0.00 - $150.00',
-      '$150.00 - $250.00',
-      '$250.00 - $350.00',
-      '$350.00 - $450.00',
-      '$450.00 - $550.00',
-    ],
-  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,38 +58,6 @@ const ProductList: React.FC = () => {
 
     fetchData();
   }, []);
-
-  const handleCategoryChange = (category: string) => {
-    setSelectedCategories(prev => 
-      prev.includes(category)
-        ? prev.filter(c => c !== category)
-        : [...prev, category]
-    );
-  };
-
-  const handleSkinConditionChange = (condition: string) => {
-    setSelectedSkinConditions(prev => 
-      prev.includes(condition)
-        ? prev.filter(c => c !== condition)
-        : [...prev, condition]
-    );
-  };
-
-  const handleFeaturedChange = (feature: string) => {
-    setSelectedFeatured(prev => 
-      prev.includes(feature)
-        ? prev.filter(f => f !== feature)
-        : [...prev, feature]
-    );
-  };
-
-  const handlePriceRangeChange = (range: string) => {
-    setSelectedPriceRange(prev => 
-      prev.includes(range)
-        ? prev.filter(r => r !== range)
-        : [...prev, range]
-    );
-  };
 
   if (loading) {
     return (
@@ -161,109 +81,15 @@ const ProductList: React.FC = () => {
     <div className={styles.productListContainer}>
       <Container maxWidth="xl">
         <Grid container spacing={3}>
-          {/* Filter Sidebar */}
-          <Grid item xs={12} md={3}>
-            <Box className={styles.filterSidebar}>
-              {/* Out of Stock Switch */}
-              <Box mb={2}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={showOutOfStock}
-                      onChange={(e) => setShowOutOfStock(e.target.checked)}
-                    />
-                  }
-                  label="Out Of Stock Items"
-                />
-              </Box>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Categories */}
-              <Typography variant="h6" gutterBottom>Category</Typography>
-              <FormGroup>
-                {filterOptions.categories.map((category) => (
-                  <FormControlLabel
-                    key={category}
-                    control={
-                      <Checkbox
-                        checked={selectedCategories.includes(category)}
-                        onChange={() => handleCategoryChange(category)}
-                      />
-                    }
-                    label={category}
-                  />
-                ))}
-              </FormGroup>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Skin Conditions */}
-              <Typography variant="h6" gutterBottom>Skin Condition</Typography>
-              <FormGroup>
-                {filterOptions.skinConditions.map((condition) => (
-                  <FormControlLabel
-                    key={condition}
-                    control={
-                      <Checkbox
-                        checked={selectedSkinConditions.includes(condition)}
-                        onChange={() => handleSkinConditionChange(condition)}
-                      />
-                    }
-                    label={condition}
-                  />
-                ))}
-              </FormGroup>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Featured */}
-              <Typography variant="h6" gutterBottom>Featured</Typography>
-              <FormGroup>
-                {filterOptions.featured.map((feature) => (
-                  <FormControlLabel
-                    key={feature}
-                    control={
-                      <Checkbox
-                        checked={selectedFeatured.includes(feature)}
-                        onChange={() => handleFeaturedChange(feature)}
-                      />
-                    }
-                    label={feature}
-                  />
-                ))}
-              </FormGroup>
-
-              <Divider sx={{ my: 2 }} />
-
-              {/* Price Range */}
-              <Typography variant="h6" gutterBottom>Price Range</Typography>
-              <FormGroup>
-                {filterOptions.priceRanges.map((range) => (
-                  <FormControlLabel
-                    key={range}
-                    control={
-                      <Checkbox
-                        checked={selectedPriceRange.includes(range)}
-                        onChange={() => handlePriceRangeChange(range)}
-                      />
-                    }
-                    label={range}
-                  />
-                ))}
-              </FormGroup>
-            </Box>
-          </Grid>
-
           {/* Product Grid */}
-          <Grid item xs={12} md={9}>
+          <Grid item xs={12}>
             {products.length === 0 ? (
               <div className={styles.noProducts}>
                 <Typography variant="h6" gutterBottom>
                   No products found
                 </Typography>
                 <Typography variant="body1">
-                  Try changing the filters or check back later.
+                  Check back later for new products.
                 </Typography>
               </div>
             ) : (
