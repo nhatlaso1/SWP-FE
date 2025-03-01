@@ -12,64 +12,49 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Pagination
+  Pagination,
 } from "@mui/material";
 import { getAllSkinTests } from "../../../store/skinTest.api";
 import { useStore } from "../../../store";
 
-
-
-interface SkinTest {
-  skinTestId: number;
-  skinTestName: string;
-  status?: boolean;
-}
-
-interface ApiResponse {
-  $id: string;
-  $values: SkinTest[];
-}
-const ListSkinTests: React.FC = () => {
+const SkinTest = () => {
   const navigate = useNavigate();
   const token = useStore((store) => store.profile.user?.token);
-  console.log("Token từ store:", token);
+  console.log("Token from store:", token);
 
-  const [skinTests, setSkinTests] = useState<SkinTest[]>([]);
+  const [skinTests, setSkinTests] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
   useEffect(() => {
     const fetchSkinTests = async () => {
       if (!token) {
-        console.error("Token không tồn tại!");
+        console.error("Token does not exist!");
         return;
       }
-  
+
       try {
         const skinTestsData = await getAllSkinTests(token);
-        console.log("Dữ liệu trả về từ API:", skinTestsData);
-  
+        console.log("API response data:", skinTestsData);
+
         const skinTestArray = skinTestsData?.$values ?? [];
-  
-        const extractedData: SkinTest[] = skinTestArray.map((test: any) => ({
+
+        const extractedData = skinTestArray.map((test) => ({
           skinTestId: test.skinTestId ?? 0,
-          skinTestName: test.skinTestName ?? "Không có tên",
+          skinTestName: test.skinTestName ?? "No Name",
           status: test.status ?? false,
         }));
-  
+
         setSkinTests(extractedData);
       } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu bộ câu hỏi:", error);
+        console.error("Error fetching skin tests:", error);
       }
     };
-  
+
     fetchSkinTests();
   }, [token]);
-  
-  
-  
 
-  const handleRowClick = (test: SkinTest) => {
+  const handleRowClick = (test) => {
     navigate(`/admin/skintest/${test.skinTestId}`);
   };
 
@@ -80,16 +65,25 @@ const ListSkinTests: React.FC = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = skinTests.slice(startIndex, startIndex + itemsPerPage);
 
-  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+  const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
 
   return (
     <Container maxWidth="lg" sx={{ paddingTop: 4 }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
-        <Typography variant="h4">Danh sách bộ câu hỏi</Typography>
-        <Button variant="contained" color="primary" onClick={handleCreateNewTest}>
-          Tạo bộ câu hỏi mới
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        marginBottom={2}
+      >
+        <Typography variant="h4">Skin Test List</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreateNewTest}
+        >
+          Create New Skin Test
         </Button>
       </Box>
 
@@ -98,8 +92,8 @@ const ListSkinTests: React.FC = () => {
           <TableHead>
             <TableRow>
               <TableCell>ID</TableCell>
-              <TableCell>Tên bộ câu hỏi</TableCell>
-              <TableCell>Trạng thái</TableCell> 
+              <TableCell>Test Name</TableCell>
+              <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -113,18 +107,17 @@ const ListSkinTests: React.FC = () => {
                 >
                   <TableCell>{test.skinTestId}</TableCell>
                   <TableCell>{test.skinTestName}</TableCell>
-                  <TableCell>{test.status ? "Hoạt động" : "Không hoạt động"}</TableCell>
+                  <TableCell>{test.status ? "Active" : "Inactive"}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  Không có dữ liệu
+                  No Data
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
-
         </Table>
       </TableContainer>
 
@@ -140,4 +133,4 @@ const ListSkinTests: React.FC = () => {
   );
 };
 
-export default ListSkinTests;
+export default SkinTest;

@@ -122,59 +122,30 @@ export const mapApiToSkinTest = (apiData: any): ApiSkinTest => {
       })) || [],
   };
 };
-
-const mapRawDataToApiSkinTest = (rawData: any): ApiSkinTest => {
-  return {
-    skinTestId: rawData.skinTestId,
-    skinTestName: rawData.skinTestName,
-    status: rawData.status,
-    skinTypeQuestions: rawData.skinTypeQuestions.$values.map((q: any) => ({
-      skinTypeQuestionId: q.skinTypeQuestionId,
-      description: q.description,
-      skinTypeAnswers: q.skinTypeAnswers.$values.map((a: any) => ({
-        skinTypeAnswerId: a.skinTypeAnswerId,
-        description: a.description,
-        skinTypeId: a.skinTypeId,
-      })),
-    })),
-  };
+export const getAllSkinTypes = async (token: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`${apiEndpoints.SkinType}/get-all-skin-type`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all skin types:", error);
+    throw error;
+  }
 };
 
-
-
-
-
-
-
-// export const getSkinTestById = async (id: number, token: string): Promise<SkinTest | null> => {
-//   try {
-//     const response = await apiClient.get(`${apiEndpoints.SkinTest}/get-skin-test?skinTestId=${id}`, {
-//       headers: {
-//         Authorization: `Bearer ${token}`, // Thêm token vào header
-//       }
-//     });
-//     return response.data || null;
-//   } catch (error) {
-//     console.error("Error fetching skin test by id:", error);
-//     throw error;
-//   }
-// };
-// // Hàm cập nhật Skin Test
-// export const updateSkinTest = async (skinTest: SkinTest, token: string): Promise<any> => {
-//   try {
-//     const response = await apiClient.put(
-//       `${apiEndpoints.SkinTest}/update-skin-test`, // Đường dẫn API cập nhật Skin Test
-//       skinTest, // Dữ liệu Skin Test sẽ được gửi lên
-//       {
-//         headers: {
-//           Authorization: `Bearer ${token}`, // Thêm token vào header để xác thực người dùng
-//         },
-//       }
-//     );
-//     return response.data; // Trả về dữ liệu từ server
-//   } catch (error) {
-//     console.error("Error updating skin test:", error); // Xử lý lỗi nếu có
-//     throw error;
-//   }
-// };
-// Hàm lấy tất cả Skin Tests
+export const getSkinTypeById = async (id: number, token: string): Promise<any> => {
+  try {
+    const response = await apiClient.get(`${apiEndpoints.SkinType}/get-skin-type-by-id?skinTypeId=${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching skin type by id:", error);
+    throw error;
+  }
+};

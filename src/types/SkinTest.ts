@@ -13,6 +13,7 @@ export interface SkinTest {
   
   export interface SkinTypeQuestion {
     description: string;
+    status: boolean;
     skinTypeAnswers: SkinTypeAnswer[];
   }
   
@@ -33,6 +34,7 @@ export interface ApiSkinTest {
 export interface ApiSkinTypeQuestion {
   skinTypeQuestionId: number;
   description: string;
+  status: boolean;
   skinTypeAnswers: ApiSkinTypeAnswer[];
 }
 

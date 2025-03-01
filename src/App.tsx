@@ -7,10 +7,8 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import { useStore } from "./store";
 import { useMemo, useEffect } from "react";
-import CreateSkinTests from "./pages/admin/skin-test/CreateSkinTest";
 import AdminLayout from "./layouts/AdminLayout";
 import OrderPage from "./pages/checkout/Checkout";
-import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
 import StaffLayout from "./layouts/StaffLayout";
 import ProductManagement from "./pages/staff/product/ProductManagement";
 import OrderList from "./pages/staff/order/OrderList";
@@ -19,7 +17,6 @@ import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import CustomerLayout from "./layouts/CustomerLayout";
-import Checkout from "./pages/checkout/Checkout";
 import ProductList from "./pages/product/ProductList";
 import SaleProducts from "./pages/product/SaleProducts";
 import ProductDetail from "./pages/product/ProductDetail";
@@ -27,6 +24,9 @@ import Cart from "./pages/cart/Cart";
 import CheckoutFail from "./pages/checkout/CheckoutFail";
 import Register from "./pages/register/Register";
 import Profile from "./pages/profile/Profile";
+import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail";
+import SkinTest from "./pages/admin/skin-test/SkinTest";
+import CreateSkinTest from "./pages/admin/skin-test/CreateSkinTest";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -79,11 +79,11 @@ function App() {
       ),
       children: [
         { path: "dashboard", element: <DashboardAdmin /> },
-        { path: "createskintest", element: <CreateSkinTests /> },
-        { path: "skintests", element: <ListSkinTest /> },
+        { path: "createskintest", element: <CreateSkinTest /> },
+        { path: "skintests", element: <SkinTest /> },
         { path: "routines", element: <OrderPage /> },
         { path: "updateskintest", element: <OrderPage /> },
-        { path: "skintest/:id", element:<OrderPage /> },
+        { path: "skintest/:id", element: <SkinTestDetail /> },
       ],
     }, {
       path: "staff",
