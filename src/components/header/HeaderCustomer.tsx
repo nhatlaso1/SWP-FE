@@ -74,7 +74,7 @@ const HeaderCustomer: React.FC = () => {
     logout(navigate); // Gọi hàm logout từ Zustand
     handleCloseMenu(); // Đóng menu sau khi logout
   };
-  
+
   const formik = useFormik<IChangePasswordForm>({
     initialValues: {
       oldPassword: "",
@@ -105,7 +105,7 @@ const HeaderCustomer: React.FC = () => {
 
         <div className="nav-wrap">
           <Button variant="text" onClick={() => navigate("/")}>Home</Button>
-          <Button variant="text" onClick={() => navigate("/checkout")}>Voucher</Button>
+          <Button variant="text" onClick={() => navigate("/brands")}>Brand</Button>
           <Button variant="text" onClick={() => navigate("/sales")}>For Sales</Button>
           <Button variant="text" onClick={() => navigate("/products")}>Products</Button>
           <Button variant="text" onClick={() => navigate("/take-quiz")}>Quiz Skin Q&A</Button>

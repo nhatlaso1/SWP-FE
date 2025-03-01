@@ -8,7 +8,6 @@ import Loading from "./components/loading/Loading";
 import { useStore } from "./store";
 import { useMemo, useEffect } from "react";
 import AdminLayout from "./layouts/AdminLayout";
-import OrderPage from "./pages/checkout/Checkout";
 import StaffLayout from "./layouts/StaffLayout";
 import ProductManagement from "./pages/staff/product/ProductManagement";
 import OrderList from "./pages/staff/order/OrderList";
@@ -21,12 +20,15 @@ import ProductList from "./pages/product/ProductList";
 import SaleProducts from "./pages/product/SaleProducts";
 import ProductDetail from "./pages/product/ProductDetail";
 import Cart from "./pages/cart/Cart";
-import CheckoutFail from "./pages/checkout/CheckoutFail";
 import Register from "./pages/register/Register";
 import Profile from "./pages/profile/Profile";
-import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail";
-import SkinTest from "./pages/admin/skin-test/SkinTest";
-import CreateSkinTest from "./pages/admin/skin-test/CreateSkinTest";
+import SkinTestDetail from "./pages/admin/skintest/SkinTestDetail";
+import SkinTest from "./pages/admin/skintest/SkinTest";
+import CreateSkinTest from "./pages/admin/skintest/CreateSkinTest";
+import OurBranch from "./components/our-branch/OurBranch";
+import Routine from "./pages/admin/routine/Routine";
+import CreateRoutine from "./pages/admin/routine/CreateRoutine";
+import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -59,7 +61,7 @@ function App() {
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
-        { path: "fail", element: <CheckoutFail /> },
+        { path: "brands", element: <OurBranch /> },
         {
           path: "profile",
           element: (
@@ -80,9 +82,10 @@ function App() {
       children: [
         { path: "dashboard", element: <DashboardAdmin /> },
         { path: "createskintest", element: <CreateSkinTest /> },
+        { path: "createroutine", element: <CreateRoutine /> },
         { path: "skintests", element: <SkinTest /> },
-        { path: "routines", element: <OrderPage /> },
-        { path: "updateskintest", element: <OrderPage /> },
+        { path: "routines", element: <Routine /> },
+        { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
       ],
     }, {

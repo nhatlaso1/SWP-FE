@@ -91,7 +91,7 @@ const SkinTest = () => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
+              <TableCell>SkinTest ID</TableCell>
               <TableCell>Test Name</TableCell>
               <TableCell>Status</TableCell>
             </TableRow>

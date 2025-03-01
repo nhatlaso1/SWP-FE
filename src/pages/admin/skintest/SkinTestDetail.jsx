@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Button,
   Typography,
   TextField,
   Box,
+  IconButton,
   Grid,
   Select,
   MenuItem,
@@ -12,13 +13,20 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useStore } from "../../../store";
-import { updateSkinTest, getAllSkinTypes } from "../../../store/skinTest.api";
+import {
+  getSkinTestById,
+  updateSkinTest,
+  getAllSkinTypes,
+} from "../../../store/skinTest.api";
 
-const CreateSkinTest = () => {
+const SkinTestDetail = () => {
+  const { id } = useParams();
   const navigate = useNavigate();
   const token = useStore((state) => state.profile.user?.token);
 
-  // Ở trang Create, luôn ở chế độ nhập liệu (editing)
+  // Nếu không có id => chế độ tạo mới (Create)
+  const isCreating = !id;
+  const [isEditing, setIsEditing] = useState(isCreating);
   const [skinTypes, setSkinTypes] = useState([]);
   const [skinTest, setSkinTest] = useState({
     skinTestId: 0,
@@ -28,14 +36,59 @@ const CreateSkinTest = () => {
   });
 
   useEffect(() => {
+    if (!isCreating && id) {
+      fetchSkinTest(Number(id));
+    }
     fetchSkinTypes();
-  }, []);
+  }, [id, isCreating]);
+
+  const fetchSkinTest = async (skinTestId) => {
+    try {
+      const data = await getSkinTestById(skinTestId, token);
+      console.log("Full data from API:", JSON.stringify(data));
+
+      if (data) {
+        // Lấy mảng câu hỏi từ skinTypeQuestions.$values nếu có
+        const questions = data.skinTypeQuestions?.$values
+          ? data.skinTypeQuestions.$values
+          : data.skinTypeQuestions;
+        console.log("Extracted questions array:", JSON.stringify(questions));
+
+        // Map từng câu hỏi:
+        // Nếu có trường "type", dùng nó; nếu không có, thử dùng "status" (nếu có), còn nếu chưa có thì mặc định true
+        const mappedQuestions = Array.isArray(questions)
+          ? questions.map((q) => {
+              const mappedStatus =
+                q.type !== undefined
+                  ? q.type
+                  : q.status !== undefined
+                  ? q.status
+                  : true;
+              return {
+                ...q,
+                status: mappedStatus,
+                skinTypeAnswers: q.skinTypeAnswers?.$values
+                  ? q.skinTypeAnswers.$values
+                  : q.skinTypeAnswers || [],
+              };
+            })
+          : [];
+        console.log("Mapped questions:", JSON.stringify(mappedQuestions));
+        setSkinTest({
+          ...data,
+          skinTypeQuestions: mappedQuestions,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching skin test:", error);
+    }
+  };
 
   const fetchSkinTypes = async () => {
     try {
       const data = await getAllSkinTypes(token);
+      console.log("Skin types from API:", JSON.stringify(data));
       if (data) {
-        // Nếu dữ liệu trả về có thuộc tính $values (như JSON mẫu), chuyển về mảng
         const types = data.$values ? data.$values : data;
         setSkinTypes(types);
       }
@@ -44,6 +97,7 @@ const CreateSkinTest = () => {
     }
   };
 
+  // Các hàm xử lý thêm, cập nhật, xóa câu hỏi và đáp án không thay đổi
   const handleAddQuestion = () => {
     setSkinTest((prev) => ({
       ...prev,
@@ -56,15 +110,6 @@ const CreateSkinTest = () => {
           skinTypeAnswers: [],
         },
       ],
-    }));
-  };
-
-  const handleDeleteQuestion = (questionId) => {
-    setSkinTest((prev) => ({
-      ...prev,
-      skinTypeQuestions: prev.skinTypeQuestions.filter(
-        (q) => q.skinTypeQuestionId !== questionId
-      ),
     }));
   };
 
@@ -137,7 +182,7 @@ const CreateSkinTest = () => {
   const handleSubmit = async () => {
     try {
       await updateSkinTest(skinTest, token);
-      navigate("/skintests");
+      navigate("/admin/skintests");
     } catch (error) {
       console.error("Error saving skin test:", error);
     }
@@ -146,8 +191,18 @@ const CreateSkinTest = () => {
   return (
     <Box sx={{ padding: 3 }}>
       <Typography variant="h4" gutterBottom>
-        Create Skin Test
+        {isCreating ? "Create Skin Test" : "Skin Test Detail"}
       </Typography>
+
+      <Box sx={{ marginBottom: 2 }}>
+        <Button
+          variant="outlined"
+          onClick={() => setIsEditing(!isEditing)}
+          sx={{ marginRight: 2 }}
+        >
+          {isEditing ? "View Detail" : "Edit"}
+        </Button>
+      </Box>
 
       <Grid container spacing={2} alignItems="center" sx={{ marginBottom: 2 }}>
         <Grid item xs={9}>
@@ -156,19 +211,26 @@ const CreateSkinTest = () => {
             fullWidth
             value={skinTest.skinTestName}
             onChange={(e) => handleChange("skinTestName", e.target.value)}
+            disabled={!isEditing}
           />
         </Grid>
         <Grid item xs={3}>
-          <Select
-            value={skinTest.status ? "Active" : "Inactive"}
-            onChange={(e) =>
-              handleChange("status", e.target.value === "Active")
-            }
-            fullWidth
-          >
-            <MenuItem value="Active">Active</MenuItem>
-            <MenuItem value="Inactive">Inactive</MenuItem>
-          </Select>
+          {isEditing ? (
+            <Select
+              value={skinTest.status ? "Active" : "Inactive"}
+              onChange={(e) =>
+                handleChange("status", e.target.value === "Active")
+              }
+              fullWidth
+            >
+              <MenuItem value="Active">Active</MenuItem>
+              <MenuItem value="Inactive">Inactive</MenuItem>
+            </Select>
+          ) : (
+            <Typography>
+              Status: {skinTest.status ? "Active" : "Inactive"}
+            </Typography>
+          )}
         </Grid>
       </Grid>
 
@@ -204,29 +266,11 @@ const CreateSkinTest = () => {
                       "description"
                     )
                   }
+                  disabled={!isEditing}
                 />
               </Grid>
-              <Grid
-                item
-                xs={4}
-                container
-                spacing={1}
-                justifyContent="flex-end"
-                alignItems="center"
-              >
-                <Grid item>
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    onClick={() =>
-                      handleDeleteQuestion(question.skinTypeQuestionId)
-                    }
-                    startIcon={<DeleteIcon />}
-                  >
-                    Delete Question
-                  </Button>
-                </Grid>
-                <Grid item xs={8}>
+              <Grid item xs={4}>
+                {isEditing ? (
                   <Select
                     value={
                       question.status ? "Single Choice" : "Multiple Choice"
@@ -239,12 +283,15 @@ const CreateSkinTest = () => {
                       )
                     }
                     fullWidth
-                    sx={{ maxWidth: 200 }}
                   >
                     <MenuItem value="Single Choice">Single Choice</MenuItem>
                     <MenuItem value="Multiple Choice">Multiple Choice</MenuItem>
                   </Select>
-                </Grid>
+                ) : (
+                  <Typography variant="subtitle1">
+                    {question.status ? "Single Choice" : "Multiple Choice"}
+                  </Typography>
+                )}
               </Grid>
             </Grid>
           </Box>
@@ -270,78 +317,97 @@ const CreateSkinTest = () => {
                       "description"
                     )
                   }
+                  disabled={!isEditing}
                 />
               </Grid>
-              <Grid item xs={2}>
-                <Select
-                  value={answer.skinTypeId || ""}
-                  onChange={(e) =>
-                    handleAnswerChange(
-                      question.skinTypeQuestionId,
-                      answer.skinTypeAnswerId,
-                      Number(e.target.value),
-                      "skinTypeId"
-                    )
-                  }
-                  fullWidth
-                >
-                  {Array.isArray(skinTypes) &&
-                    skinTypes.map((type) => (
-                      <MenuItem key={type.skinTypeId} value={type.skinTypeId}>
-                        {type.skinTypeName}
-                      </MenuItem>
-                    ))}
-                </Select>
+              <Grid item xs={3}>
+                {isEditing ? (
+                  <Select
+                    value={answer.skinTypeId || ""}
+                    onChange={(e) =>
+                      handleAnswerChange(
+                        question.skinTypeQuestionId,
+                        answer.skinTypeAnswerId,
+                        Number(e.target.value),
+                        "skinTypeId"
+                      )
+                    }
+                    fullWidth
+                  >
+                    {Array.isArray(skinTypes) &&
+                      skinTypes.map((type) => (
+                        <MenuItem key={type.skinTypeId} value={type.skinTypeId}>
+                          {type.skinTypeName}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                ) : (
+                  <TextField
+                    value={
+                      Array.isArray(skinTypes)
+                        ? skinTypes.find(
+                            (type) => type.skinTypeId === answer.skinTypeId
+                          )?.skinTypeName || "Unknown"
+                        : "Unknown"
+                    }
+                    fullWidth
+                    InputProps={{ readOnly: true }}
+                  />
+                )}
               </Grid>
-              <Grid item xs={2}>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  fullWidth
-                  onClick={() =>
-                    handleDeleteAnswer(
-                      question.skinTypeQuestionId,
-                      answer.skinTypeAnswerId
-                    )
-                  }
-                  startIcon={<DeleteIcon />}
-                >
-                  Delete
-                </Button>
-              </Grid>
+              {isEditing && (
+                <Grid item xs={1}>
+                  <IconButton
+                    onClick={() =>
+                      handleDeleteAnswer(
+                        question.skinTypeQuestionId,
+                        answer.skinTypeAnswerId
+                      )
+                    }
+                  >
+                    <DeleteIcon />
+                  </IconButton>
+                </Grid>
+              )}
             </Grid>
           ))}
 
-          <Box sx={{ marginTop: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<AddIcon />}
-              onClick={() => handleAddAnswer(question.skinTypeQuestionId)}
-              sx={{ marginRight: 2 }}
-            >
-              Add Answer
-            </Button>
-          </Box>
+          {isEditing && (
+            <Box sx={{ marginTop: 2 }}>
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon />}
+                onClick={() => handleAddAnswer(question.skinTypeQuestionId)}
+                sx={{ marginRight: 2 }}
+              >
+                Add Answer
+              </Button>
+            </Box>
+          )}
         </Box>
       ))}
 
-      <Box sx={{ marginBottom: 2 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={handleAddQuestion}
-          startIcon={<AddIcon />}
-          sx={{ marginRight: 2 }}
-        >
-          Add Question
-        </Button>
-      </Box>
+      {isEditing && (
+        <Box sx={{ marginBottom: 2 }}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddQuestion}
+            startIcon={<AddIcon />}
+            sx={{ marginRight: 2 }}
+          >
+            Add Question
+          </Button>
+        </Box>
+      )}
 
-      <Button variant="contained" color="secondary" onClick={handleSubmit}>
-        Create
-      </Button>
+      {isEditing && (
+        <Button variant="contained" color="secondary" onClick={handleSubmit}>
+          {isCreating ? "Create" : "Update"}
+        </Button>
+      )}
     </Box>
   );
 };
 
-export default CreateSkinTest;
+export default SkinTestDetail;

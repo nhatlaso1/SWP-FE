@@ -21,7 +21,7 @@ const NAVIGATION = [
     segment: "routines",
     title: "Routines",
     icon: <ShoppingCartIcon />,
-    navigate: "/admin/s",
+    navigate: "/admin/routines",
   },
   {
     segment: "skinTest",
