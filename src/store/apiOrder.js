@@ -4,17 +4,25 @@ const API_URL = 'https://localhost:7130/api';
 
 export const getAllOrders = async (status) => {
   try {
+    const apiStatus = status === 'Cancelled' ? 'Cancel' : status;
+    console.log(`Fetching orders with status: ${apiStatus}`);
     const response = await axios.get(`${API_URL}/Order/get_all_order`, {
-      params: { status }
+      params: apiStatus ? { status: apiStatus } : {}
     });
-    
-    // Transform the response to remove the $id and $values structure
+
+    console.log('API Response:', response.data);
+
+    if (!response.data || !response.data.$values) {
+      console.log('No $values in response data');
+      return [];
+    }
+
     const orders = response.data.$values.map(order => ({
       orderId: order.orderId,
       totalAmount: order.totalAmount,
       status: order.status,
       createdDate: order.createdDate,
-      details: order.details.$values.map(detail => ({
+      details: (order.details?.$values || []).map(detail => ({
         orderDetailId: detail.orderDetailId,
         productId: detail.productId,
         productName: detail.productName,
@@ -25,30 +33,79 @@ export const getAllOrders = async (status) => {
       }))
     }));
 
+    console.log(`Found ${orders.length} orders with status:`, apiStatus);
     return orders;
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    let endpoint;
+    const apiStatus = newStatus === 'Cancelled' ? 'Cancel' : newStatus;
+    switch (apiStatus) {
+      case 'Shipping':
+        endpoint = `${API_URL}/Order/shipping/${orderId}`;
+        break;
+      case 'Complete':
+        endpoint = `${API_URL}/Order/complete/${orderId}`;
+        break;
+      case 'Cancel':
+        endpoint = `${API_URL}/Order/cancel/${orderId}`;
+        break;
+      default:
+        throw new Error('Invalid status');
+    }
+    await axios.put(endpoint);
   } catch (error) {
     throw error;
   }
 };
 
+export const updateOrderStatusDirect = async (orderId, newStatus) => {
+  try {
+    const response = await axios.put(`${API_URL}/Order/update-status/${orderId}`, {
+      status: newStatus
+    });
+    if (response.status === 200) {
+      console.log(`Successfully updated order ${orderId} to status ${newStatus}`);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+};
+
+export const getOrderStatuses = () => {
+  return ['Pending', 'Shipping', 'Complete', 'Cancelled'];
+};
+
 export const completeOrder = async (orderId) => {
   try {
-    await axios.put(`${API_URL}/Order/complete/${orderId}`);
+    const response = await axios.patch(`https://localhost:7130/api/Order/complete-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
   } catch (error) {
+    console.error('Error completing order:', error);
     throw error;
   }
 };
 
 export const cancelOrder = async (orderId) => {
   try {
-    await axios.put(`${API_URL}/Order/cancel/${orderId}`);
+    const response = await axios.patch(`https://localhost:7130/api/Order/cancel-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
   } catch (error) {
+    console.error('Error canceling order:', error);
     throw error;
   }
 };
 
-export const getOrderStatuses = () => {
-  return [
-    'Complete'
-  ];
-};
+

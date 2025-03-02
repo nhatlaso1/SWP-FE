@@ -25,6 +25,8 @@ import Checkout from "./pages/checkout/Checkout";
 import SaleProducts from "./pages/product/SaleProducts";
 import ProductList from "./pages/product/ProductList";
 import ProductDetail from './pages/product/ProductDetail';
+// import ProductsByBrand from './pages/product/ProductsByBrand'; // Xóa dòng này
+import BrandList from './pages/product/BrandList';
 
 function App() {
   const user = useStore((state) => state.profile.user);
@@ -53,6 +55,7 @@ function App() {
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "for-sales", element: <SaleProducts /> },
+        { path: "brands", element: <BrandList /> },
         {
           path: "checkout",
           element: (

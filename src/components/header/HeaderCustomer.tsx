@@ -100,7 +100,7 @@ const HeaderCustomer: React.FC = () => {
 
         <div className="nav-wrap">
           <Link to="/">Home</Link>
-          <Link to="/checkout">Voucher</Link>
+          <Link to="/checkout">Brand</Link>
           <Link to="/for-sales">For Sales</Link>
           <Link to="/products">Products</Link>
           <Link to="/take-quiz">Quiz Skin Q&A</Link>

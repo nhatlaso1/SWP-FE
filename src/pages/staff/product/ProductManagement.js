@@ -8,7 +8,7 @@ const ProductManagement = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [notification, setNotification] = useState(null);
+  const [notification, setNotification] = useState({ message: '', type: 'success' });
   const [showProductForm, setShowProductForm] = useState(false);
   const [showProductDetails, setShowProductDetails] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -19,8 +19,7 @@ const ProductManagement = () => {
     price: '',
     discount: '',
     quantity: '',
-    created_date: new Date().toISOString().split('T')[0],
-    is_recommended: false,
+    size: '',
     status: 'active',
     brand_id: '',
     category_id: '',
@@ -33,24 +32,53 @@ const ProductManagement = () => {
   const [hasChanges, setHasChanges] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [imageUploadType, setImageUploadType] = useState('file'); // 'file' or 'url'
+  const [imageUploadType, setImageUploadType] = useState('file');
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    productName: '',
+    summary: '',
+    size: '',
+    price: 0,
+    quantity: 0,
+    discount: 0,
+    isRecommended: false,
+    brandId: '',
+    categoryId: '',
+    skinTypes: [],
+    ingredients: [],
+    functions: [],
+    images: []
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (pageIndex = 1) => {
     setLoading(true);
     setError(null);
-    
+
     try {
-      const response = await ProductAPI.getAll(1, 10);
+      console.log('Fetching all products...');
+      const response = await ProductAPI.getAll(pageIndex, 10);
+      console.log('Fetched products response:', response);
+
       if (Array.isArray(response)) {
         setProducts(response);
+        setTotalPages(Math.ceil(response.length / 10));
       } else if (response?.$values) {
         setProducts(response.$values);
+        setTotalPages(Math.ceil(response.$values.length / 10));
+      } else if (response?.data?.$values) {
+        setProducts(response.data.$values);
+        setTotalPages(Math.ceil(response.data.$values.length / 10));
       } else {
+        console.warn('Unexpected response format:', response);
         setProducts([]);
         setError('Dữ liệu không hợp lệ');
       }
     } catch (err) {
+      console.error('Error fetching products:', err);
       setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
+      setProducts([]);
     } finally {
       setLoading(false);
     }
@@ -67,8 +95,8 @@ const ProductManagement = () => {
           BrandAPI.getAll(),
           CategoryAPI.getAll()
         ]);
-        
-        // Xử lý dữ liệu brands
+
+
         if (Array.isArray(brandsResponse)) {
           setBrands(brandsResponse);
         } else if (brandsResponse?.$values) {
@@ -77,7 +105,7 @@ const ProductManagement = () => {
           setBrands([]);
         }
 
-        // Xử lý dữ liệu categories
+
         if (Array.isArray(categoriesResponse)) {
           setCategories(categoriesResponse);
         } else if (categoriesResponse?.$values) {
@@ -94,9 +122,9 @@ const ProductManagement = () => {
     fetchData();
   }, []);
 
-  const showNotificationMessage = (message) => {
-    setNotification(message);
-    setTimeout(() => setNotification(null), 3000);
+  const showNotificationMessage = (message, type = 'success') => {
+    setNotification({ message, type });
+    setTimeout(() => setNotification({ message: '', type: 'success' }), 3000);
   };
 
   const handleEditProduct = (product) => {
@@ -108,8 +136,7 @@ const ProductManagement = () => {
       price: product.price,
       discount: product.discount,
       quantity: product.quantity,
-      created_date: product.created_date,
-      is_recommended: product.is_recommended,
+      size: product.size,
       status: product.status,
       brand_id: product.brand_id,
       category_id: product.category_id,
@@ -118,126 +145,33 @@ const ProductManagement = () => {
     setShowProductForm(true);
   };
 
-  const handleToggleStatus = async (productId, currentStatus) => {
-    try {
-      if (currentStatus === 'active') {
-        await ProductAPI.deactivate(productId);
-        showNotificationMessage('Đã hủy kích hoạt sản phẩm thành công!');
-      } else {
-        await ProductAPI.activate(productId);
-        showNotificationMessage('Đã kích hoạt sản phẩm thành công!');
-      }
-      fetchProducts();
-    } catch (err) {
-      setError('Không thể thay đổi trạng thái sản phẩm');
-    }
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleImageChange({ target: { files: e.dataTransfer.files } });
-    }
-  };
-
-  const handleImageUrlChange = (e) => {
-    setImageUrl(e.target.value);
-    setProductForm(prev => ({
-      ...prev,
-      productImage: e.target.value
-    }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setProductForm(prev => ({
-        ...prev,
-        productImage: file
-      }));
-    }
-  };
-
-  const handleSubmitProduct = async (e) => {
-    e.preventDefault();
-    if (!productForm.productName.trim() || !productForm.price) {
-      setError('Vui lòng điền đầy đủ thông tin bắt buộc');
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      Object.keys(productForm).forEach(key => {
-        if (key === 'productImage' && productForm[key]) {
-          formData.append('image', productForm[key]);
-        } else if (key === 'discount') {
-          const discountValue = productForm[key] === '' ? 0 : parseFloat(productForm[key]) / 100;
-          formData.append(key, discountValue);
-        } else if (key === 'quantity') {
-          const quantityValue = productForm[key] === '' ? 0 : parseInt(productForm[key]);
-          formData.append(key, quantityValue);
-        } else {
-          formData.append(key, productForm[key]);
-        }
-      });
-
-      if (selectedProduct) {
-        await ProductAPI.update(selectedProduct.productId, formData);
-        showNotificationMessage('Cập nhật sản phẩm thành công!');
-      } else {
-        await ProductAPI.create(formData);
-        showNotificationMessage('Thêm sản phẩm thành công!');
-      }
-
-      setShowProductForm(false);
-      setProductForm({
-        productId: '',
-        productName: '',
-        summary: '',
-        price: '',
-        discount: '',
-        quantity: '',
-        created_date: new Date().toISOString().split('T')[0],
-        is_recommended: false,
-        status: 'active',
-        brand_id: '',
-        category_id: '',
-        productImage: null
-      });
-      setSelectedProduct(null);
-      fetchProducts();
-    } catch (err) {
-      setError(selectedProduct ? 'Không thể cập nhật sản phẩm' : 'Không thể thêm sản phẩm');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleViewDetails = (product) => {
-    setSelectedProduct(product);
+    setSelectedProduct(null);
     setShowProductDetails(true);
+    fetchProductDetail(product.productId);
+  };
+
+  const fetchProductDetail = async (productId) => {
+    try {
+      const detail = await ProductAPI.getDetail(productId);
+      setSelectedProduct(detail);
+    } catch (error) {
+      setError('Không thể lấy chi tiết sản phẩm');
+    }
   };
 
   const handleEditDetailClick = () => {
     setIsEditing(true);
     setEditedProduct({
+      productId: selectedProduct.productId,
       ...selectedProduct,
-      brand_id: selectedProduct.brand_id,
-      category_id: selectedProduct.category_id
+      brand_id: selectedProduct.brand?.brandId,
+      category_id: selectedProduct.category?.categoryId,
+      skinTypes: selectedProduct.skinTypes,
+      ingredients: selectedProduct.ingredients,
+      functions: selectedProduct.functions,
+      productImages: selectedProduct.productImages,
+      isRecommended: selectedProduct.isRecommended || false
     });
   };
 
@@ -251,250 +185,314 @@ const ProductManagement = () => {
 
   const handleSaveChanges = async () => {
     try {
-      await ProductAPI.update(editedProduct.productId, editedProduct);
-      setSelectedProduct(editedProduct);
+      setLoading(true);
+
+      if (!editedProduct.productId) {
+        throw new Error('Không tìm thấy ID sản phẩm');
+      }
+
+
+      const price = parseFloat(editedProduct.price);
+      const quantity = parseInt(editedProduct.quantity);
+      const discount = parseFloat(editedProduct.discount);
+      const brandId = parseInt(editedProduct.brand_id);
+      const categoryId = parseInt(editedProduct.category_id);
+
+      if (isNaN(price) || price < 0) {
+        throw new Error('Giá sản phẩm không hợp lệ');
+      }
+      if (isNaN(quantity) || quantity < 0) {
+        throw new Error('Số lượng sản phẩm không hợp lệ');
+      }
+      if (isNaN(discount) || discount < 0 || discount > 1) {
+        throw new Error('Giảm giá phải từ 0 đến 1');
+      }
+      if (isNaN(brandId) || brandId <= 0) {
+        throw new Error('Vui lòng chọn thương hiệu');
+      }
+      if (isNaN(categoryId) || categoryId <= 0) {
+        throw new Error('Vui lòng chọn danh mục');
+      }
+
+      const updateData = {
+        productName: editedProduct.productName?.trim() || '',
+        size: editedProduct.size?.trim() || '',
+        price,
+        quantity,
+        discount,
+        summary: editedProduct.summary?.trim() || '',
+        isRecommended: Boolean(editedProduct.isRecommended),
+        brandId,
+        categoryId,
+        skinTypeIds: Array.isArray(editedProduct.skinTypes?.$values)
+          ? editedProduct.skinTypes.$values.map(skin => skin.skinTypeId)
+          : [],
+        ingredientConcentrations: Array.isArray(editedProduct.ingredients?.$values)
+          ? editedProduct.ingredients.$values.map(ing => ({
+            ingredientId: ing.ingredientId,
+            concentration: ing.concentration || 1
+          }))
+          : [],
+        functionIds: Array.isArray(editedProduct.functions?.$values)
+          ? editedProduct.functions.$values.map(func => func.functionId)
+          : [],
+        imageUrls: Array.isArray(editedProduct.productImages?.$values)
+          ? editedProduct.productImages.$values.map(img => img.productImage)
+          : []
+      };
+
+      console.log('Updating product with ID:', editedProduct.productId);
+      console.log('Update data:', updateData);
+
+      await ProductAPI.update(editedProduct.productId, updateData);
+      await fetchProducts(); // Refresh the product list
+      await fetchProductDetail(editedProduct.productId);
       setIsEditing(false);
       setHasChanges(false);
-      showNotificationMessage('Cập nhật sản phẩm thành công!');
-      fetchProducts();
+      showNotificationMessage('Cập nhật sản phẩm thành công!', 'success');
     } catch (error) {
-      setError('Không thể cập nhật sản phẩm');
+      console.error('Error in handleSaveChanges:', error);
+      showNotificationMessage(error.message || 'Không thể cập nhật sản phẩm. Vui lòng thử lại!', 'error');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleCreateProduct = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Validate required fields
+      if (!newProduct.productName?.trim()) {
+        throw new Error('Vui lòng nhập tên sản phẩm');
+      }
+
+      // Validate numeric fields
+      const price = parseFloat(newProduct.price);
+      const quantity = parseInt(newProduct.quantity);
+      const discount = parseFloat(newProduct.discount);
+      const brandId = parseInt(newProduct.brandId);
+      const categoryId = parseInt(newProduct.categoryId);
+
+      if (isNaN(price) || price < 0) {
+        throw new Error('Giá sản phẩm không hợp lệ');
+      }
+      if (isNaN(quantity) || quantity < 0) {
+        throw new Error('Số lượng sản phẩm không hợp lệ');
+      }
+      if (isNaN(discount) || discount < 0 || discount > 1) {
+        throw new Error('Giảm giá phải từ 0 đến 1');
+      }
+      if (isNaN(brandId) || brandId <= 0) {
+        throw new Error('Vui lòng chọn thương hiệu');
+      }
+      if (isNaN(categoryId) || categoryId <= 0) {
+        throw new Error('Vui lòng chọn danh mục');
+      }
+
+      const productToCreate = {
+        productName: newProduct.productName || 'Sản phẩm mới',
+        summary: newProduct.summary || 'Mô tả sản phẩm',
+        size: newProduct.size || 'M',
+        price: parseFloat(newProduct.price) || 100,
+        quantity: parseInt(newProduct.quantity) || 10,
+        discount: parseFloat(newProduct.discount) || 0.1,
+        isRecommended: newProduct.isRecommended,
+        brandId: parseInt(newProduct.brandId) || 1,
+        categoryId: parseInt(newProduct.categoryId) || 1,
+        skinTypes: newProduct.skinTypes,
+        ingredients: newProduct.ingredients,
+        functions: newProduct.functions,
+        images: newProduct.images
+      };
+
+      console.log('Attempting to create product with data:', productToCreate);
+
+      const createResponse = await ProductAPI.create(productToCreate);
+      console.log('Create product response:', createResponse);
+
+      if (!createResponse) {
+        throw new Error('Không nhận được phản hồi khi tạo sản phẩm');
+      }
+
+      // Đợi một chút trước khi làm mới danh sách
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      console.log('Refreshing product list...');
+      await fetchProducts();
+
+      setShowCreateForm(false);
+      setNewProduct({
+        productName: '',
+        summary: '',
+        size: '',
+        price: 0,
+        quantity: 0,
+        discount: 0,
+        isRecommended: false,
+        brandId: '',
+        categoryId: '',
+        skinTypes: [],
+        ingredients: [],
+        functions: [],
+        images: []
+      });
+      showNotificationMessage('Tạo sản phẩm thành công!', 'success');
+    } catch (error) {
+      console.error('Error in handleCreateProduct:', error);
+      const errorMessage = error.response?.data?.detail
+        || error.response?.data?.message
+        || error.message
+        || 'Không thể tạo sản phẩm. Vui lòng thử lại!';
+
+      showNotificationMessage(errorMessage, 'error');
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleNewProductChange = (field, value) => {
+    setNewProduct(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    fetchProducts(page); // Gọi lại hàm fetchProducts với trang mới
   };
 
   return (
     <div className="product-management">
-      {error && (
-        <div className="error-message">
-          {error}
-          <button onClick={() => setError(null)}>✕</button>
-        </div>
-      )}
-
-      <div className="management-header">
-        <h1>Quản lý Sản phẩm</h1>
-        <div className="header-actions">
-          <button onClick={() => { setShowProductForm(true); setSelectedProduct(null); }}>
-            Thêm sản phẩm
-          </button>
-        </div>
+      <div className="header-actions" style={{ marginBottom: '20px' }}>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          style={{
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            padding: '10px 20px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
+          Thêm sản phẩm mới
+        </button>
       </div>
 
-      {showProductForm && (
+      {showCreateForm && (
         <div className="modal">
           <div className="modal-content">
-            <h2>{selectedProduct ? 'Sửa sản phẩm' : 'Thêm sản phẩm mới'}</h2>
-            <form onSubmit={handleSubmitProduct}>
-              <div className="form-group">
-                <label>Số lượng: <span className="required">*</span></label>
-                <input
-                  type="text"
-                  value={productForm.quantity}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '');
-                    setProductForm({
-                      ...productForm,
-                      quantity: value
-                    });
-                  }}
-                  placeholder="Nhập số lượng"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Ngày tạo:</label>
-                <input
-                  type="date"
-                  value={productForm.created_date}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    created_date: e.target.value
-                  })}
-                  min="2000-01-01"
-                  max="2099-12-31"
-                />
-              </div>
-              <div className="form-group">
-                <label>Thương hiệu: <span className="required">*</span></label>
-                <select
-                  value={productForm.brand_id}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    brand_id: e.target.value
-                  })}
-                  required
-                >
-                  <option value="">Chọn thương hiệu</option>
-                  {brands.map(brand => (
-                    <option key={brand.brandId} value={brand.brandId}>
-                      {brand.brandName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Danh mục: <span className="required">*</span></label>
-                <select
-                  value={productForm.category_id}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    category_id: e.target.value
-                  })}
-                  required
-                >
-                  <option value="">Chọn danh mục</option>
-                  {categories.map(category => (
-                    <option key={category.categoryId} value={category.categoryId}>
-                      {category.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Tên sản phẩm: <span className="required">*</span></label>
-                <input
-                  type="text"
-                  value={productForm.productName}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    productName: e.target.value
-                  })}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Mô tả:</label>
-                <textarea
-                  value={productForm.summary}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    summary: e.target.value
-                  })}
-                />
-              </div>
-              <div className="form-group">
-                <label>Giá: <span className="required">*</span></label>
-                <input
-                  type="number"
-                  value={productForm.price}
-                  onChange={(e) => setProductForm({
-                    ...productForm,
-                    price: parseFloat(e.target.value) || 0
-                  })}
-                  min="0"
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Giảm giá (%):</label>
-                <input
-                  type="text"
-                  value={productForm.discount}
-                  onChange={(e) => {
-                    const value = e.target.value.replace(/[^\d.]/g, '');
-                    if (value === '' || (parseFloat(value) >= 0 && parseFloat(value) <= 100)) {
-                      setProductForm({
-                        ...productForm,
-                        discount: value
-                      });
-                    }
-                  }}
-                  placeholder="Nhập % giảm giá (0-100)"
-                />
-              </div>
-              <div className="form-group">
-                <label>Hình ảnh:</label>
-                <div className="image-upload-options">
-                  <div className="upload-type-selector">
-                    <label>
-                      <input
-                        type="radio"
-                        value="file"
-                        checked={imageUploadType === 'file'}
-                        onChange={(e) => setImageUploadType(e.target.value)}
-                      />
-                      Tải lên từ máy
-                    </label>
-                    <label>
-                      <input
-                        type="radio"
-                        value="url"
-                        checked={imageUploadType === 'url'}
-                        onChange={(e) => setImageUploadType(e.target.value)}
-                      />
-                      Nhập URL
-                    </label>
-                  </div>
-
-                  {imageUploadType === 'file' ? (
-                    <div 
-                      className={`drag-drop-zone ${dragActive ? 'active' : ''}`}
-                      onDragEnter={handleDrag}
-                      onDragLeave={handleDrag}
-                      onDragOver={handleDrag}
-                      onDrop={handleDrop}
-                    >
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleImageChange}
-                        style={{ display: 'none' }}
-                        id="image-upload"
-                      />
-                      <label htmlFor="image-upload" className="upload-label">
-                        <div>
-                          Kéo thả hình ảnh vào đây hoặc click để chọn file
-                          {productForm.productImage && (
-                            <div className="selected-file">
-                              Đã chọn: {productForm.productImage.name || 'File hình ảnh'}
-                            </div>
-                          )}
-                        </div>
-                      </label>
-                    </div>
-                  ) : (
-                    <input
-                      type="url"
-                      placeholder="Nhập URL hình ảnh"
-                      value={imageUrl}
-                      onChange={handleImageUrlChange}
-                      className="url-input"
-                    />
-                  )}
-                </div>
-              </div>
-              <div className="modal-actions">
-                <button type="submit">
-                  {selectedProduct ? 'Cập nhật' : 'Thêm mới'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowProductForm(false);
-                    setProductForm({
-                      productId: '',
-                      productName: '',
-                      summary: '',
-                      price: '',
-                      discount: '',
-                      quantity: '',
-                      created_date: new Date().toISOString().split('T')[0],
-                      is_recommended: false,
-                      status: 'active',
-                      brand_id: '',
-                      category_id: '',
-                      productImage: null
-                    });
-                    setSelectedProduct(null);
-                    setImageUrl('');
-                    setImageUploadType('file');
-                  }}
-                  className="cancel-button"
-                >
-                  Hủy
-                </button>
-              </div>
-            </form>
+            <h2>Thêm sản phẩm mới</h2>
+            <div className="form-group">
+              <label>Tên sản phẩm:</label>
+              <input
+                type="text"
+                value={newProduct.productName}
+                onChange={(e) => handleNewProductChange('productName', e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Mô tả:</label>
+              <textarea
+                value={newProduct.summary}
+                onChange={(e) => handleNewProductChange('summary', e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Size:</label>
+              <input
+                type="text"
+                value={newProduct.size}
+                onChange={(e) => handleNewProductChange('size', e.target.value)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Giá:</label>
+              <input
+                type="number"
+                value={newProduct.price}
+                onChange={(e) => handleNewProductChange('price', e.target.value)}
+                min="0"
+              />
+            </div>
+            <div className="form-group">
+              <label>Số lượng:</label>
+              <input
+                type="number"
+                value={newProduct.quantity}
+                onChange={(e) => handleNewProductChange('quantity', e.target.value)}
+                min="0"
+              />
+            </div>
+            <div className="form-group">
+              <label>Giảm giá:</label>
+              <input
+                type="number"
+                value={newProduct.discount}
+                onChange={(e) => handleNewProductChange('discount', e.target.value)}
+                min="0"
+                max="1"
+                step="0.01"
+              />
+            </div>
+            <div className="form-group">
+              <label>Đề xuất:</label>
+              <input
+                type="checkbox"
+                checked={newProduct.isRecommended}
+                onChange={(e) => handleNewProductChange('isRecommended', e.target.checked)}
+              />
+            </div>
+            <div className="form-group">
+              <label>Thương hiệu:</label>
+              <select
+                value={newProduct.brandId}
+                onChange={(e) => handleNewProductChange('brandId', e.target.value)}
+              >
+                <option value="">Chọn thương hiệu</option>
+                {brands.map(brand => (
+                  <option key={brand.brandId} value={brand.brandId}>
+                    {brand.brandName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label>Danh mục:</label>
+              <select
+                value={newProduct.categoryId}
+                onChange={(e) => handleNewProductChange('categoryId', e.target.value)}
+              >
+                <option value="">Chọn danh mục</option>
+                {categories.map(category => (
+                  <option key={category.categoryId} value={category.categoryId}>
+                    {category.categoryName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="modal-actions">
+              <button
+                onClick={handleCreateProduct}
+                style={{
+                  backgroundColor: '#4CAF50',
+                  color: 'white',
+                  marginRight: '8px'
+                }}
+              >
+                Tạo
+              </button>
+              <button
+                onClick={() => setShowCreateForm(false)}
+                className="cancel-button"
+              >
+                Huỷ
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -508,6 +506,38 @@ const ProductManagement = () => {
                 {isEditing ? (
                   <>
                     <div className="form-group">
+                      <label><strong>Tên sản phẩm:</strong></label>
+                      <input
+                        type="text"
+                        value={editedProduct.productName}
+                        onChange={(e) => handleDetailChange('productName', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label><strong>Mô tả:</strong></label>
+                      <textarea
+                        value={editedProduct.summary}
+                        onChange={(e) => handleDetailChange('summary', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label><strong>Size:</strong></label>
+                      <input
+                        type="text"
+                        value={editedProduct.size}
+                        onChange={(e) => handleDetailChange('size', e.target.value)}
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label><strong>Giá:</strong></label>
+                      <input
+                        type="number"
+                        value={editedProduct.price}
+                        onChange={(e) => handleDetailChange('price', parseFloat(e.target.value) || 0)}
+                        min="0"
+                      />
+                    </div>
+                    <div className="form-group">
                       <label><strong>Số lượng:</strong></label>
                       <input
                         type="number"
@@ -517,18 +547,29 @@ const ProductManagement = () => {
                       />
                     </div>
                     <div className="form-group">
-                      <label><strong>Ngày tạo:</strong></label>
+                      <label><strong>Giảm giá:</strong></label>
                       <input
-                        type="date"
-                        value={editedProduct.created_date}
-                        onChange={(e) => handleDetailChange('created_date', e.target.value)}
+                        type="number"
+                        value={editedProduct.discount}
+                        onChange={(e) => handleDetailChange('discount', parseFloat(e.target.value) || 0)}
+                        min="0"
+                        max="1"
+                        step="0.01"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label><strong>Đề xuất:</strong></label>
+                      <input
+                        type="checkbox"
+                        checked={editedProduct.isRecommended}
+                        onChange={(e) => handleDetailChange('isRecommended', e.target.checked)}
                       />
                     </div>
                     <div className="form-group">
                       <label><strong>Thương hiệu:</strong></label>
                       <select
                         value={editedProduct.brand_id}
-                        onChange={(e) => handleDetailChange('brand_id', e.target.value)}
+                        onChange={(e) => handleDetailChange('brand_id', parseInt(e.target.value))}
                       >
                         {brands.map(brand => (
                           <option key={brand.brandId} value={brand.brandId}>
@@ -541,7 +582,7 @@ const ProductManagement = () => {
                       <label><strong>Danh mục:</strong></label>
                       <select
                         value={editedProduct.category_id}
-                        onChange={(e) => handleDetailChange('category_id', e.target.value)}
+                        onChange={(e) => handleDetailChange('category_id', parseInt(e.target.value))}
                       >
                         {categories.map(category => (
                           <option key={category.categoryId} value={category.categoryId}>
@@ -550,36 +591,70 @@ const ProductManagement = () => {
                         ))}
                       </select>
                     </div>
-                    <div className="form-group">
-                      <label><strong>Trạng thái:</strong></label>
-                      <select
-                        value={editedProduct.status}
-                        onChange={(e) => handleDetailChange('status', e.target.value)}
-                      >
-                        <option value="active">Đang kích hoạt</option>
-                        <option value="inactive">Huỷ kích hoạt</option>
-                      </select>
-                    </div>
                   </>
                 ) : (
                   <>
                     <p><strong>Số lượng:</strong> {selectedProduct.quantity}</p>
-                    <p><strong>Ngày tạo:</strong> {selectedProduct.created_date}</p>
-                    <p><strong>Được đề xuất:</strong> {selectedProduct.is_recommended ? 'Có' : ''}</p>
-                    <p><strong>Thương hiệu:</strong> {brands.find(b => b.brandId === selectedProduct.brand_id)?.brandName || selectedProduct.brand_id}</p>
-                    <p><strong>Danh mục:</strong> {categories.find(c => c.categoryId === selectedProduct.category_id)?.categoryName || selectedProduct.category_id}</p>
-                    <p className="status-line">
-                      <strong>Trạng thái:</strong>
-                      <span style={{ 
-                        color: selectedProduct.status === 'active' ? '#4CAF50' : '#f44336',
-                        backgroundColor: selectedProduct.status === 'active' ? '#E8F5E9' : '#FFEBEE',
-                        padding: '4px 8px',
-                        borderRadius: '4px',
-                        marginLeft: '8px'
-                      }}>
-                        {selectedProduct.status === 'active' ? 'Đang kích hoạt' : 'Huỷ kích hoạt'}
-                      </span>
-                    </p>
+                    <p><strong>Size:</strong> {selectedProduct.size}</p>
+                    <p><strong>Giá:</strong> {new Intl.NumberFormat('vi-VN', {
+                      style: 'currency',
+                      currency: 'VND'
+                    }).format(selectedProduct.price)}</p>
+                    <p><strong>Giảm giá:</strong> {(selectedProduct.discount * 100).toFixed(0)}%</p>
+                    <p><strong>Thương hiệu:</strong> {selectedProduct.brand?.brandName}</p>
+                    <p><strong>Danh mục:</strong> {selectedProduct.category?.categoryName}</p>
+
+                    <div className="detail-section">
+                      <h3>Loại da phù hợp:</h3>
+                      <ul>
+                        {selectedProduct.skinTypes?.$values.map(skin => (
+                          <li key={skin.skinTypeId}>{skin.skinTypeName}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="detail-section">
+                      <h3>Công dụng:</h3>
+                      <ul>
+                        {selectedProduct.functions?.$values.map(func => (
+                          <li key={func.functionId}>{func.functionName}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="detail-section">
+                      <h3>Thành phần:</h3>
+                      <ul>
+                        {selectedProduct.ingredients?.$values.map(ingredient => (
+                          <li key={ingredient.ingredientId}>{ingredient.ingredientName}</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="detail-section">
+                      <h3>Đánh giá từ khách hàng:</h3>
+                      {selectedProduct.feedbacks?.$values.map(feedback => (
+                        <div key={feedback.feedbackId} className="feedback-item">
+                          <p><strong>Đánh giá:</strong> {feedback.rating}/5</p>
+                          <p><strong>Nhận xét:</strong> {feedback.comment}</p>
+                          <p><strong>Ngày:</strong> {new Date(feedback.createdDate).toLocaleDateString('vi-VN')}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="detail-section">
+                      <h3>Hình ảnh sản phẩm:</h3>
+                      <div className="product-images">
+                        {selectedProduct.productImages?.$values.map(image => (
+                          <img
+                            key={image.productImageId}
+                            src={image.productImage}
+                            alt={selectedProduct.productName}
+                            style={{ width: '100px', height: '100px', objectFit: 'cover', margin: '5px' }}
+                          />
+                        ))}
+                      </div>
+                    </div>
                   </>
                 )}
               </div>
@@ -587,7 +662,7 @@ const ProductManagement = () => {
             <div className="modal-actions">
               {isEditing ? (
                 <>
-                  <button 
+                  <button
                     onClick={handleSaveChanges}
                     disabled={!hasChanges}
                     style={{
@@ -598,7 +673,7 @@ const ProductManagement = () => {
                   >
                     Lưu
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       setIsEditing(false);
                       setHasChanges(false);
@@ -610,7 +685,7 @@ const ProductManagement = () => {
                 </>
               ) : (
                 <>
-                  <button 
+                  <button
                     onClick={handleEditDetailClick}
                     style={{
                       backgroundColor: '#2196F3',
@@ -642,14 +717,19 @@ const ProductManagement = () => {
                 <th>Mô tả</th>
                 <th>Giá</th>
                 <th>Giảm giá</th>
-                <th>Đánh giá</th>
+                <th>Số lượng</th>
                 <th>Hình ảnh</th>
                 <th>Trạng thái</th>
               </tr>
             </thead>
             <tbody>
               {products.map((product) => (
-                <tr key={product.productId} onClick={() => handleViewDetails(product)}>
+                <tr
+                  key={product.productId}
+                  onClick={() => handleViewDetails(product)}
+                  style={{ cursor: 'pointer' }}
+                  className="product-row"
+                >
                   <td>{product.productId}</td>
                   <td>{product.productName}</td>
                   <td>{product.summary}</td>
@@ -660,19 +740,19 @@ const ProductManagement = () => {
                     }).format(product.price)}
                   </td>
                   <td>{(product.discount * 100).toFixed(0)}%</td>
-                  <td>{product.rating}</td>
+                  <td>{product.quantity}</td>
                   <td>
                     {product.productImage && (
-                      <img 
-                        src={product.productImage} 
+                      <img
+                        src={product.productImage}
                         alt={product.productName}
                         style={{ width: '50px', height: '50px', objectFit: 'cover' }}
                       />
                     )}
                   </td>
                   <td>
-                    <span 
-                      style={{ 
+                    <span
+                      style={{
                         color: '#4CAF50',
                         backgroundColor: '#E8F5E9',
                         padding: '4px 8px',
@@ -680,7 +760,7 @@ const ProductManagement = () => {
                         fontSize: '14px'
                       }}
                     >
-                      Kích hoạt
+                      Active
                     </span>
                   </td>
                 </tr>
@@ -690,7 +770,36 @@ const ProductManagement = () => {
         </div>
       )}
 
-      {notification && <div className="notification">{notification}</div>}
+      {notification.message && (
+        <div
+          className="notification"
+          style={{
+            backgroundColor: notification.type === 'success' ? '#4CAF50' : '#f44336',
+            color: 'white',
+            padding: '16px',
+            position: 'fixed',
+            bottom: '20px',
+            right: '20px',
+            borderRadius: '4px',
+            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
+            zIndex: 1000
+          }}
+        >
+          {notification.message}
+        </div>
+      )}
+
+      <div className="pagination">
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={currentPage === index + 1 ? 'active' : ''}
+          >
+            {index + 1}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
