@@ -1,209 +1,410 @@
 import React, { useEffect, useState } from 'react';
+
 import {
+
   Box,
+
   Grid,
+
   Card,
+
   CardMedia,
+
   CardContent,
+
   Typography,
+
   Button,
+
   Container,
-  Tabs,
-  Tab,
+
   CircularProgress,
+
   Alert,
-  Rating
+
+  Rating,
+
 } from '@mui/material';
+
 import { useNavigate } from 'react-router-dom';
+
 import { ProductAPI } from '../../store/apiProduct';
+
 import { CategoryAPI } from '../../store/apiCategory';
+
+import styles from './ProductList.module.css';
 import { useStore } from '../../store';
+
+
 interface Category {
+
   $id: string;
+
   categoryId: number;
+
   categoryName: string;
+
 }
+
+
 
 interface Product {
+
   $id: string;
+
   productId: number;
+
   productName: string;
+
   summary: string;
+
   price: number;
+
   discount: number;
+
   rating: number;
+
   productImage: string;
+
   categoryId: number;
-}
 
-const ProductList: React.FC = () => {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | 'all'>('all');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
-  const addItem = useStore((store) => store.addItem);
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  brand: {
 
-        const [productsData, categoriesResponse] = await Promise.all([
-          ProductAPI.getAll(),
-          CategoryAPI.getAll()
-        ]);
+    brandName: string;
 
-        const categoriesData = categoriesResponse.$values || [];
-
-        console.log('Products Data:', productsData);
-        console.log('Categories Data:', categoriesData);
-
-        setProducts(productsData);
-        setCategories(categoriesData);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to load data. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const handleCategoryChange = (_event: React.SyntheticEvent, newValue: number | 'all') => {
-    console.log('Selected Category:', newValue);
-    setSelectedCategory(newValue);
   };
 
-  const filteredProducts = selectedCategory === 'all'
-    ? products
-    : products.filter(product => {
-      console.log('Filtering product:', product);
-      return product.categoryId === selectedCategory;
-    });
+}
 
-  console.log('Filtered Products:', filteredProducts);
+
+
+const ProductList: React.FC = () => {
+
+  const [products, setProducts] = useState<Product[]>([]);
+
+  const [bestSellers, setBestSellers] = useState<Product[]>([]);
+
+  const [loading, setLoading] = useState(true);
+
+  const [error, setError] = useState<string | null>(null);
+
+  const navigate = useNavigate();
+
+  const addItem = useStore((store) => store.addItem);
+
+
+  const fetchAllProducts = async () => {
+
+    try {
+
+      setLoading(true);
+
+      setError(null);
+
+      const productsData = await ProductAPI.getAll();
+
+      setProducts(productsData);
+
+      setBestSellers([]); // Đặt bestSellers về mảng rỗng khi lấy tất cả sản phẩm
+
+    } catch (error) {
+
+      console.error('Error fetching all products:', error);
+
+      setError('Failed to load all products. Please try again later.');
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+
+  const fetchBestSellers = async () => {
+
+    try {
+
+      setLoading(true);
+
+      setError(null);
+
+      const bestSellerData = await ProductAPI.getBestSellerProducts();
+
+      setBestSellers(bestSellerData);
+
+      setProducts([]); // Đặt products về mảng rỗng khi lấy sản phẩm bán chạy
+
+    } catch (error) {
+
+      console.error('Error fetching best seller products:', error);
+
+      setError('Failed to load best seller products. Please try again later.');
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
+
+
+
+  useEffect(() => {
+
+    fetchAllProducts(); // Gọi để lấy tất cả sản phẩm khi component được mount
+
+  }, []);
+
+
 
   if (loading) {
+
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
+
+      <div className={styles.loadingContainer}>
+
         <CircularProgress />
-      </Box>
+
+      </div>
+
     );
+
   }
+
+
 
   if (error) {
+
     return (
+
       <Container maxWidth="lg" sx={{ py: 4 }}>
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
+
+        <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>
+
       </Container>
+
     );
+
   }
 
-  return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      {categories.length > 0 && (
-        <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
-          <Tabs
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            variant="scrollable"
-            scrollButtons="auto"
-          >
-            <Tab label="All Products" value="all" />
-            {categories.map((category) => (
-              <Tab key={category.categoryId} label={category.categoryName} value={category.categoryId} />
-            ))}
-          </Tabs>
-        </Box>
-      )}
 
-      {filteredProducts.length === 0 ? (
-        <Box textAlign="center" py={4}>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            No products found
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            {error ? 'There was an error loading the products.' : 'Try changing the category filter or check back later.'}
-          </Typography>
+
+  return (
+
+    <div className={styles.productListContainer}>
+
+      <Container maxWidth="xl">
+
+        <Typography variant="h4" align="center" sx={{ mb: 4 }}>Products</Typography>
+
+        <Box display="flex" justifyContent="center" sx={{ mb: 4 }}>
+
+          <Button variant="contained" onClick={fetchAllProducts} sx={{ mr: 2 }}>All Products</Button>
+
+          <Button variant="contained" onClick={fetchBestSellers}>Best Seller Products</Button>
+
         </Box>
-      ) : (
-        <Grid container spacing={4}>
-          {filteredProducts.map((product) => (
-            <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-              <Card
-                sx={{
-                  height: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  '&:hover': {
-                    transform: 'scale(1.02)',
-                    transition: 'transform 0.2s ease-in-out'
-                  }
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  height="200"
-                  image={product.productImage}
-                  alt={product.productName}
-                  sx={{ objectFit: 'cover', cursor: 'pointer' }}
-                  onClick={() => navigate(`/product/${product.productId}`)}
-                />
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h6" component="h2" noWrap>
-                    {product.productName}
-                  </Typography>
-                  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-                    <Rating value={product.rating} precision={0.1} readOnly size="small" />
-                    <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
-                      ({product.rating})
-                    </Typography>
-                  </Box>
-                  <Typography variant="body1" color="text.primary" sx={{ mb: 2 }}>
-                    ${product.price.toLocaleString()}
-                    {product.discount > 0 && (
-                      <Typography
-                        component="span"
-                        sx={{
-                          color: 'error.main',
-                          ml: 1,
-                          textDecoration: 'line-through'
+
+        <Grid container spacing={3}>
+
+          {/* Best Seller Products */}
+
+          <Grid item xs={12}>
+
+            <Grid container spacing={4}>
+
+              {bestSellers.map((product) => (
+
+                <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
+
+                  <Card className={styles.productCard}>
+
+                    <CardMedia
+
+                      className={styles.productImage}
+
+                      component="img"
+
+                      image={product.productImage}
+
+                      alt={product.productName}
+
+                      onClick={() => navigate(`/product/${product.productId}`)}
+
+                    />
+
+                    <CardContent>
+
+                      <Typography className={styles.productTitle} variant="h6" component="h2" noWrap>
+
+                        {product.productName}
+
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary">Brand: {product.brand.brandName}</Typography>
+
+                      <div className={styles.ratingContainer}>
+
+                        <Rating value={product.rating} precision={0.1} readOnly size="small" />
+
+                        <Typography variant="body2" color="text.secondary">({product.rating})</Typography>
+
+                      </div>
+
+                      <div className={styles.priceContainer}>
+
+                        <span className={styles.price}>${product.price.toLocaleString()}</span>
+
+                        {product.discount > 0 && (
+
+                          <span className={styles.discountPrice}>${(product.price * (1 + product.discount)).toLocaleString()}</span>
+
+                        )}
+
+                      </div>
+
+                      <Button
+                        variant="contained"
+                        size="large"
+                        fullWidth
+                        sx={{ mt: 2 }}
+                        onClick={() => {
+                          addItem({
+                            productId: product.productId,
+                            productName: product.productName,
+                            price: product.price,
+                            productImage: product.productImage,
+                          });
                         }}
                       >
-                        ${(product.price * (1 + product.discount)).toLocaleString()}
-                      </Typography>
-                    )}
-                  </Typography>
-                  <Button
-                    variant="contained"
-                    size="large"
-                    fullWidth
-                    sx={{ mt: 2 }}
-                    onClick={() => {
-                      addItem({
-                        productId: product.productId,
-                        productName: product.productName,
-                        price: product.price,
-                        productImage: product.productImage,
-                      });
-                    }}
-                  >
-                    Add to Cart
-                  </Button>
-                </CardContent>
-              </Card>
+                        Add to Cart
+                      </Button>
+
+                    </CardContent>
+
+                  </Card>
+
+                </Grid>
+
+              ))}
+
             </Grid>
-          ))}
+
+          </Grid>
+
+          {/* Existing Product Grid */}
+
+          <Grid item xs={12}>
+
+            {products.length === 0 ? (
+
+              <div className={styles.noProducts}>
+
+                <Typography variant="h6" gutterBottom>No products found</Typography>
+
+                <Typography variant="body1">Check back later for new products.</Typography>
+
+              </div>
+
+            ) : (
+
+              <Grid container spacing={4}>
+
+                {products.map((product) => (
+
+                  <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
+
+                    <Card className={styles.productCard}>
+
+                      <CardMedia
+
+                        className={styles.productImage}
+
+                        component="img"
+
+                        image={product.productImage}
+
+                        alt={product.productName}
+
+                        onClick={() => navigate(`/product/${product.productId}`)}
+
+                      />
+
+                      <CardContent>
+
+                        <Typography className={styles.productTitle} variant="h6" component="h2" noWrap>
+
+                          {product.productName}
+
+                        </Typography>
+
+                        <Typography variant="body2" color="text.secondary">Brand: {product.brand.brandName}</Typography>
+
+                        <div className={styles.ratingContainer}>
+
+                          <Rating value={product.rating} precision={0.1} readOnly size="small" />
+
+                          <Typography variant="body2" color="text.secondary">({product.rating})</Typography>
+
+                        </div>
+
+                        <div className={styles.priceContainer}>
+
+                          <span className={styles.price}>${product.price.toLocaleString()}</span>
+
+                          {product.discount > 0 && (
+
+                            <span className={styles.discountPrice}>${(product.price * (1 + product.discount)).toLocaleString()}</span>
+
+                          )}
+
+                        </div>
+
+                        <Button
+                          variant="contained"
+                          size="large"
+                          fullWidth
+                          sx={{ mt: 2 }}
+                          onClick={() => {
+                            addItem({
+                              productId: product.productId,
+                              productName: product.productName,
+                              price: product.price,
+                              productImage: product.productImage,
+                            });
+                          }}
+                        >
+                          Add to Cart
+                        </Button>
+
+                      </CardContent>
+
+                    </Card>
+
+                  </Grid>
+
+                ))}
+
+              </Grid>
+
+            )}
+
+          </Grid>
+
         </Grid>
-      )}
-    </Container>
+
+      </Container>
+
+    </div>
+
   );
+
 };
+
+
 
 export default ProductList; 

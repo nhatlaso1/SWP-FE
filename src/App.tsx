@@ -10,7 +10,6 @@ import { useMemo, useEffect } from "react";
 import AdminLayout from "./layouts/AdminLayout";
 import StaffLayout from "./layouts/StaffLayout";
 import ProductManagement from "./pages/staff/product/ProductManagement";
-import OrderList from "./pages/staff/order/OrderList";
 import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
@@ -29,6 +28,8 @@ import OurBranch from "./components/our-branch/OurBranch";
 import Routine from "./pages/admin/routine/Routine";
 import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
+import OrderManagement from "./pages/staff/order/OrderManagement";
+import BrandList from "./pages/brand/BrandList";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -61,7 +62,7 @@ function App() {
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
-        { path: "brands", element: <OurBranch /> },
+        { path: "brands", element: <BrandList /> },
         {
           path: "profile",
           element: (
@@ -97,7 +98,7 @@ function App() {
       ),
       children: [
         { path: "dashboard", element: <DashboardStaff /> },
-        { path: "orders", element: <OrderList /> },
+        { path: "orders", element: <OrderManagement /> },
         { path: "categories", element: <CategoryManagement /> },
         { path: "products", element: <ProductManagement /> },
       ],

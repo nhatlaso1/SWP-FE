@@ -320,7 +320,7 @@ const Cart = () => {
                         </IconButton>
                         <TextField
                           size="small"
-                          sx={{ width: 50 }}
+                          sx={{ width: 70 }}
                           type="number"
                           name={`products[${index}].quantity`}
                           value={formik.values.products[index].quantity}

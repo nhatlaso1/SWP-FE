@@ -37,7 +37,7 @@ export const callApi = async (method, url, data = null, params = {}) => {
 // Định nghĩa các API cho Product
 export const ProductAPI = {
   // Lấy tất cả sản phẩm với phân trang
-  getAll: async (pageIndex = 1, pageSize = 10) => {
+  getAll: async (pageIndex = 1, pageSize = 12) => {
     try {
       console.log('Calling API:', `${BASE_URL}/Product/get_all_product`);
       
