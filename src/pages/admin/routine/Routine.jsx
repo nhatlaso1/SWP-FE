@@ -12,6 +12,7 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Pagination,
 } from "@mui/material";
 import { useStore } from "../../../store";
 import { getAllRoutines } from "../../../store/routine.api";
@@ -21,32 +22,58 @@ const Routine = () => {
   const token = useStore((state) => state.profile.user?.token);
   const navigate = useNavigate();
 
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
   useEffect(() => {
-    const fetchRoutines = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getAllRoutines(token);
-        console.log("Data from API:", data);
-        // Nếu data có thuộc tính $values, lấy mảng từ đó; nếu không thì ép thành mảng (hoặc rỗng)
+        const routineData = await getAllRoutines(token);
+
+        console.log("Raw routine data:", routineData); // Kiểm tra dữ liệu từ API
         const routineArray =
-          data && data.$values ? data.$values : Array.isArray(data) ? data : [];
-        // In log từng object để kiểm tra xem có các trường routineId, routineName, skinTypeName không
-        routineArray.forEach((routine, index) => {
-          console.log(`Routine ${index + 1}:`, JSON.stringify(routine));
-        });
-        // Ép kiểu đối tượng theo mẫu mà bạn cần
+          routineData?.$values && Array.isArray(routineData.$values)
+            ? routineData.$values
+            : Array.isArray(routineData)
+            ? routineData
+            : [];
+
+        console.log("Parsed routine array:", routineArray);
+
         const mappedRoutines = routineArray.map((routine) => ({
-          routineId: routine.routineId, // Kiểm tra xem API có trả về routineId hay không
-          routineName: routine.routineName,
-          skinTypeName: routine.skinTypeName, // Kiểm tra xem API có trả về skinTypeName hay không
+          routineId: routine.routineId || "Unknown",
+          routineName: routine.routineName || "Unknown",
+          skinTypeName: routine.skinTypeName || "Unknown",
+          status: routine.status ? "Active" : "Inactive",
         }));
+
+        console.log("Mapped routines:", mappedRoutines);
         setRoutines(mappedRoutines);
       } catch (error) {
-        console.error("Error fetching routines:", error);
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchRoutines();
+    fetchData();
   }, [token]);
+
+  // Sắp xếp routines theo routineId tăng dần
+  const sortedRoutines = [...routines].sort(
+    (a, b) => Number(a.routineId) - Number(b.routineId)
+  );
+
+  // Tính toán phân trang
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = sortedRoutines.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+  const totalPages = Math.ceil(sortedRoutines.length / itemsPerPage);
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const handleViewDetail = (routineId) => {
     navigate(`/admin/routine/${routineId}`);
@@ -81,11 +108,12 @@ const Routine = () => {
               <TableCell>Routine ID</TableCell>
               <TableCell>Routine Name</TableCell>
               <TableCell>Skin Type</TableCell>
+              <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {routines.length > 0 ? (
-              routines.map((routine) => (
+            {currentData.length > 0 ? (
+              currentData.map((routine) => (
                 <TableRow
                   key={routine.routineId}
                   hover
@@ -95,11 +123,12 @@ const Routine = () => {
                   <TableCell>{routine.routineId}</TableCell>
                   <TableCell>{routine.routineName}</TableCell>
                   <TableCell>{routine.skinTypeName}</TableCell>
+                  <TableCell>{routine.status}</TableCell>
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} align="center">
+                <TableCell colSpan={4} align="center">
                   No routines found.
                 </TableCell>
               </TableRow>
@@ -107,6 +136,17 @@ const Routine = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {totalPages > 1 && (
+        <Box display="flex" justifyContent="center" marginTop={2}>
+          <Pagination
+            count={totalPages}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </Box>
+      )}
     </Container>
   );
 };

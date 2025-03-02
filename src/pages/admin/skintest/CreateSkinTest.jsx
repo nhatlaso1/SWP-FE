@@ -331,7 +331,7 @@ const CreateSkinTest = () => {
       </Box>
 
       <Button variant="contained" color="secondary" onClick={handleSubmit}>
-        Create
+        Create SkinTest
       </Button>
     </Box>
   );

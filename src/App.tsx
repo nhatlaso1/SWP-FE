@@ -27,8 +27,8 @@ import SkinTest from "./pages/admin/skintest/SkinTest";
 import CreateSkinTest from "./pages/admin/skintest/CreateSkinTest";
 import OurBranch from "./components/our-branch/OurBranch";
 import Routine from "./pages/admin/routine/Routine";
-import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import RoutineDetail from "./pages/admin/routine/RoutineDetail";
+import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 
 function App() {
   const user = useStore((store) => store.profile.user);

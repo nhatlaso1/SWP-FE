@@ -11,18 +11,23 @@ import {
   Grid,
   Select,
   MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useStore } from "../../../store";
-import { getRoutineById, updateRoutine } from "../../../store/routine.api";
-
+import {
+  getCategories,
+  getRoutineById,
+  updateRoutine,
+} from "../../../store/routine.api";
+import { getAllSkinType } from "../../../store/skintype.api";
 const RoutineDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const token = useStore((state) => state.profile.user?.token);
-
-  // Nếu có id => xem chi tiết và cập nhật; nếu không có thì chuyển về trang danh sách
+  const [skinTypes, setSkinTypes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [routine, setRoutine] = useState({
     routineId: 0,
@@ -30,25 +35,59 @@ const RoutineDetail = () => {
     skinTypeId: 0,
     routineDetails: [],
   });
+  const [categories, setCategories] = useState([]);
 
+  // Load Routine theo id khi component mount hoặc id thay đổi
   useEffect(() => {
     if (id) {
       fetchRoutine(Number(id));
     }
   }, [id]);
+  useEffect(() => {
+    const loadSkinTypes = async () => {
+      try {
+        const skinTypeList = await getAllSkinType();
+        setSkinTypes(skinTypeList);
+      } catch (error) {
+        console.error("Error loading skin types:", error);
+      }
+    };
 
-  const fetchRoutine = async (routineId) => {
+    loadSkinTypes();
+  }, []);
+  const fetchRoutine = async () => {
     try {
+      const routineId = Number(id); // Lấy id từ URL
       const data = await getRoutineById(routineId, token);
       if (data) {
-        setRoutine(data);
+        setRoutine({
+          routineId: routineId, // Luôn lấy routineId từ URL
+          routineName: data.routineName || "",
+          skinTypeId: data.skinTypeId || 0,
+          skinTypeName: data.skinTypeName || "",
+          routineDetails: data.routineDetails || [],
+        });
       }
     } catch (error) {
       console.error("Error fetching routine:", error);
     }
   };
 
-  // Thêm Routine Detail
+  // Load danh sách Category từ API
+  useEffect(() => {
+    const loadCategories = async () => {
+      try {
+        const categoryList = await getCategories();
+        setCategories(categoryList);
+      } catch (error) {
+        console.error("Error loading categories:", error);
+      }
+    };
+
+    loadCategories();
+  }, []);
+
+  // Thêm Routine Detail mới
   const handleAddDetail = () => {
     setRoutine((prev) => ({
       ...prev,
@@ -59,7 +98,7 @@ const RoutineDetail = () => {
     }));
   };
 
-  // Xóa Routine Detail
+  // Xóa Routine Detail tại vị trí index
   const handleDeleteDetail = (index) => {
     setRoutine((prev) => ({
       ...prev,
@@ -90,14 +129,16 @@ const RoutineDetail = () => {
     });
   };
 
-  // Xóa Routine Step từ Routine Detail tại indexDetail
+  // Xóa Routine Step tại indexDetail và stepIndex
   const handleDeleteStep = (indexDetail, stepIndex) => {
     setRoutine((prev) => {
       const details = prev.routineDetails.map((detail, idx) => {
         if (idx === indexDetail) {
           return {
             ...detail,
-            routineSteps: detail.routineSteps.filter((_, sIdx) => sIdx !== stepIndex),
+            routineSteps: detail.routineSteps.filter(
+              (_, sIdx) => sIdx !== stepIndex
+            ),
           };
         }
         return detail;
@@ -106,12 +147,12 @@ const RoutineDetail = () => {
     });
   };
 
-  // Cập nhật giá trị cho Routine
+  // Cập nhật giá trị cho Routine (ví dụ: routineName)
   const handleChange = (field, value) => {
     setRoutine((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Cập nhật Routine Detail
+  // Cập nhật giá trị cho Routine Detail tại index
   const handleDetailChange = (index, value, field) => {
     setRoutine((prev) => {
       const details = prev.routineDetails.map((detail, idx) =>
@@ -121,7 +162,7 @@ const RoutineDetail = () => {
     });
   };
 
-  // Cập nhật Routine Step
+  // Cập nhật giá trị cho Routine Step tại indexDetail, stepIndex
   const handleStepChange = (indexDetail, stepIndex, value, field) => {
     setRoutine((prev) => {
       const details = prev.routineDetails.map((detail, idx) => {
@@ -137,6 +178,7 @@ const RoutineDetail = () => {
     });
   };
 
+  // Gửi dữ liệu cập nhật về API
   const handleSubmit = async () => {
     try {
       await updateRoutine(routine, token);
@@ -151,19 +193,42 @@ const RoutineDetail = () => {
       <Typography variant="h4" gutterBottom>
         Routine Detail
       </Typography>
-      <Button variant="outlined" onClick={() => setIsEditing(!isEditing)} sx={{ mb: 2 }}>
+      <Button
+        variant="outlined"
+        onClick={() => setIsEditing((prev) => !prev)}
+        sx={{ mb: 2 }}
+      >
         {isEditing ? "View Mode" : "Edit Mode"}
       </Button>
 
-      <Box sx={{ mb: 2 }}>
-        <TextField
-          label="Routine Name"
-          fullWidth
-          value={routine.routineName}
-          onChange={(e) => handleChange("routineName", e.target.value)}
-          disabled={!isEditing}
-        />
-      </Box>
+      <Grid container spacing={2} sx={{ mb: 2 }}>
+        <Grid item xs={8}>
+          <TextField
+            label="Routine Name"
+            fullWidth
+            value={routine.routineName}
+            onChange={(e) => handleChange("routineName", e.target.value)}
+            disabled={!isEditing}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <FormControl fullWidth>
+            <InputLabel>Skin Type</InputLabel>
+            <Select
+              value={routine.skinTypeId}
+              onChange={(e) => handleChange("skinTypeId", e.target.value)}
+              disabled={!isEditing}
+              label="Skin Type"
+            >
+              {skinTypes.map((skinType) => (
+                <MenuItem key={skinType.skinTypeId} value={skinType.skinTypeId}>
+                  {skinType.skinTypeName}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
 
       {routine.routineDetails.map((detail, dIdx) => (
         <Card key={dIdx} sx={{ mb: 3 }}>
@@ -175,7 +240,11 @@ const RoutineDetail = () => {
                   fullWidth
                   value={detail.routineDetailName}
                   onChange={(e) =>
-                    handleDetailChange(dIdx, e.target.value, "routineDetailName")
+                    handleDetailChange(
+                      dIdx,
+                      e.target.value,
+                      "routineDetailName"
+                    )
                   }
                   disabled={!isEditing}
                 />
@@ -194,7 +263,16 @@ const RoutineDetail = () => {
             </Grid>
 
             {detail.routineSteps.map((step, sIdx) => (
-              <Box key={sIdx} sx={{ mt: 2, ml: 2, p: 2, border: "1px solid #ccc", borderRadius: 1 }}>
+              <Box
+                key={sIdx}
+                sx={{
+                  mt: 2,
+                  ml: 2,
+                  p: 2,
+                  border: "1px solid #ccc",
+                  borderRadius: 1,
+                }}
+              >
                 <Grid container spacing={2} alignItems="center">
                   <Grid item xs={2}>
                     <TextField
@@ -202,7 +280,12 @@ const RoutineDetail = () => {
                       fullWidth
                       value={step.step}
                       onChange={(e) =>
-                        handleStepChange(dIdx, sIdx, Number(e.target.value), "step")
+                        handleStepChange(
+                          dIdx,
+                          sIdx,
+                          Number(e.target.value),
+                          "step"
+                        )
                       }
                       disabled={!isEditing}
                     />
@@ -214,21 +297,52 @@ const RoutineDetail = () => {
                       multiline
                       value={step.instruction}
                       onChange={(e) =>
-                        handleStepChange(dIdx, sIdx, e.target.value, "instruction")
+                        handleStepChange(
+                          dIdx,
+                          sIdx,
+                          e.target.value,
+                          "instruction"
+                        )
                       }
                       disabled={!isEditing}
                     />
                   </Grid>
                   <Grid item xs={2}>
-                    <TextField
-                      label="Category ID"
-                      fullWidth
-                      value={step.categoryId}
-                      onChange={(e) =>
-                        handleStepChange(dIdx, sIdx, Number(e.target.value), "categoryId")
-                      }
-                      disabled={!isEditing}
-                    />
+                    {isEditing ? (
+                      <Select
+                        label="Category"
+                        fullWidth
+                        value={step.categoryId}
+                        onChange={(e) =>
+                          handleStepChange(
+                            dIdx,
+                            sIdx,
+                            Number(e.target.value),
+                            "categoryId"
+                          )
+                        }
+                      >
+                        {categories.map((category) => (
+                          <MenuItem
+                            key={category.categoryId}
+                            value={category.categoryId}
+                          >
+                            {category.categoryName}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    ) : (
+                      <TextField
+                        label="Category"
+                        fullWidth
+                        value={
+                          categories.find(
+                            (c) => c.categoryId === step.categoryId
+                          )?.categoryName || ""
+                        }
+                        disabled
+                      />
+                    )}
                   </Grid>
                   {isEditing && (
                     <Grid item xs={1}>
@@ -264,7 +378,7 @@ const RoutineDetail = () => {
       {isEditing && (
         <Box>
           <Button variant="contained" color="secondary" onClick={handleSubmit}>
-            Save Changes
+            Update Routine
           </Button>
         </Box>
       )}

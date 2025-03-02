@@ -54,6 +54,13 @@ const SkinTestDetail = () => {
           : data.skinTypeQuestions;
         console.log("Extracted questions array:", JSON.stringify(questions));
 
+        // In log từng câu hỏi để kiểm tra id và các trường khác
+        if (Array.isArray(questions)) {
+          questions.forEach((q, index) => {
+            console.log(`Question ${index}:`, q);
+          });
+        }
+
         // Map từng câu hỏi:
         // Nếu có trường "type", dùng nó; nếu không có, thử dùng "status" (nếu có), còn nếu chưa có thì mặc định true
         const mappedQuestions = Array.isArray(questions)
@@ -74,10 +81,14 @@ const SkinTestDetail = () => {
             })
           : [];
         console.log("Mapped questions:", JSON.stringify(mappedQuestions));
-        setSkinTest({
+
+        const payload = {
           ...data,
           skinTypeQuestions: mappedQuestions,
-        });
+        };
+        console.log("Final payload set to state:", JSON.stringify(payload));
+
+        setSkinTest(payload);
       }
     } catch (error) {
       console.error("Error fetching skin test:", error);
@@ -90,6 +101,7 @@ const SkinTestDetail = () => {
       console.log("Skin types from API:", JSON.stringify(data));
       if (data) {
         const types = data.$values ? data.$values : data;
+        console.log("Mapped skin types:", types);
         setSkinTypes(types);
       }
     } catch (error) {
@@ -97,26 +109,27 @@ const SkinTestDetail = () => {
     }
   };
 
-  // Các hàm xử lý thêm, cập nhật, xóa câu hỏi và đáp án không thay đổi
+  // Các hàm xử lý thêm, cập nhật, xóa câu hỏi và đáp án
+
   const handleAddQuestion = () => {
-    setSkinTest((prev) => ({
-      ...prev,
-      skinTypeQuestions: [
-        ...prev.skinTypeQuestions,
-        {
-          skinTypeQuestionId: Date.now(),
-          description: "",
-          status: true,
-          skinTypeAnswers: [],
-        },
-      ],
-    }));
+    setSkinTest((prev) => {
+      const newQuestion = {
+        skinTypeQuestionId: Date.now(),
+        description: "",
+        status: true,
+        skinTypeAnswers: [],
+      };
+      console.log("Adding question:", newQuestion);
+      return {
+        ...prev,
+        skinTypeQuestions: [...prev.skinTypeQuestions, newQuestion],
+      };
+    });
   };
 
   const handleAddAnswer = (questionId) => {
-    setSkinTest((prev) => ({
-      ...prev,
-      skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
+    setSkinTest((prev) => {
+      const updatedQuestions = prev.skinTypeQuestions.map((q) =>
         q.skinTypeQuestionId === questionId
           ? {
               ...q,
@@ -125,19 +138,23 @@ const SkinTestDetail = () => {
                 {
                   skinTypeAnswerId: Date.now(),
                   description: "",
-                  skinTypeId: "",
+                  skinTypeId: null, // thay vì "" để tránh chuyển đổi sang 0
                 },
               ],
             }
           : q
-      ),
-    }));
+      );
+      console.log("Adding answer to questionId", questionId, updatedQuestions);
+      return {
+        ...prev,
+        skinTypeQuestions: updatedQuestions,
+      };
+    });
   };
 
   const handleDeleteAnswer = (questionId, answerId) => {
-    setSkinTest((prev) => ({
-      ...prev,
-      skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
+    setSkinTest((prev) => {
+      const updatedQuestions = prev.skinTypeQuestions.map((q) =>
         q.skinTypeQuestionId === questionId
           ? {
               ...q,
@@ -146,15 +163,28 @@ const SkinTestDetail = () => {
               ),
             }
           : q
-      ),
-    }));
+      );
+      console.log(
+        "Deleting answer",
+        answerId,
+        "from question",
+        questionId,
+        updatedQuestions
+      );
+      return {
+        ...prev,
+        skinTypeQuestions: updatedQuestions,
+      };
+    });
   };
 
   const handleChange = (field, value) => {
+    console.log(`Changing field ${field} to:`, value);
     setSkinTest((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleQuestionChange = (questionId, value, field) => {
+    console.log(`Changing question ${questionId} field ${field} to:`, value);
     setSkinTest((prev) => ({
       ...prev,
       skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
@@ -164,6 +194,10 @@ const SkinTestDetail = () => {
   };
 
   const handleAnswerChange = (questionId, answerId, value, field) => {
+    console.log(
+      `Changing answer ${answerId} in question ${questionId} field ${field} to:`,
+      value
+    );
     setSkinTest((prev) => ({
       ...prev,
       skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
@@ -180,6 +214,7 @@ const SkinTestDetail = () => {
   };
 
   const handleSubmit = async () => {
+    console.log("Submitting skin test payload:", skinTest);
     try {
       await updateSkinTest(skinTest, token);
       navigate("/admin/skintests");
@@ -323,7 +358,7 @@ const SkinTestDetail = () => {
               <Grid item xs={3}>
                 {isEditing ? (
                   <Select
-                    value={answer.skinTypeId || ""}
+                    value={answer.skinTypeId !== null ? answer.skinTypeId : ""}
                     onChange={(e) =>
                       handleAnswerChange(
                         question.skinTypeQuestionId,
@@ -403,7 +438,7 @@ const SkinTestDetail = () => {
 
       {isEditing && (
         <Button variant="contained" color="secondary" onClick={handleSubmit}>
-          {isCreating ? "Create" : "Update"}
+          {isCreating ? "Create SkinTest" : "Update SkinTest"}
         </Button>
       )}
     </Box>
