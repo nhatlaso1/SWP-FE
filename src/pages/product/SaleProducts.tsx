@@ -25,6 +25,9 @@ interface Product {
   discount: number;
   rating: number;
   productImage: string;
+  brand: {
+    brandName: string;
+  };
 }
 
 const SaleProducts: React.FC = () => {
@@ -125,6 +128,7 @@ const SaleProducts: React.FC = () => {
                         <Typography className={styles.productTitle} variant="h6" component="h2" noWrap>
                           {product.productName}
                         </Typography>
+                        <Typography variant="body2" color="text.secondary">Brand: {product.brand.brandName}</Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           <Rating value={product.rating} precision={0.1} readOnly size="small" />
                           <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>

@@ -281,5 +281,18 @@ export const ProductAPI = {
       console.error('Error fetching products by brand:', error);
       throw new Error('Failed to load products for the selected brand.');
     }
+  },
+
+  // Lấy tất cả sản phẩm bán chạy
+  getBestSellerProducts: async () => {
+    try {
+      console.log('Calling getBestSellerProducts API');
+      const response = await api.get('/Product/get-best-seller-product');
+      console.log('Best seller products response:', response.data);
+      return response.data.$values || [];
+    } catch (error) {
+      console.error('Error fetching best seller products:', error);
+      throw new Error('Failed to load best seller products.');
+    }
   }
 };
