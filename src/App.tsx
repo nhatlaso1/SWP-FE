@@ -30,6 +30,7 @@ import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import OrderManagement from "./pages/staff/order/OrderManagement";
 import BrandList from "./pages/brand/BrandList";
+import Notification from "./components/notification/Notification";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -109,6 +110,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
       <Loading />
+      <Notification />
     </ThemeProvider>
   );
 }

@@ -14,9 +14,8 @@ const Profile = () => {
     initialValues: {
       fullName: "",
       birthday: "",
-      phoneNumber: "",
-      account: {
-        email: "",
+      skinType: {
+        skinTypeName: "",
       },
     },
     onSubmit: async (values) => {
@@ -86,44 +85,32 @@ const Profile = () => {
 
             <TextField
               fullWidth
-              id="email"
-              name="email"
-              label="Email"
-              value={formik.values.account?.email}
+              id="skinTypeName"
+              name="skinTypeName"
+              label="Skin Type Name"
+              value={formik.values.skinType?.skinTypeName}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
               error={
-                formik.touched.account?.email &&
-                Boolean(formik.errors.account?.email)
+                formik.touched.skinType?.skinTypeName &&
+                Boolean(formik.errors.skinType?.skinTypeName)
               }
               helperText={
-                formik.touched.account?.email && formik.errors.account?.email
+                formik.touched.skinType?.skinTypeName &&
+                formik.errors.skinType?.skinTypeName
               }
               style={{ marginBottom: "16px" }}
             />
 
-            <TextField
-              fullWidth
-              id="phoneNumber"
-              name="phoneNumber"
-              label="Phone number"
-              value={formik.values.phoneNumber}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={formik.touched.phone && Boolean(formik.errors.phoneNumber)}
-              helperText={formik.touched.phone && formik.errors.phoneNumber}
-              style={{ marginBottom: "16px" }}
-            />
-
-            <Button
+            {/* <Button
               color="primary"
               variant="contained"
               fullWidth
               type="submit"
-              style={{ marginTop: "16px", color: "white" }}
+              style={{ marginTop: "16px", color: "white" }}s
             >
               Edit
-            </Button>
+            </Button> */}
           </form>
         </div>
       </div>
