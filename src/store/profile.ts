@@ -5,36 +5,13 @@ import { NavigateFunction } from "react-router-dom";
 export interface UserProfile {
   $id: string;
   customerId: number;
-  accountId: number;
   fullName: string;
   birthday: string;
-  phoneNumber: string;
-  confirmedEmail: boolean;
-  status: boolean;
-  skinTypeId: number;
-  account: Account;
-  feedbacks: RefreshTokens;
-  orders: RefreshTokens;
-  shippingAddresses: RefreshTokens;
-}
-
-export interface Account {
-  $id: string;
-  accountId: number;
-  email: string;
-  password: string;
-  role: string;
-  customer: Customer;
-  refreshTokens: RefreshTokens;
-}
-
-export interface RefreshTokens {
-  $id: string;
-  $values: any[];
-}
-
-export interface Customer {
-  $ref: string;
+  skinType: {
+    $id: string;
+    skinTypeId: number;
+    skinTypeName: string;
+  };
 }
 
 export interface User {
@@ -169,39 +146,13 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         //   data: {
         //     $id: "1",
         //     customerId: 1,
-        //     accountId: 1,
-        //     fullName: "nhat vu minh",
-        //     birthday: "2001-01-01",
-        //     phoneNumber: "+84332338587",
+        //     fullName: "Customer 1",
+        //     birthday: "1992-03-12",
         //     confirmedEmail: false,
-        //     status: true,
-        //     skinTypeId: 1,
-        //     account: {
+        //     skinType: {
         //       $id: "2",
-        //       accountId: 1,
-        //       email: "customer1@example.com",
-        //       password:
-        //         "$2a$11$wtFq3R/acjsYL.k8CXT9nO1alaldf/yWdqOk/x80W9s6fcqPbo6Nu",
-        //       role: "Customer",
-        //       customer: {
-        //         $ref: "1",
-        //       },
-        //       refreshTokens: {
-        //         $id: "3",
-        //         $values: [],
-        //       },
-        //     },
-        //     feedbacks: {
-        //       $id: "4",
-        //       $values: [],
-        //     },
-        //     orders: {
-        //       $id: "5",
-        //       $values: [],
-        //     },
-        //     shippingAddresses: {
-        //       $id: "6",
-        //       $values: [],
+        //       skinTypeId: 5,
+        //       skinTypeName: "Dry skin",
         //     },
         //   },
         // };

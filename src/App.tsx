@@ -29,6 +29,7 @@ import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import OrderManagement from "./pages/staff/order/OrderManagement";
 import BrandList from "./pages/brand/BrandList";
+import Notification from "./components/notification/Notification";
 import Purchase from "./pages/purchase/Purchase";
 import PurchaseDetail from "./pages/purchase/PurchaseDetail";
 import OurBlog from "./components/our-blog/OurBlog";
@@ -124,6 +125,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
       <Loading />
+      <Notification />
     </ThemeProvider>
   );
 }
