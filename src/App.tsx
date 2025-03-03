@@ -24,13 +24,20 @@ import Profile from "./pages/profile/Profile";
 import SkinTestDetail from "./pages/admin/skintest/SkinTestDetail";
 import SkinTest from "./pages/admin/skintest/SkinTest";
 import CreateSkinTest from "./pages/admin/skintest/CreateSkinTest";
-import OurBranch from "./components/our-branch/OurBranch";
 import Routine from "./pages/admin/routine/Routine";
 import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import OrderManagement from "./pages/staff/order/OrderManagement";
 import BrandList from "./pages/brand/BrandList";
 import Notification from "./components/notification/Notification";
+import Purchase from "./pages/purchase/Purchase";
+import PurchaseDetail from "./pages/purchase/PurchaseDetail";
+import OurBlog from "./components/our-blog/OurBlog";
+import SerumMoisturizerArticle from "./pages/blog/SerumMoisturizerArticle";
+import UserPage from "./pages/admin/user/UserPage";
+import SkinType from "./pages/admin/skintype/SkinType";
+import Voucher from "./pages/admin/voucher/Voucher";
+import UserInfo from "./pages/admin/user/UserDetailPage";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -63,7 +70,11 @@ function App() {
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
+        { path: "blogs", element: <OurBlog /> },
+        { path: "blog/detail", element: <SerumMoisturizerArticle /> },
         { path: "brands", element: <BrandList /> },
+        { path: "purchase", element: <Purchase /> },
+        { path: "purchase/:id", element: <PurchaseDetail /> },
         {
           path: "profile",
           element: (
@@ -87,8 +98,12 @@ function App() {
         { path: "createroutine", element: <CreateRoutine /> },
         { path: "skintests", element: <SkinTest /> },
         { path: "routines", element: <Routine /> },
+        { path: "vouchers", element: <Voucher /> },
+        { path: "skintypes", element: <SkinType /> },
         { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
+        { path: "users", element: <UserPage /> },
+        { path: "user/:id", element: <UserInfo /> },
       ],
     }, {
       path: "staff",

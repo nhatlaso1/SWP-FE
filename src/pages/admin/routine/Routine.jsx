@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Box,
-  Button,
   Container,
+  Box,
   Paper,
   Table,
   TableBody,
@@ -13,9 +12,11 @@ import {
   TableRow,
   Typography,
   Pagination,
+  Button,
 } from "@mui/material";
 import { useStore } from "../../../store";
 import { getAllRoutines } from "../../../store/routine.api";
+import "./Routine.css";
 
 const Routine = () => {
   const [routines, setRoutines] = useState([]);
@@ -30,8 +31,7 @@ const Routine = () => {
     const fetchData = async () => {
       try {
         const routineData = await getAllRoutines(token);
-
-        console.log("Raw routine data:", routineData); // Kiểm tra dữ liệu từ API
+        // Kiểm tra dữ liệu trả về dạng { "$values": [...] }
         const routineArray =
           routineData?.$values && Array.isArray(routineData.$values)
             ? routineData.$values
@@ -39,8 +39,7 @@ const Routine = () => {
             ? routineData
             : [];
 
-        console.log("Parsed routine array:", routineArray);
-
+        // Ánh xạ dữ liệu để hiển thị
         const mappedRoutines = routineArray.map((routine) => ({
           routineId: routine.routineId || "Unknown",
           routineName: routine.routineName || "Unknown",
@@ -48,7 +47,6 @@ const Routine = () => {
           status: routine.status ? "Active" : "Inactive",
         }));
 
-        console.log("Mapped routines:", mappedRoutines);
         setRoutines(mappedRoutines);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -58,12 +56,12 @@ const Routine = () => {
     fetchData();
   }, [token]);
 
-  // Sắp xếp routines theo routineId tăng dần
+  // Sắp xếp theo routineId tăng dần
   const sortedRoutines = [...routines].sort(
     (a, b) => Number(a.routineId) - Number(b.routineId)
   );
 
-  // Tính toán phân trang
+  // Phân trang dữ liệu
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = sortedRoutines.slice(
     startIndex,
@@ -84,7 +82,7 @@ const Routine = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ paddingTop: 4 }}>
+    <Container maxWidth="lg" className="routine-container">
       <Box
         display="flex"
         justifyContent="space-between"
@@ -101,14 +99,20 @@ const Routine = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ minHeight: "500px" }}>
-        <Table>
+      <TableContainer component={Paper} className="routine-table-container">
+        <Table className="routine-table">
           <TableHead>
             <TableRow>
-              <TableCell>Routine ID</TableCell>
-              <TableCell>Routine Name</TableCell>
-              <TableCell>Skin Type</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell className="routine-cell header-cell">
+                Routine ID
+              </TableCell>
+              <TableCell className="routine-cell header-cell">
+                Routine Name
+              </TableCell>
+              <TableCell className="routine-cell header-cell">
+                Skin Type
+              </TableCell>
+              <TableCell className="routine-cell header-cell">Status</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -117,13 +121,21 @@ const Routine = () => {
                 <TableRow
                   key={routine.routineId}
                   hover
-                  sx={{ cursor: "pointer" }}
+                  className="routine-row"
                   onClick={() => handleViewDetail(routine.routineId)}
                 >
-                  <TableCell>{routine.routineId}</TableCell>
-                  <TableCell>{routine.routineName}</TableCell>
-                  <TableCell>{routine.skinTypeName}</TableCell>
-                  <TableCell>{routine.status}</TableCell>
+                  <TableCell className="routine-cell">
+                    {routine.routineId}
+                  </TableCell>
+                  <TableCell className="routine-cell">
+                    {routine.routineName}
+                  </TableCell>
+                  <TableCell className="routine-cell">
+                    {routine.skinTypeName}
+                  </TableCell>
+                  <TableCell className="routine-cell">
+                    {routine.status}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -138,7 +150,7 @@ const Routine = () => {
       </TableContainer>
 
       {totalPages > 1 && (
-        <Box display="flex" justifyContent="center" marginTop={2}>
+        <Box className="pagination-container">
           <Pagination
             count={totalPages}
             page={currentPage}

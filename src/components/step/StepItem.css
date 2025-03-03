@@ -1,0 +1,54 @@
+.step {
+    position: relative;
+    text-align: center;
+    flex: 1; /* Chia đều các step */
+  }
+  
+  /* Vòng tròn icon */
+  .circle {
+    width: 50px;
+    height: 50px;
+    background-color: #ccc; /* Màu mặc định */
+    border-radius: 50%;
+    margin: 0 auto 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+  }
+  
+  /* Khi step đã xong => màu xanh lá */
+  .step.done .circle {
+    background-color: #4caf50;
+  }
+  
+  /* Nhãn (text dưới icon) */
+  .label {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* Đường nối ngang giữa các step */
+  .line {
+    position: absolute;
+    top: 25px;    /* Căn giữa vòng tròn */
+    left: 50%;    /* Bắt đầu từ giữa step */
+    width: 100%;
+    height: 2px;
+    background-color: #ccc;
+    z-index: -1;  /* Cho đường kẻ nằm sau circle */
+  }
+  
+  /* Step đã hoàn thành => đường kẻ màu xanh lá */
+  .step.done .line {
+    background-color: #4caf50;
+  }
+  
+  /* Ẩn đường kẻ ở step cuối (do isLast) */
+  .step.done:last-child .line {
+    display: none;
+  }
+  .step:last-child .line {
+    display: none;
+  }

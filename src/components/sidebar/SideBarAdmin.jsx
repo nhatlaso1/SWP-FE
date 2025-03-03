@@ -1,8 +1,11 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import LayersIcon from "@mui/icons-material/Layers";
+import PersonIcon from "@mui/icons-material/Person";
+import QuizIcon from "@mui/icons-material/Quiz";
+import RouteIcon from "@mui/icons-material/Route";
+import AddReactionIcon from "@mui/icons-material/AddReaction";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import "./SideBarAdmin.css";
 
 const NAVIGATION = [
@@ -18,15 +21,33 @@ const NAVIGATION = [
     navigate: "/admin/dashboard",
   },
   {
+    segment: "users",
+    title: "Users",
+    icon: <PersonIcon />,
+    navigate: "/admin/users",
+  },
+  {
+    segment: "vouchers",
+    title: "Vouchers",
+    icon: <CardGiftcardIcon />,
+    navigate: "/admin/vouchers",
+  },
+  {
+    segment: "skintypes",
+    title: "Skintypes",
+    icon: <AddReactionIcon />,
+    navigate: "/admin/skintypes",
+  },
+  {
     segment: "routines",
     title: "Routines",
-    icon: <ShoppingCartIcon />,
+    icon: <RouteIcon />,
     navigate: "/admin/routines",
   },
   {
     segment: "skinTest",
     title: "SkinTests",
-    icon: <LayersIcon />,
+    icon: <QuizIcon />,
     navigate: "/admin/skintests",
   },
 ];

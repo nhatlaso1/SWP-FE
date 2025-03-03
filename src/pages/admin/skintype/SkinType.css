@@ -1,0 +1,35 @@
+.skin-type-container {
+    padding-top: 2rem;
+  }
+  
+  .skin-type-table-container {
+    min-height: 300px;
+    margin-bottom: 1rem;
+  }
+  
+  .skin-type-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  .skin-type-table .skin-type-cell {
+    border: 1px solid #ccc;
+    padding: 8px 12px;
+  }
+  
+  .skin-type-table .header-cell {
+    font-weight: bold;
+    background-color: #f5f5f5;
+  }
+  
+  .skin-type-row:hover {
+    background-color: #fafafa;
+    cursor: pointer;
+  }
+  
+  .pagination-container {
+    margin-top: 1rem;
+    display: flex;
+    justify-content: center;
+  }
+  

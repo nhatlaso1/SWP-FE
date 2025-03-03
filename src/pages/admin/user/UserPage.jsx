@@ -1,34 +1,38 @@
 import * as React from "react";
 import PropTypes from "prop-types";
-import { useTheme } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableFooter from "@mui/material/TableFooter";
-import TablePagination from "@mui/material/TablePagination";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import IconButton from "@mui/material/IconButton";
+import { useTheme, styled } from "@mui/material/styles";
+import {
+  Box,
+  Container,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableFooter,
+  TableHead,
+  TableRow,
+  Typography,
+  IconButton,
+  Button,
+  TablePagination,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
 import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
-import {
-  TableCell,
-  tableCellClasses,
-  TableContainer,
-  TableHead,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { useNavigate } from "react-router-dom";
+import "./UserPage.css";
 
+// Styled components cho TableCell và TableRow
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
+  fontSize: 14,
+  padding: "6px 8px",
+  border: "1px solid #ccc",
+  [`&.${TableCell.head}`]: {
+    backgroundColor: theme.palette.grey[800],
     color: theme.palette.common.white,
-  },
-  [`&.${tableCellClasses.body}`]: {
-    fontSize: 14,
+    fontWeight: "bold",
   },
 }));
 
@@ -36,12 +40,13 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
-  "&:last-child td, &:last-child th": {
-    border: 0,
+  "&:hover": {
+    backgroundColor: theme.palette.action.selected,
+    cursor: "pointer",
   },
 }));
 
+// Custom pagination actions
 function TablePaginationActions(props) {
   const theme = useTheme();
   const { count, page, rowsPerPage, onPageChange } = props;
@@ -111,32 +116,75 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-function createData(IdUser, Name, PhoneNumber, DateOfJoining, status) {
-  return { IdUser, Name, PhoneNumber, DateOfJoining, status };
-}
+// Hàm tạo dữ liệu mẫu cho 60 người dùng với các trường: IdUser, Name, PhoneNumber, DateOfJoining, confirmed_email, skinType
+const skinTypeMap = {
+  1: "Oily skin",
+  2: "Combination skin",
+  3: "Sensitive skin",
+  4: "Normal skin",
+  5: "Dry skin",
+};
 
-const rows = [
-  createData(11, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(1, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(21, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(31, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(41, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(51, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(61, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(71, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(1, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(11, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(11, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(11, "Huong", "0387815870", "23/9/2023", "Online"),
-  createData(11, "Huong", "0387815870", "23/9/2023", "Online"),
-].sort((a, b) => (a.calories < b.calories ? -1 : 1));
+const generateUsers = () => {
+  const firstNames = [
+    "Alice",
+    "Bob",
+    "Charlie",
+    "David",
+    "Eva",
+    "Frank",
+    "Grace",
+    "Helen",
+    "Ian",
+    "Julia",
+  ];
+  const lastNames = [
+    "Nguyen",
+    "Tran",
+    "Le",
+    "Pham",
+    "Hoang",
+    "Duong",
+    "Phan",
+    "Vu",
+    "Bui",
+    "Dang",
+  ];
+  const users = [];
+  for (let i = 1; i <= 60; i++) {
+    const firstName = firstNames[i % firstNames.length];
+    const lastName = lastNames[i % lastNames.length];
+    const fullName = `${firstName} ${lastName} ${i}`;
+    const phoneNumber = "0" + (380000000 + i);
+    const dateOfJoining = new Date(
+      2023,
+      i % 12,
+      (i % 28) + 1
+    ).toLocaleDateString();
+    // Xét confirmed_email: "Yes" nếu i chẵn, "No" nếu lẻ
+    const confirmed_email = i % 2 === 0 ? "Yes" : "No";
+    // Skin type: dùng (i % 5) + 1
+    const skinTypeId = (i % 5) + 1;
+    users.push({
+      IdUser: i,
+      Name: fullName,
+      PhoneNumber: phoneNumber,
+      DateOfJoining: dateOfJoining,
+      confirmed_email: confirmed_email,
+      skinType: skinTypeMap[skinTypeId],
+    });
+  }
+  return users;
+};
+
+const rows = generateUsers();
 
 export default function UserPage() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
   const navigate = useNavigate();
-  // Avoid a layout jump when reaching the last page with empty rows.
+
+  // Tính số dòng trống (nếu có) để tránh layout jump
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
@@ -148,56 +196,87 @@ export default function UserPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
+
+  const handleDetail = (id) => {
+    navigate(`/admin/user/${id}`);
+  };
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Id User</StyledTableCell>
-            <StyledTableCell>Name</StyledTableCell>
-            <StyledTableCell align="right">PhoneNumber</StyledTableCell>
-            <StyledTableCell align="right">Date Of Joining</StyledTableCell>
-            <StyledTableCell align="right">Status</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row) => (
-            <StyledTableRow key={row.IdUser} variant ='contained'>
-              <StyledTableCell align="left">{row.IdUser}</StyledTableCell>
-              <StyledTableCell component="th" scope="row">
-                {row.Name}
+    <Container maxWidth="lg" className="userpage-container">
+      <Typography variant="h4" gutterBottom>
+        User List
+      </Typography>
+      <TableContainer component={Paper} className="userpage-table-container">
+        <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell sx={{ width: "8%" }}>Id User</StyledTableCell>
+              <StyledTableCell sx={{ width: "20%" }}>Name</StyledTableCell>
+              <StyledTableCell sx={{ width: "20%" }} align="right">
+                Phone Number
               </StyledTableCell>
-              <StyledTableCell align="right">{row.PhoneNumber}</StyledTableCell>
-              <StyledTableCell align="right">
-                {row.DateOfJoining}
+              <StyledTableCell sx={{ width: "20%" }} align="right">
+                Date Of Joining
               </StyledTableCell>
-              <StyledTableCell align="right">{row.status}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-        <TableFooter>
-          <TableRow>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-              colSpan={3}
-              count={rows.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              slotProps={{
-                select: {
-                  inputProps: {
-                    "aria-label": "rows per page",
-                  },
+              <StyledTableCell sx={{ width: "12%" }} align="right">
+                Confirmed Email
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: "20%" }} align="center">
+                Skin Type
+              </StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {(rowsPerPage > 0
+              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : rows
+            ).map((row) => (
+              <StyledTableRow
+                key={row.IdUser}
+                onClick={() => handleDetail(row.IdUser)}
+              >
+                <StyledTableCell component="th" scope="row">
+                  {row.IdUser}
+                </StyledTableCell>
+                <StyledTableCell>{row.Name}</StyledTableCell>
+                <StyledTableCell align="right">
+                  {row.PhoneNumber}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {row.DateOfJoining}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {row.confirmed_email}
+                </StyledTableCell>
+                <StyledTableCell align="center">{row.skinType}</StyledTableCell>
+              </StyledTableRow>
+            ))}
+            {emptyRows > 0 && (
+              <TableRow style={{ height: 53 * emptyRows }}>
+                <TableCell colSpan={6} />
+              </TableRow>
+            )}
+          </TableBody>
+          <TableFooter>
+            <TableRow>
+              <TablePagination
+                rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                colSpan={6}
+                count={rows.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                SelectProps={{
+                  inputProps: { "aria-label": "rows per page" },
                   native: true,
-                },
-              }}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              ActionsComponent={TablePaginationActions}
-            />
-          </TableRow>
-        </TableFooter>
-      </Table>
-    </TableContainer>
+                }}
+                onPageChange={handleChangePage}
+                onRowsPerPageChange={handleChangeRowsPerPage}
+                ActionsComponent={TablePaginationActions}
+              />
+            </TableRow>
+          </TableFooter>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }

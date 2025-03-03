@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { getAllSkinTests } from "../../../store/skinTest.api";
 import { useStore } from "../../../store";
+import "./SkinTest.css";
 
 const SkinTest = () => {
   const navigate = useNavigate();
@@ -37,6 +38,7 @@ const SkinTest = () => {
         const skinTestsData = await getAllSkinTests(token);
         console.log("API response data:", skinTestsData);
 
+        // Giả sử API trả về dữ liệu dạng { "$values": [...] }
         const skinTestArray = skinTestsData?.$values ?? [];
 
         const extractedData = skinTestArray.map((test) => ({
@@ -70,7 +72,7 @@ const SkinTest = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ paddingTop: 4 }}>
+    <Container maxWidth="lg" className="skintest-container">
       <Box
         display="flex"
         justifyContent="space-between"
@@ -87,13 +89,19 @@ const SkinTest = () => {
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ minHeight: "500px" }}>
-        <Table>
+      <TableContainer component={Paper} className="skintest-table-container">
+        <Table className="skintest-table">
           <TableHead>
             <TableRow>
-              <TableCell>SkinTest ID</TableCell>
-              <TableCell>Test Name</TableCell>
-              <TableCell>Status</TableCell>
+              <TableCell className="skintest-cell header-cell">
+                SkinTest ID
+              </TableCell>
+              <TableCell className="skintest-cell header-cell">
+                Test Name
+              </TableCell>
+              <TableCell className="skintest-cell header-cell">
+                Status
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -102,12 +110,18 @@ const SkinTest = () => {
                 <TableRow
                   key={test.skinTestId}
                   hover
+                  className="skintest-row"
                   onClick={() => handleRowClick(test)}
-                  style={{ cursor: "pointer" }}
                 >
-                  <TableCell>{test.skinTestId}</TableCell>
-                  <TableCell>{test.skinTestName}</TableCell>
-                  <TableCell>{test.status ? "Active" : "Inactive"}</TableCell>
+                  <TableCell className="skintest-cell">
+                    {test.skinTestId}
+                  </TableCell>
+                  <TableCell className="skintest-cell">
+                    {test.skinTestName}
+                  </TableCell>
+                  <TableCell className="skintest-cell">
+                    {test.status ? "Active" : "Inactive"}
+                  </TableCell>
                 </TableRow>
               ))
             ) : (
@@ -121,7 +135,7 @@ const SkinTest = () => {
         </Table>
       </TableContainer>
 
-      <Box display="flex" justifyContent="center" marginTop={2}>
+      <Box className="pagination-container">
         <Pagination
           count={Math.ceil(skinTests.length / itemsPerPage)}
           page={currentPage}

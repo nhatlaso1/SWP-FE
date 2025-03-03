@@ -203,16 +203,26 @@ const CreateRoutine = () => {
           <CardContent>
             <Grid container spacing={2} alignItems="center">
               <Grid item xs={10}>
-                <TextField
-                  label="Routine Detail Name"
-                  fullWidth
-                  value={detail.routineDetailName}
-                  onChange={(e) =>
-                    handleDetailChange(dIdx, e.target.value, "routineDetailName")
-                  }
-                  disabled={!isEditing}
-                />
+                <FormControl fullWidth>
+                  <InputLabel>Routine Detail Name</InputLabel>
+                  <Select
+                    label="Routine Detail Name"
+                    value={detail.routineDetailName}
+                    onChange={(e) =>
+                      handleDetailChange(
+                        dIdx,
+                        e.target.value,
+                        "routineDetailName"
+                      )
+                    }
+                    disabled={!isEditing}
+                  >
+                    <MenuItem value="Morning">Morning</MenuItem>
+                    <MenuItem value="Evening">Evening</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
+
               {isEditing && (
                 <Grid item xs={2}>
                   <Button
@@ -244,7 +254,12 @@ const CreateRoutine = () => {
                       fullWidth
                       value={step.step}
                       onChange={(e) =>
-                        handleStepChange(dIdx, sIdx, Number(e.target.value), "step")
+                        handleStepChange(
+                          dIdx,
+                          sIdx,
+                          Number(e.target.value),
+                          "step"
+                        )
                       }
                       disabled={!isEditing}
                     />
@@ -256,7 +271,12 @@ const CreateRoutine = () => {
                       multiline
                       value={step.instruction}
                       onChange={(e) =>
-                        handleStepChange(dIdx, sIdx, e.target.value, "instruction")
+                        handleStepChange(
+                          dIdx,
+                          sIdx,
+                          e.target.value,
+                          "instruction"
+                        )
                       }
                       disabled={!isEditing}
                     />
@@ -290,9 +310,12 @@ const CreateRoutine = () => {
                         label="Category"
                         fullWidth
                         value={
-                          categories.find((c) => c.categoryId === step.categoryId)
-                            ? categories.find((c) => c.categoryId === step.categoryId)
-                                .categoryName
+                          categories.find(
+                            (c) => c.categoryId === step.categoryId
+                          )
+                            ? categories.find(
+                                (c) => c.categoryId === step.categoryId
+                              ).categoryName
                             : ""
                         }
                         disabled

@@ -112,6 +112,7 @@ const HeaderGuest: React.FC = () => {
           <Button variant="text" onClick={() => navigate("/products")}>
             Products
           </Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>Blog</Button>
           <Button variant="text" onClick={() => navigate("/take-quiz")}>
             Quiz Skin Q&A
           </Button>

@@ -1,9 +1,15 @@
 import * as React from "react";
+import { useParams } from "react-router-dom";
 import Card from "@mui/material/Card";
-
 import CardMedia from "@mui/material/CardMedia";
 
 const UserInfo = () => {
+  // Lấy id từ URL, ví dụ URL có dạng /user/123
+  const { id } = useParams();
+  console.log("User id from URL:", id);
+
+  // Ví dụ: nếu có id, bạn có thể fetch dữ liệu người dùng từ API ở đây.
+  // Hiện tại, ta sử dụng dữ liệu tĩnh dưới đây.
   const userData = {
     account: "Bemeonhomituot",
     password: "abc123",
@@ -13,6 +19,17 @@ const UserInfo = () => {
     address: "67, Đường số 8, Phường Trảng Dài, TP Biên Hòa, Tỉnh Đồng Nai",
     dateOfJoining: "06/25/2022",
   };
+
+  // Mảng cấu hình các trường hiển thị (dễ dàng mapping trong tương lai)
+  const fields = [
+    { key: "account", label: "Account:" },
+    { key: "password", label: "Password:", type: "password" },
+    { key: "name", label: "Name:" },
+    { key: "phone", label: "Phone Number:" },
+    { key: "email", label: "Email:" },
+    { key: "address", label: "Address:" },
+    { key: "dateOfJoining", label: "Date of Joining:" },
+  ];
 
   return (
     <div style={styles.wrapper}>
@@ -26,13 +43,9 @@ const UserInfo = () => {
       </Card>
 
       <div style={styles.container}>
-        <FormRow label="Account :" value={userData.account} />
-        <FormRow label="Password :" value={userData.password} type="password" />
-        <FormRow label="Name :" value={userData.name} />
-        <FormRow label="Phone number :" value={userData.phone} />
-        <FormRow label="Email :" value={userData.email} />
-        <FormRow label="Address :" value={userData.address} />
-        <FormRow label="Date of joining :" value={userData.dateOfJoining} />
+        {fields.map(({ key, label, type = "text" }) => (
+          <FormRow key={key} label={label} value={userData[key]} type={type} />
+        ))}
       </div>
     </div>
   );
