@@ -1,19 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Card, 
-  CardMedia, 
-  CardContent, 
-  Typography, 
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
   Container,
   CircularProgress,
   Alert,
   Button
 } from '@mui/material';
 import { CombinedAPI } from '../../store/apiCombined';
-import styles from '../product/ProductList.module.css';
-
+import styles from '../brand/BrandList.module.css';
+import "./BrandList";
 interface ProductDetail {
   productId: number;
   productName: string;
@@ -89,7 +89,7 @@ const BrandList: React.FC = () => {
         <Grid container spacing={4} sx={{ mb: 4 }}>
           {brands.map((brand) => (
             <Grid item key={brand.brandId} xs={6} sm={4} md={3}>
-              <Card 
+              <Card
                 sx={{ cursor: 'pointer', textAlign: 'center', p: 2, backgroundColor: selectedBrandId === brand.brandId ? 'lightblue' : 'white' }}
                 onClick={() => handleBrandClick(brand.brandId)}
               >
@@ -98,12 +98,6 @@ const BrandList: React.FC = () => {
             </Grid>
           ))}
         </Grid>
-
-        {selectedBrandId !== null && (
-          <Box textAlign="center" sx={{ mb: 4 }}>
-            <Button variant="outlined" onClick={clearFilter}>Back to Brands</Button>
-          </Box>
-        )}
 
         {products.length > 0 && (
           <Grid container spacing={4}>

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Card, 
-  CardMedia, 
-  CardContent, 
-  Typography, 
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
   Button,
   Container,
   CircularProgress,
@@ -15,6 +15,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
 import styles from './ProductList.module.css';
+import { useStore } from '../../store';
 
 interface Product {
   $id: string;
@@ -35,7 +36,7 @@ const SaleProducts: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  const addItem = useStore((store) => store.addItem);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -44,7 +45,7 @@ const SaleProducts: React.FC = () => {
 
         const productsData = await ProductAPI.getAll();
         const saleProducts = productsData.filter((product: Product) => product.discount > 0);
-        
+
         console.log('Sale Products:', saleProducts);
         setProducts(saleProducts);
       } catch (error) {
@@ -99,7 +100,7 @@ const SaleProducts: React.FC = () => {
               <Grid container spacing={4}>
                 {products.map((product) => (
                   <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-                    <Card 
+                    <Card
                       className={styles.productCard}
                     >
                       <Box
@@ -149,10 +150,19 @@ const SaleProducts: React.FC = () => {
                             ${product.price.toLocaleString()}
                           </Typography>
                         </Box>
-                        <Button 
-                          className={styles.addToCartButton}
-                          variant="contained" 
+                        <Button
+                          variant="contained"
+                          size="large"
                           fullWidth
+                          sx={{ mt: 2 }}
+                          onClick={() => {
+                            addItem({
+                              productId: product.productId,
+                              productName: product.productName,
+                              price: product.price,
+                              productImage: product.productImage,
+                            });
+                          }}
                         >
                           Add to Cart
                         </Button>

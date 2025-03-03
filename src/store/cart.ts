@@ -86,8 +86,12 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         state.loading.isLoading = true;
       });
       try {
+        const url =
+          voucher && voucher > 0
+            ? `${BASE_URL}/Order/create-order?voucherId=${voucher}`
+            : `${BASE_URL}/Order/create-order`;
         const response = await axios.post(
-          `${BASE_URL}/Order/create-order?voucherId=${voucher}`,
+          url,
           body,
           {
             headers: {
@@ -111,6 +115,6 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         });
       }
     },
-    
+
   };
 }

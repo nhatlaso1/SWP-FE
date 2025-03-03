@@ -34,6 +34,7 @@ import "./Cart.scss";
 import CheckoutSuccess from "../checkout/CheckoutSuccess";
 import { createPayment } from "../../store/payment.api";
 import CheckoutFail from "../checkout/CheckoutFail";
+import { getAllVoucher } from "../../store/voucher.api";
 
 const steps = [
   { label: "Shopping cart", icon: <ShoppingBagIcon /> },
@@ -46,7 +47,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeStep, setActiveStep] = useState(0);
-  const [voucher, setVoucher] = useState(0);
+  const [voucher, setVoucher] = useState("0");
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("");
@@ -55,6 +56,9 @@ const Cart = () => {
   const onRemoveItem = useStore((store) => store.removeItem);
   const onCreateOrder = useStore((store) => store.createOrder);
   const orderIdRef = useRef(1);
+  const [voucherList, setVoucherList] = useState([]);
+  const [order, setOrder] = useState(null);
+
   const cart = useStore((store) => store.cart.cart);
   const formik = useFormik({
     initialValues: {
@@ -74,7 +78,17 @@ const Cart = () => {
       setActiveStep(activeStep + 1);
     },
   });
-
+  useEffect(() => {
+    const fetchVoucherList = async () => {
+      try {
+        const data = await getAllVoucher(token);
+        setVoucherList(data);
+      } catch (error) {
+        console.error("Error fetching voucher list:", error);
+      }
+    };
+    fetchVoucherList();
+  }, [token]);
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const paymentStatus = searchParams.get("status");
@@ -146,30 +160,25 @@ const Cart = () => {
 
   const applyVoucher = () => {
     let discountValue = 0;
-
-    switch (voucher) {
-      case "1":
-        discountValue = 10000;
-        break;
-      case "2":
-        discountValue = 20000;
-        break;
-      case "3":
-        discountValue = 30000;
-        break;
-      case "4":
-        discountValue = 40000;
-        break;
-      case "5":
-        discountValue = 50000;
-        break;
-      default:
-        discountValue = 0;
-        break;
+    if (voucher !== "0") {
+      const selectedVoucher = voucherList.find(
+        (v) => v.voucherId.toString() === voucher
+      );
+      if (selectedVoucher) {
+        discountValue = selectedVoucher.discountAmount;
+      }
     }
-
     setDiscount(Math.min(discountValue, totalPrice));
   };
+  useEffect(() => {
+    if (activeStep === 3 && !order) {
+      const timer = setTimeout(() => {
+        // Giả lập order được trả về sau 3 giây
+        setOrder({ orderId: orderIdRef.current, details: "Order details..." });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [activeStep, order]);
 
   useEffect(() => {
     setTotal(totalPrice - discount);
@@ -357,13 +366,19 @@ const Cart = () => {
                     onChange={(e) => setVoucher(e.target.value)}
                     sx={{ flex: 1 }}
                   >
-                    {["1", "2", "3", "4", "5"].map((option) => (
-                      <MenuItem key={option} value={option}>
-                        Voucher {option}
+                    <MenuItem key="0" value="0">
+                      No voucher
+                    </MenuItem>
+                    {voucherList.map((v) => (
+                      <MenuItem
+                        key={v.voucherId}
+                        value={v.voucherId.toString()}
+                      >
+                        {v.voucherName} - {v.discountAmount.toLocaleString()}đ
+                        off
                       </MenuItem>
                     ))}
                   </TextField>
-
                   <Button
                     variant="contained"
                     startIcon={<LocalOfferIcon />}
@@ -605,39 +620,43 @@ const Cart = () => {
             </Box>
           )}
 
-          {activeStep === 3 && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 2,
-                mx: "auto",
-              }}
-            >
-              {(() => {
-                if (status === "success") {
-                  return (
-                    <Typography variant="h4" fontWeight="bold" color="green">
-                      <CheckoutSuccess />
-                    </Typography>
-                  );
-                } else if (status === "fail") {
-                  return (
-                    <Typography variant="h4" fontWeight="bold" color="red">
-                      <CheckoutFail />
-                    </Typography>
-                  );
-                } else {
-                  return (
-                    <Typography variant="h4" fontWeight="bold">
-                      Processing payment... ⏳
-                    </Typography>
-                  );
-                }
-              })()}
-            </Box>
-          )}
+          {activeStep === 3 &&
+            (!order ? (
+              <div className="loading-container">
+                <p className="loading-text">
+                  Verify payment information...{" "}
+                  <img
+                    src="/loading-quiz-result.svg"
+                    alt="Loading"
+                    className="loading-img"
+                  />
+                </p>
+              </div>
+            ) : (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: 2,
+                  mx: "auto",
+                }}
+              >
+                {status === "success" ? (
+                  <Typography variant="h4" fontWeight="bold" color="green">
+                    <CheckoutSuccess />
+                  </Typography>
+                ) : status === "fail" ? (
+                  <Typography variant="h4" fontWeight="bold" color="red">
+                    <CheckoutFail />
+                  </Typography>
+                ) : (
+                  <Typography variant="h4" fontWeight="bold">
+                    Payment completed.
+                  </Typography>
+                )}
+              </Box>
+            ))}
         </Box>
       </div>
     </>

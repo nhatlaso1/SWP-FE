@@ -9,7 +9,8 @@ export const apiEndpoints = {
   Payment:"Payment",
   SkinType: "SkinType",
   Routine: "Routine",
-  Category:"Category"
+  Category:"Category",
+  Voucher:"Voucher",
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({

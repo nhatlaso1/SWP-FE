@@ -163,7 +163,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(`${BASE_URL}/Authentication/profile`);
+        const response = await axios.get(`${BASE_URL}/profile`);
         //Dummy data
         // const response = {
         //   data: {

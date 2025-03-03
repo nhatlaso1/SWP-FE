@@ -108,6 +108,7 @@ const HeaderCustomer: React.FC = () => {
           <Button variant="text" onClick={() => navigate("/brands")}>Brand</Button>
           <Button variant="text" onClick={() => navigate("/sales")}>For Sales</Button>
           <Button variant="text" onClick={() => navigate("/products")}>Products</Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>Blog</Button>
           <Button variant="text" onClick={() => navigate("/take-quiz")}>Quiz Skin Q&A</Button>
         </div>
 
@@ -127,6 +128,7 @@ const HeaderCustomer: React.FC = () => {
             MenuListProps={{ "aria-labelledby": "user-menu-button" }}
           >
             <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+            <MenuItem onClick={() => navigate("/purchase")}>Purchase</MenuItem>
             <MenuItem onClick={handleLogout}>Logout</MenuItem>
           </Menu>
         </div>

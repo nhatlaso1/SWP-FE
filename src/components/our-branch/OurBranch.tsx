@@ -2,8 +2,13 @@ import React from "react";
 
 import "./OurBranch.scss";
 import { Button } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
 const OurBranch: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate("/brands");
+  };
   return (
     <div className="our-branch-container">
       <div className="our-branch-info">
@@ -24,6 +29,7 @@ const OurBranch: React.FC = () => {
             color: "white",
             borderColor: "white",
           }}
+          onClick={handleClick}
         >
           Discover More
         </Button>
