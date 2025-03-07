@@ -19,5 +19,7 @@ export const createPayment = async (orderId: number, token: string): Promise<str
   } catch (error) {
     console.error("Error creating payment:", error);
     throw error;
+    JSON.parse(localStorage.getItem('cart'))
+    
   }
 };
