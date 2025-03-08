@@ -18,26 +18,9 @@ import RemoveIcon from "@mui/icons-material/Remove";
 import { useStore } from "../../store";
 
 import "./Cart.scss";
-import CheckoutSuccess from "../checkout/CheckoutCOD";
-import { createPayment } from "../../store/payment.api";
-import { getAllVoucher } from "../../store/voucher.api";
-
-const steps = [
-  { label: "Shopping cart", icon: <ShoppingBagIcon /> },
-  { label: "Order information", icon: <PeopleIcon /> },
-  { label: "Payment", icon: <PaymentIcon /> },
-  { label: "Result", icon: <PublishedWithChangesIcon /> },
-];
 
 const Cart = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [activeStep, setActiveStep] = useState(0);
-  const [voucher, setVoucher] = useState("0");
-  const [discount, setDiscount] = useState(0);
-  const [total, setTotal] = useState(0);
-  const [status, setStatus] = useState("");
-  const token = useStore((state) => state.profile.user?.token);
   const onUpdateQuantity = useStore((store) => store.updateQuantity);
   const onRemoveItem = useStore((store) => store.removeItem);
 
@@ -56,7 +39,8 @@ const Cart = () => {
       ),
     }),
     onSubmit: (values) => {
-      console.log("Navigate to payment page:", values.products);
+      console.log("Navigate to checkout page:", values.products);
+      navigate("/checkout");
     },
   });
 
@@ -131,15 +115,55 @@ const Cart = () => {
                   <Typography variant="body1" fontWeight="bold" mb={2}>
                     {product.productName}
                   </Typography>
-                ) : status === "fail" ? (
-                  <Typography
-                    variant="h4"
-                    fontWeight="bold"
-                    color="red"
-                  ></Typography>
-                ) : (
-                  <Typography variant="h4" fontWeight="bold">
-                    Payment completed.
+                  <Typography variant="body2" mb={2}>
+                    {product.summary ? product.summary : ""}
+                  </Typography>
+                  <Box sx={{ my: 1 }}>
+                    <IconButton
+                      sx={{ px: 0 }}
+                      onClick={() =>
+                        updateQuantity(index, product.quantity - 1)
+                      }
+                    >
+                      <RemoveIcon />
+                    </IconButton>
+
+                    <TextField
+                      size="small"
+                      sx={{ width: 70 }}
+                      type="number"
+                      name={`products[${index}].quantity`}
+                      value={formik.values.products[index].quantity}
+                      onChange={formik.handleChange}
+                      inputProps={{ min: 1 }}
+                    />
+                    <IconButton
+                      sx={{ px: 0 }}
+                      onClick={() =>
+                        updateQuantity(index, product.quantity + 1)
+                      }
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </Box>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 1,
+                  }}
+                >
+                  <IconButton
+                    color="error"
+                    onClick={() => removeProduct(index)}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                  <Typography variant="caption" fontWeight={"bold"}>
+                    {product.price.toLocaleString()} đ
                   </Typography>
                 </Box>
               </CardContent>
