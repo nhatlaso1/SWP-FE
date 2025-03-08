@@ -520,3 +520,58 @@ tr:hover {
   border-bottom: 2px solid #eee;
   padding-bottom: 10px;
 }
+
+.image-upload-options {
+  margin-top: 10px;
+}
+
+.upload-type-selector {
+  margin-bottom: 15px;
+  display: flex;
+  gap: 20px;
+}
+
+.upload-type-selector label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.drag-drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.drag-drop-zone.active {
+  border-color: #2196F3;
+  background-color: rgba(33, 150, 243, 0.1);
+}
+
+.upload-label {
+  cursor: pointer;
+  color: #666;
+}
+
+.selected-file {
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #2196F3;
+}
+
+.url-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.url-input:focus {
+  border-color: #2196F3;
+  outline: none;
+}

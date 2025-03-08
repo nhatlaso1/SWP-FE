@@ -1,82 +1,111 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://localhost:7130/api';
+const API_URL = 'https://localhost:7130/api';
 
-const api = axios.create({
-  baseURL: BASE_URL,
-  timeout: 15000,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json'
-  }
-});
+export const getAllOrders = async (status) => {
+  try {
+    const apiStatus = status === 'Cancelled' ? 'Cancel' : status;
+    console.log(`Fetching orders with status: ${apiStatus}`);
+    const response = await axios.get(`${API_URL}/Order/get_all_order`, {
+      params: apiStatus ? { status: apiStatus } : {}
+    });
 
-api.interceptors.response.use(
-  response => response,
-  error => {
-    if (error.code === 'ERR_NETWORK' || error.code === 'ECONNABORTED') {
-      console.warn('Không thể kết nối đến server');
-      return Promise.resolve({ data: [] });
-    }
-    return Promise.reject(error);
-  }
-);
+    console.log('API Response:', response.data);
 
-export const OrderAPI = {
-  // Lấy tất cả đơn hàng với phân trang
-  getAll: async (pageIndex = 1, pageSize = 10) => {
-    try {
-      const response = await api.get('/Order/get-all-orders', {
-        params: {
-          pageIndex,
-          pageSize
-        }
-      });
-
-      if (response?.data) {
-        const data = response.data;
-        if (Array.isArray(data)) return data;
-        if (data.$values) return data.$values;
-        if (data.data) return data.data;
-      }
-      
+    if (!response.data || !response.data.$values) {
+      console.log('No $values in response data');
       return [];
-    } catch (error) {
-      console.warn('Lỗi khi lấy danh sách đơn hàng:', error.message);
-      throw new Error('Không thể lấy danh sách đơn hàng');
     }
-  },
 
-  // Lấy chi tiết đơn hàng
-  getDetail: async (orderId) => {
-    try {
-      const response = await api.get(`/Order/get-order-detail/${orderId}`);
-      return response.data;
-    } catch (error) {
-      console.warn('Lỗi khi lấy chi tiết đơn hàng:', error.message);
-      throw new Error('Không thể lấy chi tiết đơn hàng');
-    }
-  },
+    const orders = response.data.$values.map(order => ({
+      orderId: order.orderId,
+      totalAmount: order.totalAmount,
+      status: order.status,
+      createdDate: order.createdDate,
+      details: (order.details?.$values || []).map(detail => ({
+        orderDetailId: detail.orderDetailId,
+        productId: detail.productId,
+        productName: detail.productName,
+        size: detail.size,
+        quantity: detail.quantity,
+        price: detail.price,
+        discount: detail.discount
+      }))
+    }));
 
-  // Cập nhật trạng thái đơn hàng
-  updateStatus: async (orderId, status) => {
-    try {
-      const response = await api.patch(`/Order/update-status/${orderId}`, { status });
-      return response.data;
-    } catch (error) {
-      console.warn('Lỗi khi cập nhật trạng thái đơn hàng:', error.message);
-      throw new Error('Không thể cập nhật trạng thái đơn hàng');
-    }
-  },
-
-  // Hủy đơn hàng
-  cancel: async (orderId) => {
-    try {
-      const response = await api.patch(`/Order/cancel-order/${orderId}`);
-      return response.data;
-    } catch (error) {
-      console.warn('Lỗi khi hủy đơn hàng:', error.message);
-      throw new Error('Không thể hủy đơn hàng');
-    }
+    console.log(`Found ${orders.length} orders with status:`, apiStatus);
+    return orders;
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    throw error;
   }
-}; 
+};
+
+export const updateOrderStatus = async (orderId, newStatus) => {
+  try {
+    let endpoint;
+    const apiStatus = newStatus === 'Cancelled' ? 'Cancel' : newStatus;
+    switch (apiStatus) {
+      case 'Shipping':
+        endpoint = `${API_URL}/Order/shipping/${orderId}`;
+        break;
+      case 'Complete':
+        endpoint = `${API_URL}/Order/complete/${orderId}`;
+        break;
+      case 'Cancel':
+        endpoint = `${API_URL}/Order/cancel/${orderId}`;
+        break;
+      default:
+        throw new Error('Invalid status');
+    }
+    await axios.put(endpoint);
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateOrderStatusDirect = async (orderId, newStatus) => {
+  try {
+    const response = await axios.put(`${API_URL}/Order/update-status/${orderId}`, {
+      status: newStatus
+    });
+    if (response.status === 200) {
+      console.log(`Successfully updated order ${orderId} to status ${newStatus}`);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+};
+
+export const getOrderStatuses = () => {
+  return ['Pending', 'Shipping', 'Complete', 'Cancelled'];
+};
+
+export const completeOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/complete-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error completing order:', error);
+    throw error;
+  }
+};
+
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/cancel-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error canceling order:', error);
+    throw error;
+  }
+};
+
+

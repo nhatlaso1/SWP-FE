@@ -1,0 +1,224 @@
+/* Reset cơ bản */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+/* Background cho toàn trang */
+body {
+  background-color: #f5f5f5;
+}
+
+/* Container tổng thể cho trang Purchase */
+.purchase {
+  background-color: #f5f5f5;
+  padding: 20px;
+}
+
+/* Status Tabs */
+.status-tabs {
+  background-color: #fff;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  padding: 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.status-tabs ul {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.status-tabs ul li {
+  flex: 1;
+  text-align: center;
+  cursor: pointer;
+  font-weight: 500;
+  color: #666;
+  font-size: 18px;
+  transition: background-color 0.3s, color 0.3s;
+  padding: 10px 0;
+  margin-right: 10px;
+}
+.status-tabs ul li:last-child {
+  margin-right: 0;
+}
+.status-tabs ul li:hover {
+  background-color: #ffebee;
+}
+.status-tabs ul li.active {
+  background-color: #ff5722;
+  color: #fff;
+  font-weight: 700;
+}
+
+/* Order Container */
+.order {
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+/* Order Header */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.order-code {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.order-code {
+  font-weight: 600;
+  color: #cf2121;
+}
+.order-header .btn {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s, color 0.3s;
+}
+.order-header .btn:hover {
+  background-color: #ff5722;
+  color: #fff;
+}
+
+/* Order Status */
+.order-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.status {
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 25px;
+}
+.status.success {
+  background-color: #23d14c;
+  color: #dae8dd;
+}
+.status.done {
+  background-color: #1e64af;
+  color: #e1e6eb;
+}
+
+/* Order Body: Product Information */
+.order-body {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+.product-img {
+  width: 140px;
+  height: 140px;
+  object-fit: cover;
+  background-color: #eee;
+  border-radius: 10px;
+  margin: 4px;
+}
+.product-info {
+  flex: 1;
+}
+.product-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #222;
+}
+.product-variant {
+  font-size: 18px;
+  color: #444;
+}
+.product-price {
+  text-align: right;
+}
+.old-price {
+  text-decoration: line-through;
+  color: #b0b0b0;
+  margin-right: 8px;
+  font-size: 20px;
+}
+.new-price {
+  color: #d32f2f;
+  font-weight: 700;
+  font-size: 25px;
+}
+
+/* Order Footer */
+.order-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+.total {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2e2e2e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.total .price {
+  color: #d32f2f;
+  font-weight: 700;
+  margin-left: 8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+.actions .btn {
+  margin-left: 10px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #ff69b4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+.actions .btn:hover {
+  background-color: #ff85c1;
+}
+.btn-rating {
+  background-color: #ff5722;
+  border: 1px solid #ffd54f;
+  padding: 12px 24px;    /* Tăng padding để nút to hơn */
+  font-size: 16px;       /* Tăng kích thước chữ */
+  border-radius: 4px;    /* Bo góc cho nút */
+  display: inline-block; /* Đảm bảo nút không bị ảnh hưởng bởi flex */
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-rating:hover {
+  background-color: #ff85c1;
+  color: #fff;
+}
+
+.btn-return {
+  background-color: #fff;
+  border: 1px solid #ff5722;
+  color: #ff5722;
+}
+.btn-return:hover {
+  background-color: #ff5722;
+  color: #fff;
+}
+
+/* Extra Info */
+.extra-info p {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+}

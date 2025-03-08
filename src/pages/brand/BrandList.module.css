@@ -1,0 +1,220 @@
+:root {
+  --primary-color: #e91e63;
+  --secondary-color: #ff4081;
+  --light-bg: #fff5f8;
+  --dark-color: #2c3e50;
+  --accent-color: #ffe4e9;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --transition-speed: 0.3s;
+}
+
+/* Container */
+.productDetailContainer {
+  background-color: #fff0f4;
+  min-height: 100vh;
+  padding: 40px 0;
+  font-family: 'Roboto', sans-serif;
+}
+
+/* Main Image */
+.mainImage {
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px var(--shadow-color);
+  padding: 20px;
+  transition: all var(--transition-speed) ease;
+}
+
+/* Thumbnail List */
+.thumbnailList {
+  margin-top: 16px !important;
+}
+
+.thumbnailItem {
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all var(--transition-speed) ease;
+}
+
+.thumbnailItem:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 8px rgba(233, 30, 99, 0.2);
+}
+
+.thumbnailSelected {
+  border: 2px solid var(--primary-color) !important;
+}
+
+/* Product Title */
+.productTitle {
+  color: var(--dark-color);
+  margin-bottom: 16px !important;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Rating Container */
+.ratingContainer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+/* Price Container */
+.priceContainer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  background-color: var(--light-bg);
+  padding: 16px;
+  border-radius: 12px;
+}
+
+.currentPrice {
+  color: var(--primary-color);
+  font-size: 2rem !important;
+  font-weight: bold !important;
+}
+
+.discountPrice {
+  color: #999;
+  text-decoration: line-through;
+}
+
+/* Summary */
+.summary {
+  color: var(--dark-color);
+  line-height: 1.6;
+  margin: 20px 0;
+  font-size: 1rem;
+}
+
+/* Quantity Container */
+.quantityContainer {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background-color: var(--light-bg);
+  padding: 16px;
+  border-radius: 12px;
+  margin: 20px 0;
+}
+
+/* Quantity Button */
+.quantityButton {
+  color: var(--primary-color) !important;
+  background-color: #fff !important;
+  box-shadow: 0 2px 4px rgba(233, 30, 99, 0.2) !important;
+  transition: background-color var(--transition-speed) ease;
+}
+
+.quantityButton:hover {
+  background-color: #fff0f4 !important;
+}
+
+/* Add to Cart Button */
+.addToCartButton {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)) !important;
+  color: #fff !important;
+  border-radius: 25px !important;
+  padding: 12px 24px !important;
+  font-size: 1.1rem !important;
+  transition: all var(--transition-speed) ease !important;
+  box-shadow: 0 4px 8px rgba(233, 30, 99, 0.3) !important;
+}
+
+.addToCartButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(233, 30, 99, 0.4) !important;
+}
+
+/* Info Section */
+.infoSection {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 32px !important;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.sectionTitle {
+  color: var(--dark-color);
+  margin-bottom: 16px !important;
+  font-weight: 600 !important;
+  font-size: 1.5rem;
+}
+
+/* Chip Container & Chips */
+.chipContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.chip {
+  background-color: var(--light-bg) !important;
+  color: var(--primary-color) !important;
+  border: 1px solid var(--accent-color) !important;
+  transition: all var(--transition-speed) ease !important;
+  padding: 4px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+}
+
+.chip:hover {
+  background-color: var(--accent-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* Review Section */
+.reviewSection {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 32px !important;
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+.reviewItem {
+  border-bottom: 1px solid var(--accent-color);
+  padding: 16px 0;
+}
+
+.reviewDate {
+  color: #666;
+  margin-left: 8px !important;
+  font-size: 0.85rem;
+}
+
+.reviewText {
+  margin-top: 8px;
+  color: var(--dark-color);
+  font-size: 1rem;
+}
+
+.noReviews {
+  color: #666;
+  text-align: center;
+  padding: 20px;
+  font-style: italic;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .productDetailContainer {
+    padding: 20px;
+  }
+
+  .currentPrice {
+    font-size: 1.5rem !important;
+  }
+
+  .infoSection,
+  .reviewSection {
+    padding: 16px;
+  }
+}

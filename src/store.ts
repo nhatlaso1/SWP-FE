@@ -20,15 +20,36 @@ import {
   notificationActions,
   NotificationState,
 } from "./store/notification";
+import { CartActions, cartActions, CartState, initialCart } from "./store/cart";
+import {
+  initialProducts,
+  ProductsActions,
+  productsActions,
+  ProductsState,
+} from "./store/product";
+import {
+  initialRoutine,
+  routineActions,
+  RoutineActions,
+  RoutineState,
+} from "./store/routine";
 
 export interface State {
   loading: LoadingState;
   notification: NotificationState;
   profile: ProfileState;
+  products: ProductsState;
   users: UsersState;
+  cart: CartState;
+  routine: RoutineState;
 }
 
-export type Actions = ProfileActions & UsersActions & NotificationActions;
+export type Actions = ProfileActions &
+  UsersActions &
+  NotificationActions &
+  ProductsActions &
+  CartActions &
+  RoutineActions;
 
 export type Store = State & Actions;
 export type StoreGet = () => Store;
@@ -40,8 +61,14 @@ export const useStore = create<Store, [["zustand/immer", never]]>(
     ...profileActions(set, get),
     users: initialUsers,
     ...usersActions(set, get),
+    products: initialProducts,
+    ...productsActions(set, get),
     notification: initialNotification,
     ...notificationActions(set, get),
     loading: initialLoading,
+    ...cartActions(set, get),
+    cart: initialCart,
+    ...routineActions(set, get),
+    routine: initialRoutine,
   }))
 );

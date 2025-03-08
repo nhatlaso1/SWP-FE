@@ -22,7 +22,8 @@ const HeaderAdmin: React.FC<HeaderAdminProps> = ({ currentPage }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   return (

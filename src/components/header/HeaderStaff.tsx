@@ -22,7 +22,8 @@ const HeaderStaff: React.FC<HeaderStaffProps> = ({ currentPage }) => {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/");
+    localStorage.removeItem("role");
+    navigate("/login");
   };
 
   return (

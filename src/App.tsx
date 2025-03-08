@@ -6,43 +6,80 @@ import Login from "./pages/login/Login";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import { useStore } from "./store";
-import { useMemo } from "react";
-import CreateSkinTests from "./pages/admin/skin-test/CreateSkinTest"; // Đổi đường dẫn
+import { useMemo, useEffect } from "react";
 import AdminLayout from "./layouts/AdminLayout";
-import OrderPage from "./pages/checkout/Checkout";
-import CreateSkinQuestion from "./pages/UpdateSkinTest";
-import ListSkinTest from "./pages/admin/skin-test/ListSkinTest";
-import SkinTestDetail from "./pages/admin/skin-test/SkinTestDetail"; // Import SkinTestDetail
 import StaffLayout from "./layouts/StaffLayout";
 import ProductManagement from "./pages/staff/product/ProductManagement";
-import OrderList from "./pages/staff/order/OrderList";
 import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
-import ProductList from "./pages/product/Product";
 import CustomerLayout from "./layouts/CustomerLayout";
-import Checkout from "./pages/checkout/Checkout";
+import ProductList from "./pages/product/ProductList";
+import SaleProducts from "./pages/product/SaleProducts";
+import ProductDetail from "./pages/product/ProductDetail";
+import Cart from "./pages/cart/Cart";
+import Register from "./pages/register/Register";
+import Profile from "./pages/profile/Profile";
+import SkinTestDetail from "./pages/admin/skintest/SkinTestDetail";
+import SkinTest from "./pages/admin/skintest/SkinTest";
+import CreateSkinTest from "./pages/admin/skintest/CreateSkinTest";
+import Routine from "./pages/admin/routine/Routine";
+import RoutineDetail from "./pages/admin/routine/RoutineDetail";
+import CreateRoutine from "./pages/admin/routine/CreateRoutine";
+import OrderManagement from "./pages/staff/order/OrderManagement";
+import BrandList from "./pages/brand/BrandList";
+import Notification from "./components/notification/Notification";
+import Purchase from "./pages/purchase/Purchase";
+import PurchaseDetail from "./pages/purchase/PurchaseDetail";
+import OurBlog from "./components/our-blog/OurBlog";
+import SerumMoisturizerArticle from "./pages/blog/SerumMoisturizerArticle";
+import UserPage from "./pages/admin/user/UserPage";
+import SkinType from "./pages/admin/skintype/SkinType";
+import Voucher from "./pages/admin/voucher/Voucher";
+import UserInfo from "./pages/admin/user/UserDetailPage";
 
 function App() {
   const user = useStore((store) => store.profile.user);
-  const role = useMemo(() => user?.role || localStorage.getItem("role"), [user]);
+  const token = localStorage.getItem("token");
+  const role = useMemo(() => {
+    if (user?.role) return user.role;
+    if (token) return localStorage.getItem("role");
+    return null;
+  }, [user, token]);
+
   const isAuthenticated = !!localStorage.getItem("token");
+
+  // Log role mỗi lần user hoặc role thay đổi
+  useEffect(() => {
+    console.log("User:", user);
+    console.log("Token:", token);
+    console.log("Role:", role);
+  }, [user, token, role]);
 
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
+    { path: "register", element: <Register /> },
+    { path: "cart", element: <Cart /> },
     {
       path: "",
-      element: <CustomerLayout />, 
+      element: <CustomerLayout />,
       children: [
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
+        { path: "product/:id", element: <ProductDetail /> },
+        { path: "sales", element: <SaleProducts /> },
+        { path: "blogs", element: <OurBlog /> },
+        { path: "blog/detail", element: <SerumMoisturizerArticle /> },
+        { path: "brands", element: <BrandList /> },
+        { path: "purchase", element: <Purchase /> },
+        { path: "purchase/:id", element: <PurchaseDetail /> },
         {
-          path: "checkout",
+          path: "profile",
           element: (
             <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
-              <Checkout />
+              <Profile />
             </ProtectedRoute>
           )
         },
@@ -57,11 +94,16 @@ function App() {
       ),
       children: [
         { path: "dashboard", element: <DashboardAdmin /> },
-        { path: "createskintest", element: <CreateSkinTests /> },
-        { path: "skintests", element: <ListSkinTest /> },
-        { path: "routines", element: <OrderPage /> },
-        { path: "updateskintest", element: <CreateSkinQuestion /> },
+        { path: "createskintest", element: <CreateSkinTest /> },
+        { path: "createroutine", element: <CreateRoutine /> },
+        { path: "skintests", element: <SkinTest /> },
+        { path: "routines", element: <Routine /> },
+        { path: "vouchers", element: <Voucher /> },
+        { path: "skintypes", element: <SkinType /> },
+        { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
+        { path: "users", element: <UserPage /> },
+        { path: "user/:id", element: <UserInfo /> },
       ],
     }, {
       path: "staff",
@@ -72,9 +114,9 @@ function App() {
       ),
       children: [
         { path: "dashboard", element: <DashboardStaff /> },
-        { path: "orders", element: <OrderList /> },
+        { path: "orders", element: <OrderManagement /> },
         { path: "categories", element: <CategoryManagement /> },
-        { path: "products", element: <ProductManagement /> }, // Thêm route chi tiết SkinTest
+        { path: "products", element: <ProductManagement /> },
       ],
     },
   ]);
@@ -83,6 +125,7 @@ function App() {
     <ThemeProvider theme={theme}>
       <RouterProvider router={router} />
       <Loading />
+      <Notification />
     </ThemeProvider>
   );
 }

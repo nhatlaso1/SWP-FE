@@ -1,0 +1,152 @@
+/* ProductList.module.css */
+
+/* Container */
+.productListContainer {
+    padding: 2rem;
+    background-color: #ffffff;
+    min-height: 100vh;
+    font-family: 'Roboto', sans-serif; /* Example Google font */
+  }
+  
+  /* =========================================
+     BRAND SECTION
+  ========================================= */
+  .brandGrid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    margin-bottom: 3rem;
+  }
+  
+  .brandCard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #f7f7f7;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.4s ease;
+  }
+  
+  .brandCard:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+  }
+  
+  /* Optional: If you want a circular “frame” for brand logos */
+  .brandLogoContainer {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .brandLogo {
+    max-width: 80%;
+    height: auto;
+  }
+  
+  /* For brand names in a modern style */
+  .brandName {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-top: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    /* Example gradient text: */
+    background: linear-gradient(to right, #1e90ff, #ff6347);
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* Highlight selected brand */
+  .selectedBrand {
+    background-color: #e0f1ff;
+    box-shadow: 0 10px 20px rgba(0, 100, 255, 0.1);
+  }
+  
+  /* =========================================
+     PRODUCT SECTION
+  ========================================= */
+  .productsGrid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  }
+  
+  .productCard {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .productCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+  .productCard img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+  }
+  
+  .cardContent {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .productTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.25rem;
+  }
+  
+  .productPrice,
+  .productDiscount {
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  .productDiscount {
+    color: #d32f2f;
+  }
+  
+  /* =========================================
+     RESPONSIVE STYLES
+  ========================================= */
+  @media (max-width: 600px) {
+    .productListContainer {
+      padding: 1rem;
+    }
+  
+    .brandCard {
+      padding: 1.5rem;
+    }
+  
+    .brandLogoContainer {
+      width: 80px;
+      height: 80px;
+    }
+  
+    .productCard img {
+      height: 140px;
+    }
+  }
+  

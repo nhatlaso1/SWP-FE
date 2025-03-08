@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Drawer,
   IconButton,
   InputAdornment,
   Menu,
@@ -19,11 +20,13 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useFormik } from "formik";
 
 import { useStore } from "../../store";
 
 import "./HeaderCustomer.scss";
+import Cart from "../../pages/cart/Cart";
 
 interface IChangePasswordForm {
   oldPassword: string;
@@ -33,6 +36,7 @@ interface IChangePasswordForm {
 
 const HeaderCustomer: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
@@ -69,6 +73,10 @@ const HeaderCustomer: React.FC = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleLogout = () => {
+    logout(navigate); // Gọi hàm logout từ Zustand
+    handleCloseMenu(); // Đóng menu sau khi logout
+  };
 
   const formik = useFormik<IChangePasswordForm>({
     initialValues: {
@@ -94,30 +102,64 @@ const HeaderCustomer: React.FC = () => {
     <>
       <nav className={`headercustomer ${visible ? "visible" : "hidden"}`}>
         <div className="branch-wrap" onClick={() => navigate("/")}>
-          <img src="/beauty-logo.svg" alt="" />
+          <img src="/beauty-logo.svg" alt="logo" />
           <h4>BEAUTYSC</h4>
         </div>
 
         <div className="nav-wrap">
-          <a href="">Home</a>
-          <a href="/checkout">Voucher</a>
-          <a href="">For Sales</a>
-          <a href="/products">Products</a>
-          <a href="/take-quiz">Quiz Skin Q&A</a>
+          <Button variant="text" onClick={() => navigate("/")}>
+            Home
+          </Button>
+          <Button variant="text" onClick={() => navigate("/brands")}>
+            Brand
+          </Button>
+          <Button variant="text" onClick={() => navigate("/sales")}>
+            For Sales
+          </Button>
+          <Button variant="text" onClick={() => navigate("/products")}>
+            Products
+          </Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>
+            Blog
+          </Button>
+          <Button variant="text" onClick={() => navigate("/take-quiz")}>
+            Quiz Skin Q&A
+          </Button>
         </div>
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
-          <div>
-            <img src="" alt="" />
-            US <span>(EN)</span>
+          <div style={{ cursor: "pointer" }} onClick={() => setOpenCart(true)}>
+            <ShoppingCartOutlinedIcon />
           </div>
-          <Button variant="text" href="/profile">
-            Profile
-          </Button>
+          <Drawer
+            open={openCart}
+            anchor="right"
+            onClose={(reason) => {
+              setOpenCart(false);
+            }}
+          >
+            <Cart />
+          </Drawer>
+          <IconButton
+            onClick={handleOpenMenu}
+            className="header-staff__user-icon"
+          >
+            <PersonIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseMenu}
+            MenuListProps={{ "aria-labelledby": "user-menu-button" }}
+          >
+            <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+            <MenuItem onClick={() => navigate("/purchase")}>Purchase</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
         </div>
-
-        {/* <div className="action-group-wrap">
+      </nav>
+      {/* <div className="action-group-wrap">
           {(role === "ROLE_VOLUNTEER" || role === "ROLE_ADMIN") && (
             <IconButton
               style={{ color: "white", marginRight: "8px" }}
@@ -196,7 +238,6 @@ const HeaderCustomer: React.FC = () => {
             )}
           </Menu>
         </div> */}
-      </nav>
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Change Password</DialogTitle>
