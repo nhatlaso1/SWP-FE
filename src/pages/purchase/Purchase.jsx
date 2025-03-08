@@ -30,9 +30,12 @@ export default function Purchase() {
   const statusTabs = [
     { key: "", label: "All" },
     { key: "pending", label: "Pending" },
+    { key: "confirmed", label: "Confirmed" },
     { key: "shipping", label: "Shipping" },
     { key: "complete", label: "Complete" },
+    { key: "returned", label: "Returned" },
     { key: "cancel", label: "Cancel" },
+    { key: "denied", label: "Denied" },
   ];
 
   useEffect(() => {
@@ -41,8 +44,14 @@ export default function Purchase() {
       try {
         // API getAllUserOrders trả về mảng Order theo trạng thái được truyền
         const data = await getAllUserOrders(selectedStatus, token);
-        console.log("Orders from API:", data);
-        setOrders(data);
+        // Sắp xếp đơn hàng từ mới nhất đến cũ nhất dựa trên createdDate
+        const sortedData = data.sort(
+          (a, b) =>
+            new Date(b.createdDate).getTime() -
+            new Date(a.createdDate).getTime()
+        );
+        console.log("Orders from API:", sortedData);
+        setOrders(sortedData);
         // Reset trang mỗi khi filter thay đổi
         setCurrentPage(1);
       } catch (error) {

@@ -38,6 +38,8 @@ import UserPage from "./pages/admin/user/UserPage";
 import SkinType from "./pages/admin/skintype/SkinType";
 import Voucher from "./pages/admin/voucher/Voucher";
 import UserInfo from "./pages/admin/user/UserDetailPage";
+import Checkout from "./pages/checkout/Checkout";
+import CheckoutSuccess from "./pages/checkout/CheckoutCOD";
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -50,17 +52,11 @@ function App() {
 
   const isAuthenticated = !!localStorage.getItem("token");
 
-  // Log role mỗi lần user hoặc role thay đổi
-  useEffect(() => {
-    console.log("User:", user);
-    console.log("Token:", token);
-    console.log("Role:", role);
-  }, [user, token, role]);
-
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
     { path: "cart", element: <Cart /> },
+    { path: "checkout", element: <Checkout /> },
     {
       path: "",
       element: <CustomerLayout />,
@@ -75,6 +71,7 @@ function App() {
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
+
         {
           path: "profile",
           element: (
@@ -82,7 +79,15 @@ function App() {
               <Profile />
             </ProtectedRoute>
           )
+        }, {
+          path: "order-success",
+          element: (
+            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+              <CheckoutSuccess />
+            </ProtectedRoute>
+          )
         },
+
       ],
     },
     {

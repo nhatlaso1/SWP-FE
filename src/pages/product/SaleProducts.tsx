@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Card, 
-  CardMedia, 
-  CardContent, 
-  Typography, 
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
   Button,
   Container,
   CircularProgress,
@@ -14,24 +14,40 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
+import { useStore } from '../../store';
 
 interface Product {
   $id: string;
   productId: number;
   productName: string;
+  quantity: number;
+  category: Category;
+  skinTypes: {
+    $id: string;
+    $values: SkinType[];
+  };
   summary: string;
   price: number;
   discount: number;
   rating: number;
   productImage: string;
 }
-
+interface Category {
+  $id: string;
+  categoryId: number;
+  categoryName: string;
+}
+interface SkinType {
+  $id: string;
+  skinTypeId: number;
+  skinTypeName: string;
+}
 const SaleProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
-
+  const addItem = useStore((store) => store.addItem);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -40,7 +56,7 @@ const SaleProducts: React.FC = () => {
 
         const productsData = await ProductAPI.getAll();
         const saleProducts = productsData.filter((product: Product) => product.discount > 0);
-        
+
         console.log('Sale Products:', saleProducts);
         setProducts(saleProducts);
       } catch (error) {
@@ -91,10 +107,10 @@ const SaleProducts: React.FC = () => {
         <Grid container spacing={4}>
           {products.map((product) => (
             <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-              <Card 
-                sx={{ 
-                  height: '100%', 
-                  display: 'flex', 
+              <Card
+                sx={{
+                  height: '100%',
+                  display: 'flex',
                   flexDirection: 'column',
                   position: 'relative',
                   '&:hover': {
@@ -149,15 +165,20 @@ const SaleProducts: React.FC = () => {
                       ${product.price.toLocaleString()}
                     </Typography>
                   </Box>
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
+                    size="large"
                     fullWidth
-                    sx={{
-                      mt: 'auto',
-                      backgroundColor: 'primary.main',
-                      '&:hover': {
-                        backgroundColor: 'primary.dark',
-                      }
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      addItem({
+                        productId: product.productId,
+                        productName: product.productName,
+                        price: product.price,
+                        productImage: product.productImage,
+                        category: product.category.categoryName,
+                        skintype: product.skinTypes,
+                      });
                     }}
                   >
                     Add to Cart

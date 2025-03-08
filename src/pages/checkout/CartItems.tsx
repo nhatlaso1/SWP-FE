@@ -1,69 +1,98 @@
-import React, { useState, useEffect } from 'react';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
+import React from "react";
+import { Card, CardMedia, CardContent, Typography, Box } from "@mui/material";
 
-interface CartItem {
-  id: number;
-  name: string;
-  image: string;
-  price: number;
-  quantity: number;
+interface CartItemProps {
+  product: {
+    productId: number;
+    productName: string;
+    productImage: string;
+    category: string;
+    skintype: any;
+    price: number;
+    quantity: number;
+    note?: string;
+  };
 }
 
-const CartItems: React.FC = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-
-  
-  useEffect(() => {
-    const storedCart = sessionStorage.getItem('cart');
-    if (storedCart) {
-      setCartItems(JSON.parse(storedCart));
-    }
-  }, []);
-
+const CartItem: React.FC<CartItemProps> = ({ product }) => {
   return (
-    <Box sx={{ padding: '12px', backgroundColor: '#f9f9f9', borderRadius: '8px' }}>
-      <Grid container spacing={1}>
-        {cartItems.map((item) => (
-          <Grid item xs={12} key={item.id}>
-            <Card
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                padding: '8px',
-                boxShadow: '0px 2px 6px rgba(0,0,0,0.08)',
-                borderRadius: '6px',
-              }}
-            >
-              <CardMedia
-                component="img"
-                sx={{ width: 60, height: 60, borderRadius: '6px', objectFit: 'cover', marginRight: '8px' }}
-                image={item.image}
-                alt={item.name}
-              />
-              <CardContent sx={{ flexGrow: 1, padding: '0' }}>
-                <Typography variant="body2" fontWeight="bold" color="#333">
-                  {item.name}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  SL: {item.quantity}
-                </Typography>
-              </CardContent>
-              <CardContent sx={{ padding: '0' }}>
-                <Typography variant="body2" color="primary" fontWeight="bold">
-                  {item.price.toLocaleString('vi-VN')} đ
-                </Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Box>
+    <Card
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        mb: 2,
+        borderRadius: "12px",
+        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+        padding: "8px",
+      }}
+    >
+      <CardMedia
+        component="img"
+        sx={{
+          width: 60,
+          height: 60,
+          borderRadius: "6px",
+          objectFit: "cover",
+          marginRight: "8px",
+        }}
+        image={product.productImage}
+        alt={product.productName}
+      />
+      <CardContent sx={{ flexGrow: 1, padding: 0 }}>
+        <Typography variant="body1" fontWeight="bold" color="#333">
+          {product.productName}
+        </Typography>
+
+        {/* Hiển thị category và dung tích */}
+        <Typography variant="caption" color="text.secondary">
+          {`Phân loại: ${product.category}`}
+        </Typography>
+        <Typography variant="caption" color="text.secondary" display="block">
+          {`Loại da: ${Array.isArray(product.skintype?.$values)
+            ? product.skintype.$values.map((s: any) => s.skinTypeName).join(", ")
+            : product.skintype?.skinTypeName || ""
+            }`}
+        </Typography>
+
+        {/* Hiển thị note (nếu có) */}
+        {product.note && (
+          <Typography variant="caption" color="text.secondary">
+            {product.note}
+          </Typography>
+        )}
+
+        {/* Giá */}
+        <Typography
+          variant="body2"
+          fontWeight="bold"
+          sx={{ color: product.price === 0 ? "#888" : "error.main", mt: 0.5 }}
+        >
+          {product.price === 0
+            ? "0 đ"
+            : `${product.price.toLocaleString("vi-VN")} đ`}
+        </Typography>
+      </CardContent>
+
+      {/* Số lượng (read-only) */}
+      <CardContent sx={{ padding: 0, display: "flex", alignItems: "center" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 1,
+            backgroundColor: "#fff6f6",
+            borderRadius: "6px",
+            padding: "4px 8px",
+          }}
+        >
+          <Typography variant="body2">Quantity:</Typography>
+          <Typography variant="body2" fontWeight="bold">
+            {product.quantity}
+          </Typography>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 
-export default CartItems;
+export default CartItem;

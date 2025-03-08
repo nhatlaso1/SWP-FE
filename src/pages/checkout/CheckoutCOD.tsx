@@ -6,11 +6,11 @@ export default function CheckoutSuccess() {
     const navigate = useNavigate();
 
     const handleGoHome = () => {
-        navigate('/'); // Navigate to the homepage
+        navigate('/products'); 
     };
 
     const handleViewOrderDetail = () => {
-        navigate('/order-detail'); // Navigate to the order details page
+        navigate('/purchase'); 
     };
 
     return (
@@ -32,7 +32,7 @@ export default function CheckoutSuccess() {
                     }}
                 >
                     <Typography variant="h3" sx={{ fontWeight: 'bold', mb: 2 }}>
-                        PAYMENT SUCCESSFUL
+                        ORDER SUCCESSFUL
                     </Typography>
                     <Typography variant="h5" sx={{ maxWidth: '600px', lineHeight: 1.6, mb: 4 }}>
                         Thank you for shopping with us!

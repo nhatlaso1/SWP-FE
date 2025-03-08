@@ -31,9 +31,8 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import { useStore } from "../../store";
 
 import "./Cart.scss";
-import CheckoutSuccess from "../checkout/CheckoutSuccess";
+import CheckoutSuccess from "../checkout/CheckoutCOD";
 import { createPayment } from "../../store/payment.api";
-import CheckoutFail from "../checkout/CheckoutFail";
 import { getAllVoucher } from "../../store/voucher.api";
 
 const steps = [
@@ -51,7 +50,7 @@ const Cart = () => {
   const [discount, setDiscount] = useState(0);
   const [total, setTotal] = useState(0);
   const [status, setStatus] = useState("");
-  const token = localStorage.getItem("token");
+  const token = useStore((state) => state.profile.user?.token);
   const onUpdateQuantity = useStore((store) => store.updateQuantity);
   const onRemoveItem = useStore((store) => store.removeItem);
   const onCreateOrder = useStore((store) => store.createOrder);
@@ -647,9 +646,11 @@ const Cart = () => {
                     <CheckoutSuccess />
                   </Typography>
                 ) : status === "fail" ? (
-                  <Typography variant="h4" fontWeight="bold" color="red">
-                    <CheckoutFail />
-                  </Typography>
+                  <Typography
+                    variant="h4"
+                    fontWeight="bold"
+                    color="red"
+                  ></Typography>
                 ) : (
                   <Typography variant="h4" fontWeight="bold">
                     Payment completed.

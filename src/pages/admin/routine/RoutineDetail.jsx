@@ -211,6 +211,7 @@ const RoutineDetail = () => {
             disabled={!isEditing}
           />
         </Grid>
+
         <Grid item xs={4}>
           <FormControl fullWidth>
             <InputLabel>Skin Type</InputLabel>
@@ -234,20 +235,25 @@ const RoutineDetail = () => {
         <Card key={dIdx} sx={{ mb: 3 }}>
           <CardContent>
             <Grid container spacing={2} alignItems="center">
-              <Grid item xs={10}>
-                <TextField
-                  label="Routine Detail Name"
-                  fullWidth
-                  value={detail.routineDetailName}
-                  onChange={(e) =>
-                    handleDetailChange(
-                      dIdx,
-                      e.target.value,
-                      "routineDetailName"
-                    )
-                  }
-                  disabled={!isEditing}
-                />
+              <Grid item xs={8}>
+                <FormControl fullWidth>
+                  <InputLabel>Routine Detail Name</InputLabel>
+                  <Select
+                    label="Routine Detail Name"
+                    value={detail.routineDetailName}
+                    onChange={(e) =>
+                      handleDetailChange(
+                        dIdx,
+                        e.target.value,
+                        "routineDetailName"
+                      )
+                    }
+                    disabled={!isEditing}
+                  >
+                    <MenuItem value="Morning">Morning</MenuItem>
+                    <MenuItem value="Evening">Evening</MenuItem>
+                  </Select>
+                </FormControl>
               </Grid>
               {isEditing && (
                 <Grid item xs={2}>

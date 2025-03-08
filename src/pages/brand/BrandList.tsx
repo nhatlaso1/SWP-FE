@@ -14,18 +14,38 @@ import {
 import { CombinedAPI } from '../../store/apiCombined';
 import styles from '../brand/BrandList.module.css';
 import "./BrandList";
+import { useStore } from '../../store';
 interface ProductDetail {
   productId: number;
   productName: string;
   productImage: string;
   price: number;
   discount: number;
+  quantity: number;
+  category: Category;
+  skinTypes: {
+    $id: string;
+    $values: SkinType[];
+  };
   brand: {
     brandId: number;
     brandName: string;
   };
 }
+interface SkinType {
+  $id: string;
+  skinTypeId: number;
+  skinTypeName: string;
+}
+interface Category {
 
+  $id: string;
+
+  categoryId: number;
+
+  categoryName: string;
+
+}
 const BrandList: React.FC = () => {
   const [products, setProducts] = useState<ProductDetail[]>([]);
   const [originalProducts, setOriginalProducts] = useState<ProductDetail[]>([]);
@@ -33,7 +53,7 @@ const BrandList: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedBrandId, setSelectedBrandId] = useState<number | null>(null);
-
+  const addItem = useStore((store) => store.addItem);
   useEffect(() => {
     const fetchBrandsAndProducts = async () => {
       try {
@@ -112,6 +132,24 @@ const BrandList: React.FC = () => {
                       <Typography variant="body2" color="error">Discount: {product.discount * 100}%</Typography>
                     )}
                   </CardContent>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    sx={{ mt: 2 }}
+                    onClick={() => {
+                      addItem({
+                        productId: product.productId,
+                        productName: product.productName,
+                        price: product.price,
+                        productImage: product.productImage,
+                        category: product.category.categoryName,
+                        skintype: product.skinTypes,
+                      });
+                    }}
+                  >
+                    Add to Cart
+                  </Button>
                 </Card>
               </Grid>
             ))}

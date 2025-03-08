@@ -278,13 +278,18 @@ const ProductDetail: React.FC = () => {
               fullWidth
               sx={{ mt: 2 }}
               onClick={() => {
-                addItem({
+                const item = {
                   productId: product.productId,
                   productName: product.productName,
                   price: product.price,
                   productImage: selectedImage || product.productImages.$values[0].productImage,
-                });
+                  category: product.category.categoryName,
+                  skintype: product.skinTypes, // nếu cần, bạn có thể tinh chỉnh dữ liệu này
+                };
+                console.log("Adding item to cart:", item);
+                addItem(item);
               }}
+              
             >
               Add to Cart
             </Button>

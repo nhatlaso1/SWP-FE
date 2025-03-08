@@ -10,8 +10,10 @@ import OurBlog from "../../components/our-blog/OurBlog";
 import NewIn from "../../components/new-in/NewIn";
 
 import "./Home.scss";
+import { useStore } from "../../store";
 
 const Home: React.FC = () => {
+  const token = useStore((state) => state.profile.user?.token);
   return (
     <>
 
