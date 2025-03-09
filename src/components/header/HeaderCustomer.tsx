@@ -11,7 +11,7 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -19,6 +19,7 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useFormik } from "formik";
 
 import { useStore } from "../../store";
@@ -69,6 +70,10 @@ const HeaderCustomer: React.FC = () => {
   const handleClose = () => {
     setOpen(false);
   };
+  const handleLogout = () => {
+    logout(navigate); // Gọi hàm logout từ Zustand
+    handleCloseMenu(); // Đóng menu sau khi logout
+  };
 
   const formik = useFormik<IChangePasswordForm>({
     initialValues: {
@@ -94,30 +99,41 @@ const HeaderCustomer: React.FC = () => {
     <>
       <nav className={`headercustomer ${visible ? "visible" : "hidden"}`}>
         <div className="branch-wrap" onClick={() => navigate("/")}>
-          <img src="/beauty-logo.svg" alt="" />
+          <img src="/beauty-logo.svg" alt="logo" />
           <h4>BEAUTYSC</h4>
         </div>
 
         <div className="nav-wrap">
-          <Link to="/">Home</Link>
-          <Link to="/checkout">Brand</Link>
-          <Link to="/for-sales">For Sales</Link>
-          <Link to="/products">Products</Link>
-          <Link to="/take-quiz">Quiz Skin Q&A</Link>
+          <Button variant="text" onClick={() => navigate("/")}>Home</Button>
+          <Button variant="text" onClick={() => navigate("/brands")}>Brand</Button>
+          <Button variant="text" onClick={() => navigate("/sales")}>For Sales</Button>
+          <Button variant="text" onClick={() => navigate("/products")}>Products</Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>Blog</Button>
+          <Button variant="text" onClick={() => navigate("/take-quiz")}>Quiz Skin Q&A</Button>
         </div>
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
-          <div>
-            <img src="" alt="" />
-            US <span>(EN)</span>
+          <div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+            <ShoppingCartOutlinedIcon />
           </div>
-          <Button variant="text" href="/profile">
-            Profile
-          </Button>
-        </div>
 
-        {/* <div className="action-group-wrap">
+          <IconButton onClick={handleOpenMenu} className="header-staff__user-icon">
+            <PersonIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseMenu}
+            MenuListProps={{ "aria-labelledby": "user-menu-button" }}
+          >
+            <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
+            <MenuItem onClick={() => navigate("/purchase")}>Purchase</MenuItem>
+            <MenuItem onClick={handleLogout}>Logout</MenuItem>
+          </Menu>
+        </div>
+      </nav>
+      {/* <div className="action-group-wrap">
           {(role === "ROLE_VOLUNTEER" || role === "ROLE_ADMIN") && (
             <IconButton
               style={{ color: "white", marginRight: "8px" }}
@@ -196,7 +212,7 @@ const HeaderCustomer: React.FC = () => {
             )}
           </Menu>
         </div> */}
-      </nav>
+
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Change Password</DialogTitle>

@@ -25,7 +25,7 @@ import {
   Alert,
 } from '@mui/material';
 
-import { getAllOrders, updateOrderStatusDirect, completeOrder, cancelOrder } from '../../../store/apiOrder';
+import { getAllOrders, updateOrderStatusDirect, completeOrder, cancelOrder, denyOrder, confirmOrder, shippingOrder, returnOrder, approveOrder, rejectOrder } from '../../../store/apiOrder';
 
 const OrderManagement = () => {
   const [orders, setOrders] = useState([]);
@@ -42,14 +42,9 @@ const OrderManagement = () => {
 
   const fetchOrders = async () => {
     try {
-      console.log('Fetching orders with filter: All');
-      const allOrders = await Promise.all([
-        getAllOrders('Pending'),
-        getAllOrders('Shipping'),
-        getAllOrders('Complete'),
-        getAllOrders('Cancelled'),
-      ]);
-      setOrders(allOrders.flat());
+      console.log('Fetching all orders');
+      const allOrders = await getAllOrders();
+      setOrders(allOrders);
     } catch (error) {
       console.error('Error fetching orders:', error);
       setNotification({ open: true, message: 'Không thể tải danh sách đơn hàng. Vui lòng thử lại sau.', severity: 'error' });
@@ -82,21 +77,42 @@ const OrderManagement = () => {
 
   const handleStatusChange = async (newStatus) => {
     let updatedStatus;
-    if (newStatus === 'Complete') {
-      const success = await completeOrder(selectedOrder.orderId);
-      if (success) {
-        updatedStatus = 'Complete';
-        setNotification({ open: true, message: 'Đơn hàng đã hoàn tất!', severity: 'success' });
+    if (selectedOrder.status === 'Pending') {
+      if (newStatus === 'Confirmed') {
+        const success = await confirmOrder(selectedOrder.orderId);
+        if (success) {
+          updatedStatus = 'Confirmed';
+        }
+      } else if (newStatus === 'Denied') {
+        const success = await denyOrder(selectedOrder.orderId);
+        if (success) {
+          updatedStatus = 'Denied';
+        }
       }
-    } else if (newStatus === 'Cancelled') {
-      const success = await cancelOrder(selectedOrder.orderId);
-      if (success) {
-        updatedStatus = 'Cancelled';
-        setNotification({ open: true, message: 'Đơn hàng đã bị hủy!', severity: 'success' });
+    } else if (selectedOrder.status === 'Confirmed') {
+      if (newStatus === 'Shipping') {
+        const success = await shippingOrder(selectedOrder.orderId);
+        if (success) {
+          updatedStatus = 'Shipping';
+        }
+      }
+    } else if (selectedOrder.status === 'Shipping') {
+      if (newStatus === 'Returned') {
+        const success = await returnOrder(selectedOrder.orderId);
+        if (success) {
+          updatedStatus = 'Returned';
+        }
+      } else if (newStatus === 'Complete') {
+        const success = await completeOrder(selectedOrder.orderId);
+        if (success) {
+          updatedStatus = 'Complete';
+        }
       }
     }
     if (updatedStatus) {
       setSelectedOrder(prev => ({ ...prev, status: updatedStatus }));
+      setNotification({ open: true, message: `Đơn hàng đã chuyển sang trạng thái ${updatedStatus}!`, severity: 'success' });
+      await fetchOrders();
     }
   };
 
@@ -108,8 +124,16 @@ const OrderManagement = () => {
         return 'Đang giao hàng';
       case 'Complete':
         return 'Hoàn tất';
-      case 'Cancelled':
+      case 'Cancel':
         return 'Đã hủy';
+      case 'Denied':
+        return 'Đã bị từ chối';
+      case 'Confirmed':
+        return 'Đã được xác nhận';
+      case 'Delivered':
+        return 'Đã giao thành công';
+      case 'Returned':
+        return 'Đã được trả';
       default:
         return status;
     }
@@ -123,8 +147,16 @@ const OrderManagement = () => {
         return 'Đơn hàng đang trong quá trình vận chuyển';
       case 'Complete':
         return 'Đơn hàng đã giao thành công';
-      case 'Cancelled':
+      case 'Cancel':
         return 'Đơn hàng đã bị hủy, không thể phục hồi';
+      case 'Denied':
+        return 'Đơn hàng đã bị từ chối, không thể phục hồi';
+      case 'Confirmed':
+        return 'Đơn hàng đã được xác nhận, chờ giao hàng';
+      case 'Delivered':
+        return 'Đơn hàng đã giao thành công';
+      case 'Returned':
+        return 'Đơn hàng đã được trả, không thể phục hồi';
       default:
         return '';
     }
@@ -133,11 +165,18 @@ const OrderManagement = () => {
   const getAvailableStatuses = (currentStatus) => {
     switch (currentStatus) {
       case 'Pending':
-        return ['Shipping', 'Cancelled'];
+        return ['Confirmed', 'Denied'];
+      case 'Confirmed':
+        return ['Shipping'];
       case 'Shipping':
+        return ['Returned', 'Complete'];
+      case 'Delivered':
         return ['Complete'];
+      case 'Returned':
+        return [];
+      case 'Denied':
+      case 'Cancel':
       case 'Complete':
-      case 'Cancelled':
         return [];
       default:
         return [];
@@ -147,6 +186,10 @@ const OrderManagement = () => {
   const handleStatusClose = () => {
     setAnchorEl(null);
   };
+
+  const totalAmount = selectedOrder?.details.reduce((total, detail) => {
+    return total + (detail.price * detail.quantity);
+  }, 0) || 0;
 
   return (
     <Box p={3}>
@@ -196,7 +239,7 @@ const OrderManagement = () => {
               { label: 'Địa chỉ', value: selectedOrder.address },
               { label: 'Ngày đặt', value: new Date(selectedOrder.createdDate).toLocaleDateString() },
               { label: 'Trạng thái', value: getStatusText(selectedOrder.status) },
-              { label: 'Tổng tiền', value: selectedOrder.totalAmount.toLocaleString() + 'đ' }
+              { label: 'Tổng tiền', value: totalAmount.toLocaleString() + 'đ' }
             ].map((item, index) => (
               <Box key={index} sx={{ display: 'flex', alignItems: 'center', marginBottom: 0.5 }}>
                 <Typography sx={{ width: '20%', textAlign: 'left', marginRight: '2px' }}>
@@ -217,10 +260,21 @@ const OrderManagement = () => {
                   {item.value || '-'}
                 </span>
                 {item.label === 'Trạng thái' && selectedOrder.status === 'Pending' && (
-                  <Button onClick={() => handleStatusChange('Cancelled')} sx={{ marginLeft: 2 }}>Hủy đơn hàng</Button>
+                  <> 
+                    <Button onClick={() => handleStatusChange('Confirmed')} sx={{ marginLeft: 2 }}>Xác nhận</Button>
+                    <Button onClick={() => handleStatusChange('Denied')} sx={{ marginLeft: 2 }}>Từ chối</Button>
+                  </>
+                )}
+                {item.label === 'Trạng thái' && selectedOrder.status === 'Confirmed' && (
+                  <> 
+                    <Button onClick={() => handleStatusChange('Shipping')} sx={{ marginLeft: 2 }}>Giao hàng</Button>
+                  </>
                 )}
                 {item.label === 'Trạng thái' && selectedOrder.status === 'Shipping' && (
-                  <Button onClick={() => handleStatusChange('Complete')} sx={{ marginLeft: 2 }}>Hoàn tất đơn hàng</Button>
+                  <> 
+                    <Button onClick={() => handleStatusChange('Returned')} sx={{ marginLeft: 2 }}>Trả hàng</Button>
+                    <Button onClick={() => handleStatusChange('Complete')} sx={{ marginLeft: 2 }}>Hoàn tất</Button>
+                  </>
                 )}
               </Box>
             ))}

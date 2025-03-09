@@ -108,4 +108,72 @@ export const cancelOrder = async (orderId) => {
   }
 };
 
+export const denyOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/deny-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error denying order:', error);
+    throw error;
+  }
+};
+
+export const confirmOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/confirm-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error confirming order:', error);
+    throw error;
+  }
+};
+
+export const shippingOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/shipping-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error shipping order:', error);
+    throw error;
+  }
+};
+
+export const returnOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`https://localhost:7130/api/Order/return-order`, null, {
+      params: { orderId }
+    });
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error returning order:', error);
+    throw error;
+  }
+};
+
+export const approveOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`${API_URL}/Order/approve/${orderId}`);
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error approving order:', error);
+    throw error;
+  }
+};
+
+export const rejectOrder = async (orderId) => {
+  try {
+    const response = await axios.patch(`${API_URL}/Order/reject/${orderId}`);
+    return response.status === 200;
+  } catch (error) {
+    console.error('Error rejecting order:', error);
+    throw error;
+  }
+};
+
 

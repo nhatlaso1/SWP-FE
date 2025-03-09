@@ -40,25 +40,40 @@
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  overflow: auto;
+  margin: 0 auto;
+  padding: 20px;
+  overflow-x: auto;
+  max-width: 100%;
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 1000px;
+  table-layout: fixed;
+  margin: 0 auto;
 }
 
 th, td {
-  padding: 12px 15px;
+  padding: 12px 10px;
   text-align: left;
   border-bottom: 1px solid #eee;
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 230px;
 }
 
 th {
   background-color: #f8f9fa;
   font-weight: 600;
   color: #333;
+  width: 152px; /* Đảm bảo các cột có chiều rộng cố định là 152px */
+}
+
+td img {
+  max-width: 100%; /* Đảm bảo hình ảnh không làm mở rộng cột */
+  height: auto;
 }
 
 tr:hover {
@@ -306,7 +321,9 @@ tr:hover {
   background: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
-  margin-bottom: 20px;
+  margin: 0 auto;
+  max-width: 600px;
+  margin-left: 80px;
 }
 
 .product-detail h3 {
@@ -557,7 +574,7 @@ tr:hover {
   color: #666;
 }
 
-.selected-file {
+.selected-file { 
   margin-top: 10px;
   font-size: 0.9em;
   color: #2196F3;

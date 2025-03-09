@@ -1,0 +1,156 @@
+/* Overlay covers the entire screen */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+
+  .popup {
+    width: 80%;            /* Tăng độ rộng của popup */
+    max-width: 800px;      /* Giới hạn độ rộng tối đa */
+    height: 80%;           /* Chiều cao popup bằng 80% chiều cao cửa sổ */
+    max-height: 600px;     /* Giới hạn chiều cao tối đa */
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 30px;         /* Tăng padding để nội dung không dính mép */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;      /* Cho phép cuộn dọc nếu nội dung quá dài */
+    position: relative;
+    margin: 5% auto;       /* Căn giữa popup theo chiều dọc và ngang */
+  }
+   
+  h2 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  /* Section for showing reward or tips */
+  .reward {
+    background: #fff8e1;
+    padding: 10px;
+    border: 1px solid #ffcc80;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 15px;
+  }
+  
+  /* Product info section */
+  .product-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .product-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+  
+  .product-category {
+    font-size: 12px;
+    color: #777;
+  }
+  
+  /* Rating stars */
+  .stars {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .star {
+    color: gold;
+    font-size: 20px;
+    cursor: pointer;
+  }
+  
+  .rate-text {
+    color: #ff5722;
+    font-size: 14px;
+    font-weight: bold;
+  }
+  
+  .rating-section {
+    margin-bottom: 15px;
+  }
+  
+  /* Text area for review */
+  .review-input {
+    width: 100%;
+    height: 200px; /* Chiều cao có thể điều chỉnh theo ý muốn */
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    resize: vertical;  /* Cho phép người dùng thay đổi chiều cao nếu cần */
+  }
+  
+  
+  /* Upload buttons */
+  .upload-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .upload {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  
+  .upload:hover {
+    background: #f5f5f5;
+  }
+  
+  /* Service rating section */
+  .service-rating {
+    margin-bottom: 15px;
+  }
+  
+  /* Action buttons at the bottom */
+  .action-buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .btn {
+    padding: 10px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  
+  /* Cancel/Back button */
+  .cancel {
+    background: white;
+    border: 1px solid #ddd;
+  }
+  
+  /* Submit button */
+  .submit {
+    background: #ff5722;
+    border: none;
+    color: white;
+  }
+  
+  .submit:hover {
+    background: #e64a19;
+  }

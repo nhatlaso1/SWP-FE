@@ -26,6 +26,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { ProductAPI } from '../../store/apiProduct';
 import styles from './ProductDetail.module.css';
+import { useStore } from '../../store';
 
 interface Brand {
   $id: string;
@@ -111,7 +112,7 @@ const ProductDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
-
+  const addItem = useStore((store) => store.addItem);
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -121,7 +122,7 @@ const ProductDetail: React.FC = () => {
           setError('Product ID is required');
           return;
         }
-        
+
         const productId = parseInt(id);
         if (isNaN(productId)) {
           setError('Invalid product ID');
@@ -194,7 +195,7 @@ const ProductDetail: React.FC = () => {
             </Card>
             <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
               {product.productImages.$values.map((image) => (
-                <ImageListItem 
+                <ImageListItem
                   key={image.productImageId}
                   className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''}`}
                   onClick={() => setSelectedImage(image.productImage)}
@@ -221,7 +222,7 @@ const ProductDetail: React.FC = () => {
                 ({averageRating.toFixed(1)}) · {product.feedbacks.$values.length} reviews
               </Typography>
             </div>
-            
+
             <div className={styles.priceContainer}>
               <Typography variant="h4" className={styles.currentPrice}>
                 ${product.price.toLocaleString()}
@@ -254,16 +255,16 @@ const ProductDetail: React.FC = () => {
 
             <div className={styles.quantityContainer}>
               <Typography variant="subtitle1">Quantity:</Typography>
-              <IconButton 
-                onClick={() => handleQuantityChange(-1)} 
+              <IconButton
+                onClick={() => handleQuantityChange(-1)}
                 disabled={quantity <= 1}
                 className={styles.quantityButton}
               >
                 <RemoveIcon />
               </IconButton>
               <Typography>{quantity}</Typography>
-              <IconButton 
-                onClick={() => handleQuantityChange(1)} 
+              <IconButton
+                onClick={() => handleQuantityChange(1)}
                 disabled={quantity >= product.quantity}
                 className={styles.quantityButton}
               >
@@ -271,11 +272,19 @@ const ProductDetail: React.FC = () => {
               </IconButton>
             </div>
 
-            <Button 
-              variant="contained" 
-              size="large" 
-              fullWidth 
-              className={styles.addToCartButton}
+            <Button
+              variant="contained"
+              size="large"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={() => {
+                addItem({
+                  productId: product.productId,
+                  productName: product.productName,
+                  price: product.price,
+                  productImage: selectedImage || product.productImages.$values[0].productImage,
+                });
+              }}
             >
               Add to Cart
             </Button>
@@ -288,8 +297,8 @@ const ProductDetail: React.FC = () => {
               </Typography>
               <div className={styles.chipContainer}>
                 {product.skinTypes.$values.map((type) => (
-                  <Chip 
-                    key={type.skinTypeId} 
+                  <Chip
+                    key={type.skinTypeId}
                     label={type.skinTypeName}
                     className={styles.chip}
                   />
@@ -303,8 +312,8 @@ const ProductDetail: React.FC = () => {
               </Typography>
               <div className={styles.chipContainer}>
                 {product.functions.$values.map((func) => (
-                  <Chip 
-                    key={func.functionId} 
+                  <Chip
+                    key={func.functionId}
                     label={func.functionName}
                     className={styles.chip}
                   />
@@ -318,8 +327,8 @@ const ProductDetail: React.FC = () => {
               </Typography>
               <div className={styles.chipContainer}>
                 {product.ingredients.$values.map((ingredient) => (
-                  <Chip 
-                    key={ingredient.ingredientId} 
+                  <Chip
+                    key={ingredient.ingredientId}
                     label={ingredient.ingredientName}
                     className={styles.chip}
                   />

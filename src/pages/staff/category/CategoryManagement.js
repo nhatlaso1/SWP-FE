@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { CategoryAPI } from '../../../store/apiCategory';
-import { ProductAPI } from '../../../store/apiProduct';
+import { CategoryCountAPI } from '../../../store/apiCountCategory';
 import './CategoryManagement.css';
 
 const CategoryManagement = () => {
@@ -11,10 +11,8 @@ const CategoryManagement = () => {
   const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryForm, setCategoryForm] = useState({
-    categoryName: '',
-    description: ''
+    categoryName: ''
   });
-  const [productCounts, setProductCounts] = useState({});
 
   useEffect(() => {
     fetchCategories();
@@ -23,22 +21,8 @@ const CategoryManagement = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const response = await CategoryAPI.getAll();
-      let categoriesData = [];
-      if (Array.isArray(response)) {
-        categoriesData = response;
-      } else if (response?.$values) {
-        categoriesData = response.$values;
-      }
-      setCategories(categoriesData);
-      
-      // Lấy số lượng sản phẩm cho mỗi danh mục
-      const counts = {};
-      for (const category of categoriesData) {
-        const count = await ProductAPI.getCountByCategory(category.categoryId);
-        counts[category.categoryId] = count;
-      }
-      setProductCounts(counts);
+      const categoriesWithCount = await CategoryCountAPI.getCategoriesWithCount();
+      setCategories(categoriesWithCount);
     } catch (err) {
       setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
     } finally {
@@ -54,8 +38,7 @@ const CategoryManagement = () => {
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
     setCategoryForm({
-      categoryName: category.categoryName,
-      description: category.description
+      categoryName: category.categoryName
     });
     setShowCategoryForm(true);
   };
@@ -89,9 +72,9 @@ const CategoryManagement = () => {
         showNotificationMessage('Thêm danh mục thành công!');
       }
       setShowCategoryForm(false);
-      setCategoryForm({ categoryName: '', description: '' });
+      setCategoryForm({ categoryName: '' });
       setSelectedCategory(null);
-      fetchCategories(); // Refresh danh sách
+      fetchCategories();
     } catch (err) {
       setError(selectedCategory ? 'Không thể cập nhật danh mục' : 'Không thể thêm danh mục');
     } finally {
@@ -134,16 +117,6 @@ const CategoryManagement = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>Mô tả:</label>
-                <textarea
-                  value={categoryForm.description}
-                  onChange={(e) => setCategoryForm({
-                    ...categoryForm,
-                    description: e.target.value
-                  })}
-                />
-              </div>
               <div className="modal-actions">
                 <button type="submit">
                   {selectedCategory ? 'Cập nhật' : 'Thêm mới'}
@@ -152,7 +125,7 @@ const CategoryManagement = () => {
                   type="button" 
                   onClick={() => {
                     setShowCategoryForm(false);
-                    setCategoryForm({ categoryName: '', description: '' });
+                    setCategoryForm({ categoryName: '' });
                     setSelectedCategory(null);
                   }}
                   className="cancel-button"
@@ -174,7 +147,6 @@ const CategoryManagement = () => {
               <tr>
                 <th>ID</th>
                 <th>Tên danh mục</th>
-                <th>Mô tả</th>
                 <th>Số lượng sản phẩm</th>
                 <th>Thao tác</th>
               </tr>
@@ -184,8 +156,7 @@ const CategoryManagement = () => {
                 <tr key={category.categoryId}>
                   <td>{category.categoryId}</td>
                   <td>{category.categoryName}</td>
-                  <td>{category.description}</td>
-                  <td>{productCounts[category.categoryId] || 0} sản phẩm</td>
+                  <td>{category.productCount}</td>
                   <td>
                     <div className="action-buttons">
                       <button onClick={() => handleEditCategory(category)}>Sửa</button>

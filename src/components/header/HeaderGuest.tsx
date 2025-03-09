@@ -11,7 +11,7 @@ import {
   MenuItem,
   TextField,
 } from "@mui/material";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
@@ -19,6 +19,7 @@ import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRen
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import { useFormik } from "formik";
 
 import { useStore } from "../../store";
@@ -94,30 +95,41 @@ const HeaderGuest: React.FC = () => {
     <>
       <nav className={`header ${visible ? "visible" : "hidden"}`}>
         <div className="branch-wrap" onClick={() => navigate("/")}>
-          <img src="/beauty-logo.svg" alt="" />
+          <img src="/beauty-logo.svg" alt="Logo" />
           <h4>BEAUTYSC</h4>
         </div>
 
         <div className="nav-wrap">
-          <Link to="/">Home</Link>
-          <Link to="/brands">Brand</Link>
-          <Link to="/for-sales">For Sales</Link>
-          <Link to="/products">Products</Link>
-          <Link to="/take-quiz">Quiz Skin Q&A</Link>
-        </div>
-
-        <div className="searchbar-wrap">
-          <SearchOutlinedIcon />|
-          <div>
-            <img src="" alt="" />
-            US <span>(EN)</span>
-          </div>
-          <Button variant="text" href="/login">
-            Login
+          <Button variant="text" onClick={() => navigate("/")}>
+            Home
+          </Button>
+          <Button variant="text" onClick={() => navigate("/brands")}>
+            Brand
+          </Button>
+          <Button variant="text" onClick={() => navigate("/sales")}>
+            For Sales
+          </Button>
+          <Button variant="text" onClick={() => navigate("/products")}>
+            Products
+          </Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>Blog</Button>
+          <Button variant="text" onClick={() => navigate("/take-quiz")}>
+            Quiz Skin Q&A
           </Button>
         </div>
 
-        {/* <div className="action-group-wrap">
+        <div className="searchbar-wrap">
+          <SearchOutlinedIcon />
+          |<div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+            <ShoppingCartOutlinedIcon />
+          </div>
+          <Button variant="text" onClick={() => navigate("/login")}>
+            Login
+          </Button>
+        </div>
+      </nav>
+
+      {/* <div className="action-group-wrap">
           {(role === "ROLE_VOLUNTEER" || role === "ROLE_ADMIN") && (
             <IconButton
               style={{ color: "white", marginRight: "8px" }}
@@ -196,7 +208,6 @@ const HeaderGuest: React.FC = () => {
             )}
           </Menu>
         </div> */}
-      </nav>
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Change Password</DialogTitle>

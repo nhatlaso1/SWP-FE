@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, TextField } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import PersonIcon from "@mui/icons-material/Person";
@@ -15,7 +15,8 @@ const Login: React.FC = () => {
   const onLogin = useStore((store) => store.login);
   const user = useStore((store) => store.profile.user);
   const setError = useStore((store) => store.setError);
-
+  const location = useLocation();
+  
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -36,17 +37,18 @@ const Login: React.FC = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    const token = localStorage.getItem("token");
+    if (user && token) {
       const { role } = user;
-      if (role === "Manager") {
-        navigate("/admin/dashboard");
-      } else if (role === "Staff") {
-        navigate("/staff/dashboard");
-      } else if (role === "Customer") {
-        navigate("/");
-      }
+      console.log("Role hiện tại:", role);
+
+      const redirectPath = location.state?.from || 
+        (role === "Manager" ? "/admin/dashboard" :
+        role === "Staff" ? "/staff/dashboard" : "/");
+
+      navigate(redirectPath); // Điều hướng về trang trước đó hoặc theo vai trò
     }
-  }, [user, navigate]);
+  }, [user, navigate, location.state]);
 
   return (
     <div className="login-page">
@@ -116,6 +118,33 @@ const Login: React.FC = () => {
             Login
           </Button>
         </form>
+        <div className="register">
+          <Button
+            color="primary"
+            variant="text"
+            onClick={() => navigate("/register")}
+          >
+            Register
+          </Button>
+        </div>
+
+        <div className="sign-up-w-line">
+          <span></span>
+          <p>Or sign up with</p>
+          <span></span>
+        </div>
+
+        <div className="other-login">
+          <div className="login-item">
+            <img src="/icons/fb-icon.svg" alt="fb" />
+          </div>
+          <div className="login-item">
+            <img src="/icons/google-icon.svg" alt="google" />
+          </div>
+          <div className="login-item">
+            <img src="/icons/apple-icon.svg" alt="apple" />
+          </div>
+        </div>
       </div>
     </div>
   );
