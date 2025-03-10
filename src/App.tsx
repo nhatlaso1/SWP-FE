@@ -56,8 +56,7 @@ function App() {
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
-    { path: "cart", element: <Cart /> },
-    { path: "checkout", element: <Checkout /> },
+
     {
       path: "",
       element: <CustomerLayout />,
@@ -72,7 +71,13 @@ function App() {
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
-
+        { path: "cart",
+           element: (
+            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+              <Cart/>
+            </ProtectedRoute>
+          )},
+        { path: "checkout", element: <Checkout /> },
         {
           path: "profile",
           element: (

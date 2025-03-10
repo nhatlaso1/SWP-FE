@@ -626,6 +626,10 @@ const Checkout: React.FC = () => {
                     Boolean(phoneError) ||
                     !name.trim() ||
                     !phone ||
+                    !streetAddress.trim() || // Kiểm tra nhập địa chỉ
+                    !selectedProvince ||       // Kiểm tra chọn tỉnh/thành phố
+                    !selectedDistrict ||       // Kiểm tra chọn quận/huyện
+                    !selectedWard ||
                     (cart && cart.length === 0)
                   }
                 >

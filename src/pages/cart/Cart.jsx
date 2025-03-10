@@ -39,8 +39,7 @@ const Cart = () => {
       ),
     }),
     onSubmit: (values) => {
-      console.log("Navigate to checkout page:", values.products);
-      navigate("/checkout");
+      console.log("Navigate to payment page:", values.products);
     },
   });
 
@@ -175,7 +174,7 @@ const Cart = () => {
           <img
             style={{ objectFit: "cover", height: 180 }}
             width={"100%"}
-            src="cart-bg.avif"
+            src="cart-bg.avif.jpg"
             alt=""
           />
 
@@ -206,6 +205,7 @@ const Cart = () => {
               mb: 2,
               fontSize: "1.1rem",
             }}
+             onClick={() => navigate("/checkout")}
           >
             Payment
           </Button>

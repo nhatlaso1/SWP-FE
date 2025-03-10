@@ -1,59 +1,50 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./PurchaseDetail.css";
 import { FaFileAlt, FaMoneyCheckAlt, FaTruck, FaBoxOpen } from "react-icons/fa";
 import StepItem from "../../components/step/StepItem";
+import "./PurchaseDetail.css";
+import { getPurchaseDetail } from "../../store/purchase.api";
+import { useStore } from "../../store";
+
+function getDoneSteps(status) {
+  const s = status.toLowerCase();
+  switch (s) {
+    case "pending":
+      return 1;
+    case "confirmed":
+      return 2;
+    case "shipping":
+      return 3;
+    case "complete":
+      return 5;
+    case "returned":
+      return 4;
+    case "cancel":
+    case "denied":
+      return 0;
+    default:
+      return 0;
+  }
+}
+
 export default function PurchaseDetail() {
   const { id } = useParams();
+  const token = useStore((state) => state.profile.user?.token);
 
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    const mockData = {
-      orderCode: id,
-      status: "Complete",
-
-      summaryMessage:
-        "Your order has been delivered successfully. Your order is now complete.",
-      address: {
-        name: "John Doe",
-        phone: "0900 000 000",
-        addressLine: "123 ABC Street, District 1, HCMC",
-        orderDate: "03/10/2025",
-        paymentMethod: "Bank Transfer",
-      },
-      shopName: "BEAUTYSC",
-      products: [
-        {
-          id: 1,
-          name: "Product 2",
-          variant: "100ml x1",
-          oldPrice: 220000,
-          newPrice: 200000,
-          img: "https://mint07.com/wp-content/uploads/2015/10/sua-rua-mat-Simple-Kind-To-Skin-Refreshing-Facial-Wash-Gel-review-1.jpg",
-        },
-        {
-          id: 1,
-          name: "Product 3",
-          variant: "1000ml x2",
-          oldPrice: 320000,
-          newPrice: 300000,
-          img: "https://mint07.com/wp-content/uploads/2015/10/sua-rua-mat-Simple-Kind-To-Skin-Refreshing-Facial-Wash-Gel-review-1.jpg",
-        },
-      ],
-      fee: {
-        productTotal: 540000,
-        shipping: 0,
-        discount: 40000,
-      },
-      note: "",
-    };
-
-    // Simulate async call
-    setTimeout(() => {
-      setOrder(mockData);
-    }, 2000);
-  }, [id]);
+    if (!id || !token) return;
+    async function fetchOrder() {
+      try {
+        const data = await getPurchaseDetail(id, token);
+        setOrder(data);
+      } catch (error) {
+        console.error("Error fetching purchase detail:", error);
+      }
+    }
+    fetchOrder();
+  }, [id, token]);
 
   if (!order) {
     return (
@@ -69,6 +60,29 @@ export default function PurchaseDetail() {
       </div>
     );
   }
+
+  // Mảng chi tiết sản phẩm
+  const items = order.details?.$values || [];
+
+  // Tính “tổng tiền hàng” (chưa áp discount)
+  const totalProductPrice = items.reduce((acc, item) => {
+    return acc + item.price * item.quantity;
+  }, 0);
+
+  // Tính tổng discount
+  const shopDiscount = items.reduce((acc, item) => {
+    // tiền giảm cho mỗi sản phẩm = item.price * discount * quantity
+    return acc + item.price * item.discount * item.quantity;
+  }, 0);
+
+  // Giả sử phí vận chuyển, voucher
+  const shippingFee = 30000;
+  const voucher = 10000;
+
+  // Tổng thanh toán cuối
+  const totalPayment = totalProductPrice + shippingFee - shopDiscount - voucher;
+
+  // Các bước hiển thị trạng thái đơn hàng
   const steps = [
     { label: "Order Placed", icon: <FaFileAlt /> },
     { label: "Payment Confirmed", icon: <FaMoneyCheckAlt /> },
@@ -76,23 +90,18 @@ export default function PurchaseDetail() {
     { label: "Order Received", icon: <FaBoxOpen /> },
     { label: "Completed", icon: <FaBoxOpen /> },
   ];
-  const doneSteps = 5;
-  // Calculate total amount
-  const totalAmount =
-    (order.fee.productTotal || 0) +
-    (order.fee.shipping || 0) -
-    (order.fee.discount || 0);
+  const doneSteps = getDoneSteps(order.status);
 
   return (
     <div className="order-detail-container">
       {/* Header Bar */}
       <div className="order-header-bar">
         <button className="back-button" onClick={() => window.history.back()}>
-          Back
+          &lt; Trở Lại
         </button>
         <div className="order-info">
-          <span className="order-code">Order Code: {order.orderCode}</span>
-          <span className="order-status-final"> | Order {order.status}</span>
+          <span className="order-code">Mã đơn hàng: {order.orderCode}</span>
+          <span className="order-status-final">| Order {order.status}</span>
         </div>
       </div>
 
@@ -108,76 +117,107 @@ export default function PurchaseDetail() {
         ))}
       </div>
 
-      {/* Summary */}
-      <div className="order-summary-top">
-        <p>{order.summaryMessage}</p>
-        <div className="order-actions-top">
-          <button className="btn-review">Review</button>
+      {/* Thông báo trạng thái / heading */}
+      {order.status.toLowerCase() === "complete" && (
+        <div className="order-completed-msg">
+          <p>Đơn hàng đã hoàn thành. Cảm ơn bạn đã mua sắm!</p>
+          <p>
+            Ngày hoàn thành: {new Date(order.createdDate).toLocaleDateString()}
+          </p>
         </div>
-      </div>
+      )}
+      {order.status.toLowerCase() === "confirmed" && (
+        <div className="order-completed-msg">
+          <p>Đơn hàng đã được xác nhận, đang chuẩn bị giao.</p>
+        </div>
+      )}
+      {order.status.toLowerCase() === "shipping" && (
+        <div className="order-completed-msg">
+          <p>Đơn hàng đang bị giao.</p>
+        </div>
+      )}
 
-      {/* Shipping Address */}
-      <div className="shipping-address">
-        <h3>Shipping Address</h3>
+      {/* Customer Information */}
+      <div className="customer-info">
+        <h3>Customer Information</h3>
         <p>
-          {order.address.name} | {order.address.phone}
+          <strong>Name:</strong> {order.fullName}
         </p>
-        <p>{order.address.addressLine}</p>
-        <div className="address-extra">
-          <p>Order Date: {order.address.orderDate}</p>
-          <p>Payment Method: {order.address.paymentMethod}</p>
-        </div>
+        <p>
+          <strong>Phone:</strong> {order.phoneNumber}
+        </p>
+        <p>
+          <strong>Address:</strong> {order.address}
+        </p>
+        <p>
+          <strong>Order Date:</strong>{" "}
+          {new Date(order.createdDate).toLocaleDateString()}
+        </p>
       </div>
 
-      {/* Product List */}
+      {/* Order Details */}
       <div className="order-products">
-        <div className="shop-header">
-          <span className="shop-name">{order.shopName}</span>
-        </div>
-        {order.products.map((product) => (
-          <div className="product-row" key={product.id}>
-            <div className="product-info-wrap">
-              <img
-                src={product.img}
-                alt={product.name}
-                className="product-img"
-              />
-              <div className="product-info">
-                <h4>{product.name}</h4>
-                <p className="product-variant">Variant: {product.variant}</p>
+        <h3>Sản phẩm trong đơn hàng</h3>
+        {items.map((item) => {
+          const originalPrice = item.price * item.quantity;
+          const discountedPrice = item.price * (1 - item.discount);
+          const finalPrice = discountedPrice * item.quantity;
+
+          return (
+            <div className="product-row" key={item.orderDetailId}>
+              <div className="product-info-wrap">
+                <img
+                  src={item.productImage || "https://via.placeholder.com/100"}
+                  alt={item.productName}
+                  className="product-img"
+                />
+                <div className="product-info">
+                  <h4>{item.productName}</h4>
+                  <p className="product-variant">
+                    {item.size} x {item.quantity}
+                  </p>
+                </div>
+              </div>
+              <div className="product-price">
+                {/* Giá gốc (nếu discount > 0) */}
+                {item.discount > 0 && (
+                  <p className="old-price">₫{originalPrice.toLocaleString()}</p>
+                )}
+                {/* Giá đã giảm */}
+                <p className="new-price">₫{finalPrice.toLocaleString()}</p>
               </div>
             </div>
-            <div className="product-price">
-              {product.oldPrice && (
-                <p className="old-price">
-                  ₫{product.oldPrice.toLocaleString()}
-                </p>
-              )}
-              <p className="new-price">₫{product.newPrice.toLocaleString()}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Payment Summary */}
       <div className="order-payment-summary">
+        <h3>Payment Summary</h3>
         <div className="order-fee-line">
-          <span>Product Total:</span>
-          <span>₫{order.fee.productTotal.toLocaleString()}</span>
+          <span className="label">Tổng tiền hàng:</span>
+          <span className="value">₫{totalProductPrice.toLocaleString()}</span>
         </div>
         <div className="order-fee-line">
-          <span>Shipping Fee:</span>
-          <span>₫{order.fee.shipping.toLocaleString()}</span>
+          <span className="label">Phí vận chuyển:</span>
+          <span className="value">₫{shippingFee.toLocaleString()}</span>
         </div>
         <div className="order-fee-line">
-          <span>Discount:</span>
-          <span>-₫{order.fee.discount.toLocaleString()}</span>
+          <span className="label">Giảm giá SP:</span>
+          <span className="value">-₫{shopDiscount.toLocaleString()}</span>
+        </div>
+        <div className="order-fee-line">
+          <span className="label">Voucher:</span>
+          <span className="value">-₫{voucher.toLocaleString()}</span>
         </div>
         <div className="order-total">
-          <span>Total:</span>
-          <strong>₫{totalAmount.toLocaleString()}</strong>
+          <span className="label">Tổng thanh toán:</span>
+          <span className="value">₫{totalPayment.toLocaleString()}</span>
         </div>
-        <p className="order-note">{order.note}</p>
+        <p className="order-note">
+          Vui lòng thanh toán <strong>₫{totalPayment.toLocaleString()}</strong>{" "}
+          khi nhận hàng
+        </p>
       </div>
 
       {/* Footer Actions */}
