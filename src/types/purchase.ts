@@ -1,4 +1,22 @@
-// Interface cho 1 Order Detail (chi tiết đơn hàng)
+// Interface cho danh mục sản phẩm
+export interface OrderCategory {
+  categoryId: number;
+  categoryName: string;
+}
+
+// Interface cho loại da phù hợp với sản phẩm
+export interface SkinType {
+  skinTypeId: number;
+  skinTypeName: string;
+}
+
+// Wrapper cho danh sách loại da (do API trả về theo `$values`)
+export interface SkinTypeWrapper {
+  $id: string;
+  $values: SkinType[];
+}
+
+// Interface cho OrderDetail (chi tiết đơn hàng)
 export interface OrderDetail {
   orderDetailId: number;
   productId: number;
@@ -8,15 +26,24 @@ export interface OrderDetail {
   price: number;
   discount: number;
   productImage?: string;
+  category: OrderCategory;
+  skinTypes: SkinTypeWrapper;
 }
 
-// Interface cho 1 Order (đơn hàng)
+// Wrapper cho trường `details` trong PurchaseDetail (do API trả về `$values`)
+export interface OrderDetailWrapper {
+  $id: string;
+  $values: OrderDetail[];
+}
+
+// Interface cho Order (đơn hàng thông thường)
 export interface Order {
   orderId: number;
   orderCode: string;
   fullName: string;
-  address?: string;
-  phoneNumber?: string;
+  address: string;
+  phoneNumber: string;
+  shippingPrice: number; // ✅ Thêm shippingPrice
   totalAmount: number;
   paymentMethodName: string;
   status: string;
@@ -24,25 +51,7 @@ export interface Order {
   details: OrderDetail[];
 }
 
-// Interface cho 1 Order Detail (chi tiết đơn hàng)
-export interface OrderDetail {
-  orderDetailId: number;
-  productId: number;
-  productName: string;
-  size: string;
-  quantity: number;
-  price: number;
-  discount: number;
-  productImage?: string;
-}
-
-// Wrapper cho trường details trong PurchaseDetail (do API trả về theo cấu trúc $values)
-export interface OrderDetailWrapper {
-  $id: string;
-  $values: OrderDetail[];
-}
-
-// Interface cho PurchaseDetail (đơn hàng chi tiết)
+// Interface cho PurchaseDetail (đơn hàng chi tiết từ API)
 export interface PurchaseDetail {
   $id: string;
   orderId: number;
@@ -55,4 +64,3 @@ export interface PurchaseDetail {
   createdDate: string;
   details: OrderDetailWrapper;
 }
-

@@ -1,6 +1,7 @@
-import { Order, OrderDetail, PurchaseDetail } from "../types/purchase";
+import { Order, OrderDetail, PurchaseDetail, OrderCategory, SkinTypeWrapper } from "../types/purchase";
 import { apiClient, apiEndpoints } from "./utils.api";
 
+// Lấy danh sách đơn hàng của người dùng
 export const getAllUserOrders = async (
   status: string | undefined,
   token: string
@@ -10,9 +11,11 @@ export const getAllUserOrders = async (
       status && status !== ""
         ? `${apiEndpoints.Order}/get-user-order?status=${status}`
         : `${apiEndpoints.Order}/get-user-order`;
+
     const response = await apiClient.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     const data = response.data;
     const ordersArray = data?.$values || [];
     return ordersArray.map((order: any) => mapApiToOrder(order));
@@ -22,42 +25,57 @@ export const getAllUserOrders = async (
   }
 };
 
-
+// Map API Order response -> Order interface
 export const mapApiToOrder = (apiOrder: any): Order => {
   return {
     orderId: apiOrder.orderId,
-    orderCode: apiOrder.orderCode, // Sửa lại đúng tên trường
-    fullName: apiOrder.fullName || "Unknown", // Thêm fullName
+    orderCode: apiOrder.orderCode,
+    fullName: apiOrder.fullName || "Unknown",
     address: apiOrder.address,
+    shippingPrice: apiOrder.shippingPrice,
     phoneNumber: apiOrder.phoneNumber,
     totalAmount: apiOrder.totalAmount,
-    paymentMethodName: apiOrder.paymentMethodName || "N/A", // Thêm paymentMethodName
+    paymentMethodName: apiOrder.paymentMethodName || "N/A",
     status: apiOrder.status,
     createdDate: apiOrder.createdDate,
-    details:
-      apiOrder.details?.$values?.map((detail: any) => ({
-        orderDetailId: detail.orderDetailId,
-        productId: detail.productId,
-        productName: detail.productName,
-        size: detail.size,
-        quantity: detail.quantity,
-        price: detail.price,
-        discount: detail.discount,
-        productImage: detail.productImage || "https://via.placeholder.com/100",
-      })) || [],
+    details: apiOrder.details?.$values?.map((detail: any) => mapApiToOrderDetail(detail)) || [],
   };
 };
 
+// Map API OrderDetail response -> OrderDetail interface
+export const mapApiToOrderDetail = (apiDetail: any): OrderDetail => {
+  return {
+    orderDetailId: apiDetail.orderDetailId,
+    productId: apiDetail.productId,
+    productName: apiDetail.productName,
+    size: apiDetail.size,
+    quantity: apiDetail.quantity,
+    price: apiDetail.price,
+    discount: apiDetail.discount,
+    productImage: apiDetail.productImage || "https://via.placeholder.com/100",
+    category: {
+      categoryId: apiDetail.category?.categoryId || 0,
+      categoryName: apiDetail.category?.categoryName || "Unknown",
+    } as OrderCategory,
+    skinTypes: {
+      $id: apiDetail.skinTypes?.$id || "",
+      $values: apiDetail.skinTypes?.$values || [],
+    } as SkinTypeWrapper,
+  };
+};
 
+// Lấy thông tin chi tiết đơn hàng theo orderId
 export const getPurchaseDetail = async (
   orderId: string,
   token: string
 ): Promise<PurchaseDetail> => {
   try {
-    const url = `${apiEndpoints.Order}/get_order_by_id?orderId=${orderId}`;  
+    const url = `${apiEndpoints.Order}/get_order_by_id?orderId=${orderId}`;
+
     const response = await apiClient.get(url, {
       headers: { Authorization: `Bearer ${token}` },
     });
+
     const data = response.data;
     return mapApiToPurchaseDetail(data);
   } catch (error) {
@@ -66,6 +84,7 @@ export const getPurchaseDetail = async (
   }
 };
 
+// Map API PurchaseDetail response -> PurchaseDetail interface
 export const mapApiToPurchaseDetail = (apiData: any): PurchaseDetail => {
   return {
     $id: apiData.$id,
@@ -78,17 +97,8 @@ export const mapApiToPurchaseDetail = (apiData: any): PurchaseDetail => {
     status: apiData.status,
     createdDate: apiData.createdDate,
     details: {
-      $id: apiData.details.$id,
-      $values: apiData.details.$values.map((detail: any): OrderDetail => ({
-        orderDetailId: detail.orderDetailId,
-        productId: detail.productId,
-        productName: detail.productName,
-        size: detail.size,
-        quantity: detail.quantity,
-        price: detail.price,
-        discount: detail.discount,
-        productImage: detail.productImage || "https://via.placeholder.com/100",
-      })),
+      $id: apiData.details?.$id || "",
+      $values: apiData.details?.$values.map((detail: any) => mapApiToOrderDetail(detail)) || [],
     },
   };
 };
