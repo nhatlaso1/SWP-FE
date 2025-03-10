@@ -54,7 +54,7 @@ interface Product {
   summary: string;
   quantity: number;
   price: number;
-  discount: number;
+  discount: number; // discount dưới dạng số thập phân, ví dụ: 0.1
   rating: number;
   productImage: string;
   brand: Brand;
@@ -153,9 +153,8 @@ const ProductList: React.FC = () => {
   const location = useLocation();
   const addItem = useStore((store) => store.addItem);
 
-  // Khi component mount, kiểm tra query parameter currentPage (nếu có)
+  // Khi component mount, đọc currentPage từ URL (nếu có)
   useEffect(() => {
-    // Sử dụng URLSearchParams để lấy currentPage từ query string
     const searchParams = new URLSearchParams(location.search);
     const savedPage = Number(searchParams.get('currentPage')) || 1;
     fetchFilterOptions();
@@ -179,10 +178,10 @@ const ProductList: React.FC = () => {
   };
 
   /**
-   * Gọi API để lấy toàn bộ sản phẩm từ backend.
-   * Sử dụng queryParams để đảm bảo backend trả về toàn bộ sản phẩm (pageSize=999)
+   * Gọi API để lấy toàn bộ sản phẩm.
+   * Sử dụng queryParams để yêu cầu backend trả về toàn bộ sản phẩm (pageSize=999)
    * và bodyPayload chứa các filter (hoặc rỗng nếu reset).
-   * Sau đó, áp dụng local filter (nếu không reset) và phân trang với 10 sản phẩm/trang.
+   * Sau đó áp dụng local filter (nếu không reset) và phân trang với 10 sản phẩm/trang.
    */
   const fetchAllProducts = async (pageNumber: number, resetAll: boolean = false) => {
     try {
@@ -197,7 +196,7 @@ const ProductList: React.FC = () => {
       };
 
       const bodyPayload = resetAll
-        ? {} // Khi reset, gửi body rỗng để lấy tất cả sản phẩm
+        ? {} // Khi reset, bỏ qua filter
         : {
             BrandIds: filterParams.brandIds ? [filterParams.brandIds] : [],
             Categories: filterParams.categoryIds ? [filterParams.categoryIds] : [],
@@ -258,14 +257,13 @@ const ProductList: React.FC = () => {
     }));
   };
 
-  // Nút "Áp dụng": sử dụng filter hiện tại
+  // Nút "Áp dụng": sử dụng filter hiện tại, reset về trang 1 và cập nhật URL
   const handleApplyFilter = () => {
-    // Khi áp dụng filter, reset về trang 1 và cập nhật URL (query parameter currentPage)
     navigate({ search: '?currentPage=1' });
     fetchAllProducts(1, false);
   };
 
-  // Nút "Đặt lại": reset các trường filter về mặc định và gọi API với body rỗng, cập nhật URL
+  // Nút "Đặt lại": reset các trường filter về mặc định, cập nhật URL và gọi API với body rỗng
   const handleReset = () => {
     setFilterParams({
       pageIndex: 1,
@@ -283,7 +281,6 @@ const ProductList: React.FC = () => {
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    // Cập nhật query parameter currentPage để giữ trạng thái khi chuyển trang
     navigate({ search: `?currentPage=${value}` });
     fetchAllProducts(value, false);
   };
@@ -422,49 +419,70 @@ const ProductList: React.FC = () => {
         {products.length === 0 ? (
           <Typography variant="h6">Không tìm thấy sản phẩm.</Typography>
         ) : (
-          products.map((product) => (
-            <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-              <Card>
-                <CardMedia
-                  component="img"
-                  image={product.productImage}
-                  alt={product.productName}
-                  sx={{ height: 200, cursor: 'pointer' }}
-                  onClick={() =>
-                    navigate(`/product/${product.productId}?currentPage=${currentPage}`)
-                  }
-                />
-                <CardContent>
-                  <Typography variant="h6" noWrap>
-                    {product.productName}
-                  </Typography>
-                  <Typography variant="body2">
-                    Thương hiệu: {product.brand.brandName}
-                  </Typography>
-                  <Rating value={product.rating} readOnly size="small" />
-                  <Typography>${product.price.toLocaleString()}</Typography>
-                  <Button
-                    variant="contained"
-                    fullWidth
+          products.map((product) => {
+            // Tính giá cuối cùng nếu có discount
+            const hasDiscount = product.discount > 0;
+            const finalPrice = hasDiscount ? product.price * (1 - product.discount) : product.price;
+            return (
+              <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
+                <Card>
+                  <CardMedia
+                    component="img"
+                    image={product.productImage}
+                    alt={product.productName}
+                    sx={{ height: 200, cursor: 'pointer' }}
                     onClick={() =>
-                      addItem({
-                        productId: product.productId,
-                        productName: product.productName,
-                        price: product.price,
-                        productImage: product.productImage,
-                      })
+                      navigate(`/product/${product.productId}?currentPage=${currentPage}`)
                     }
-                  >
-                    Thêm vào giỏ
-                  </Button>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))
+                  />
+                  <CardContent>
+                    <Typography variant="h6" noWrap>
+                      {product.productName}
+                    </Typography>
+                    <Typography variant="body2">
+                      Thương hiệu: {product.brand.brandName}
+                    </Typography>
+                    <Rating value={product.rating} readOnly size="small" />
+                    <Box sx={{ mt: 1 }}>
+                      {hasDiscount ? (
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                          <Typography variant="h6" color="error">
+                            ${finalPrice.toLocaleString()}
+                          </Typography>
+                          <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'gray' }}>
+                            ${product.price.toLocaleString()}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        <Typography variant="h6">
+                          ${product.price.toLocaleString()}
+                        </Typography>
+                      )}
+                    </Box>
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      onClick={() =>
+                        addItem({
+                          productId: product.productId,
+                          productName: product.productName,
+                          price: product.price,
+                          productImage: product.productImage,
+                        })
+                      }
+                    >
+                      Thêm vào giỏ
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            );
+          })
         )}
       </Grid>
 
-      {/* Phân trang (frontend) nếu có nhiều hơn 10 sản phẩm */}
+      {/* Phân trang (frontend): hiển thị nếu có nhiều hơn 10 sản phẩm */}
       {totalPages > 1 && (
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
           <Pagination

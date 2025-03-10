@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -79,7 +79,7 @@ interface ProductDetail {
   summary: string;
   size: string;
   price: number;
-  discount: number;
+  discount: number; // discount dưới dạng số thập phân, ví dụ: 0.10 tương đương 10%
   quantity: number;
   brand: Brand;
   category: Category;
@@ -113,6 +113,8 @@ const ProductDetail: React.FC = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState('');
   const addItem = useStore((store) => store.addItem);
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchProductDetail = async () => {
       try {
@@ -175,9 +177,15 @@ const ProductDetail: React.FC = () => {
     );
   }
 
-  const averageRating = product.feedbacks.$values.length > 0
-    ? product.feedbacks.$values.reduce((acc, feedback) => acc + feedback.rating, 0) / product.feedbacks.$values.length
-    : 0;
+  const averageRating =
+    product.feedbacks.$values.length > 0
+      ? product.feedbacks.$values.reduce((acc, feedback) => acc + feedback.rating, 0) /
+        product.feedbacks.$values.length
+      : 0;
+
+  // Tính giá sau discount: nếu có discount, finalPrice = price * (1 - discount)
+  const hasDiscount = product.discount > 0;
+  const finalPrice = hasDiscount ? product.price * (1 - product.discount) : product.price;
 
   return (
     <div className={styles.productDetailContainer}>
@@ -197,7 +205,9 @@ const ProductDetail: React.FC = () => {
               {product.productImages.$values.map((image) => (
                 <ImageListItem
                   key={image.productImageId}
-                  className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''}`}
+                  className={`${styles.thumbnailItem} ${
+                    selectedImage === image.productImage ? styles.thumbnailSelected : ''
+                  }`}
                   onClick={() => setSelectedImage(image.productImage)}
                 >
                   <img
@@ -223,13 +233,20 @@ const ProductDetail: React.FC = () => {
               </Typography>
             </div>
 
+            {/* Giá sản phẩm: hiển thị giá sau discount, kèm theo giá gốc (gạch ngang) nếu có discount */}
             <div className={styles.priceContainer}>
-              <Typography variant="h4" className={styles.currentPrice}>
-                ${product.price.toLocaleString()}
-              </Typography>
-              {product.discount > 0 && (
-                <Typography variant="h6" className={styles.discountPrice}>
-                  ${(product.price * (1 + product.discount)).toLocaleString()}
+              {hasDiscount ? (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography variant="h4" color="error">
+                    ${finalPrice.toLocaleString()}
+                  </Typography>
+                  <Typography variant="h6" sx={{ textDecoration: 'line-through', color: 'gray' }}>
+                    ${product.price.toLocaleString()}
+                  </Typography>
+                </Box>
+              ) : (
+                <Typography variant="h4">
+                  ${product.price.toLocaleString()}
                 </Typography>
               )}
             </div>
@@ -373,4 +390,4 @@ const ProductDetail: React.FC = () => {
   );
 };
 
-export default ProductDetail; 
+export default ProductDetail;
