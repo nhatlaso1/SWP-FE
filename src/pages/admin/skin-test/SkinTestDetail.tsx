@@ -1,9 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Container, Paper, Typography, Button, Box, CircularProgress, IconButton, TextField, Stack } from '@mui/material';
-import { getSkinTestById, updateSkinTest } from '../../../store/skinTest.api'; // Import hàm lấy và cập nhật Skin Test
-import { SkinTest, SkinTypeQuestion, SkinTypeAnswer } from '../../../types/SkinTest'; // Import interface SkinTest
+import { getSkinTestById, updateSkinTest } from '../../../store/skinTest.api';
+import { SkinTest, SkinTypeQuestion, SkinTypeAnswer } from '../../../types/SkinTest';
 import DeleteIcon from '@mui/icons-material/Delete';
+
+interface UpdateSkinTestPayload {
+    skinTestId: number;
+    skinTestName: string;
+    status: boolean;
+    skinTypeQuestions: Array<{
+        skinTypeQuestionId: number;
+        description: string;
+        status: boolean;
+        skinTypeAnswers: Array<{
+            skinTypeAnswerId: number;
+            description: string;
+            skinTypeId: number;
+        }>;
+    }>;
+}
 
 const SkinTestDetail: React.FC = () => {
     const { id } = useParams(); // Lấy ID từ URL
@@ -22,8 +38,20 @@ const SkinTestDetail: React.FC = () => {
   
             if (id && token) {
                 try {
-                    const fetchedSkinTest = await getSkinTestById(parseInt(id), token); // Truyền token vào API
-                    setSkinTest(fetchedSkinTest);
+                    const fetchedSkinTest = await getSkinTestById(parseInt(id), token);
+                    // Convert ApiSkinTest to SkinTest
+                    const convertedSkinTest: SkinTest = {
+                        skinTestId: fetchedSkinTest?.skinTestId,
+                        skinTestName: fetchedSkinTest?.skinTestName || '',
+                        status: fetchedSkinTest?.status === 'true' || fetchedSkinTest?.status === '1',
+                        skinTypeQuestions: fetchedSkinTest?.skinTypeQuestions.map(q => ({
+                            skinTypeQuestionId: q.skinTypeQuestionId,
+                            description: q.description,
+                            status: q.type,
+                            skinTypeAnswers: q.skinTypeAnswers
+                        })) || []
+                    };
+                    setSkinTest(convertedSkinTest);
                 } catch (error) {
                     setError('Không thể tải dữ liệu bộ câu hỏi.');
                     console.error("Error fetching skin test details:", error);
@@ -44,18 +72,49 @@ const SkinTestDetail: React.FC = () => {
     };
 
     const handleUpdate = async () => {
-        if (!skinTest) return;
-        const payload = {
+        const skinTestId = skinTest?.skinTestId;
+        if (!skinTest || typeof skinTestId !== 'number') {
+            setError("Invalid skin test data");
+            return;
+        }
+        
+        // Ensure all required IDs are present
+        const validQuestions = skinTest.skinTypeQuestions
+            .filter(q => typeof q.skinTypeQuestionId === 'number')
+            .map(q => {
+                const validAnswers = q.skinTypeAnswers
+                    .filter(a => typeof a.skinTypeAnswerId === 'number')
+                    .map(a => ({
+                        skinTypeAnswerId: a.skinTypeAnswerId as number,
+                        description: a.description,
+                        skinTypeId: a.skinTypeId
+                    }));
+
+                if (validAnswers.length === 0) {
+                    return null;
+                }
+
+                return {
+                    skinTypeQuestionId: q.skinTypeQuestionId as number,
+                    description: q.description,
+                    status: q.status,
+                    skinTypeAnswers: validAnswers
+                };
+            })
+            .filter((q): q is NonNullable<typeof q> => q !== null);
+
+        if (validQuestions.length === 0) {
+            setError("No valid questions to update");
+            return;
+        }
+
+        const payload: UpdateSkinTestPayload = {
+            skinTestId,
             skinTestName: skinTest.skinTestName,
             status: skinTest.status,
-            skinTypeQuestions: skinTest.skinTypeQuestions?.map((q: SkinTypeQuestion) => ({
-                description: q.description,
-                skinTypeAnswers: q.skinTypeAnswers.map((a: SkinTypeAnswer) => ({
-                    description: a.description,
-                    skinTypeId: a.skinTypeId,
-                })),
-            })),
+            skinTypeQuestions: validQuestions
         };
+
         try {
             await updateSkinTest(payload, token!);
             setError("Cập nhật bộ câu hỏi thành công!");

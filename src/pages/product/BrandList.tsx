@@ -43,7 +43,7 @@ const BrandList: React.FC = () => {
         console.log('Brands and products data:', { brands, products });
         setBrands(brands);
         setProducts([]);
-        setOriginalProducts(products);
+        setOriginalProducts(products.products as ProductDetail[]);
       } catch (err) {
         console.error('Fetch error:', err);
         setError('Failed to load data. Please try again later.');

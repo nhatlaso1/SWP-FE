@@ -14,8 +14,11 @@ const CategoryManagement = () => {
   const fetchCategories = async () => {
     setLoading(true);
     try {
-      const categoriesWithCount = await CategoryCountAPI.getCategoriesWithCount();
-      setCategories(categoriesWithCount);
+      // Fetch data for each category ID (assuming we know the category IDs)
+      const categoryIds = [1, 2, 3, 4, 5]; // You might want to fetch this list from another API
+      const promises = categoryIds.map(id => CategoryCountAPI.getCategoryWithCount(id));
+      const results = await Promise.all(promises);
+      setCategories(results);
     } catch (err) {
       setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
     } finally {

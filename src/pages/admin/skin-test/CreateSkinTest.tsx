@@ -60,6 +60,7 @@ const CreateSkinTests: React.FC = () => {
     status: status,
     skinTypeQuestions: questions.map((q) => ({
       description: q.question,
+      status: true,
       skinTypeAnswers: q.answers.map((a) => ({
         description: a.answer,
         skinTypeId: Number(a.skinTypeId),

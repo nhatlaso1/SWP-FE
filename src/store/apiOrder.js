@@ -176,4 +176,45 @@ export const rejectOrder = async (orderId) => {
   }
 };
 
+export const getOrderById = async (orderId) => {
+  try {
+    const response = await axios.get(`${API_URL}/Order/get_order_by_id`, {
+      params: { orderId }
+    });
+    
+    if (!response.data) {
+      throw new Error('No data received from the API');
+    }
+
+    const order = response.data;
+    return {
+      orderId: order.orderId,
+      orderCode: order.orderCode,
+      fullName: order.fullName,
+      address: order.address,
+      phoneNumber: order.phoneNumber,
+      shippingPrice: order.shippingPrice,
+      totalAmount: order.totalAmount,
+      paymentMethodName: order.paymentMethodName,
+      status: order.status,
+      createdDate: order.createdDate,
+      details: (order.details?.$values || []).map(detail => ({
+        orderDetailId: detail.orderDetailId,
+        productId: detail.productId,
+        productName: detail.productName,
+        productImage: detail.productImage,
+        size: detail.size,
+        quantity: detail.quantity,
+        price: detail.price,
+        discount: detail.discount,
+        category: detail.category,
+        skinTypes: detail.skinTypes?.$values || []
+      }))
+    };
+  } catch (error) {
+    console.error('Error fetching order details:', error);
+    throw error;
+  }
+};
+
 

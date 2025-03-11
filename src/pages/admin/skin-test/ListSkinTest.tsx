@@ -39,14 +39,19 @@ const ListSkinTests: React.FC = () => {
       }
     
       try {
-        const skinTestsData = await getAllSkinTests(token); // Trả về SkinTest[]
-        console.log("Dữ liệu trả về từ API:", skinTestsData); 
-        const extractedData = skinTestsData.map((test: any) => ({
-          skinTestId: test.skinTestId ?? 0,
-          skinTestName: test.skinTestName ?? "Không có tên",
-          status: test.status ?? false,
-        }));
-        setSkinTests(extractedData);
+        const skinTestsData = await getAllSkinTests(token);
+        console.log("Dữ liệu trả về từ API:", skinTestsData);
+        if (Array.isArray(skinTestsData)) {
+          const extractedData = skinTestsData.map((test: any) => ({
+            skinTestId: test.skinTestId ?? 0,
+            skinTestName: test.skinTestName ?? "Không có tên",
+            status: typeof test.status === 'string' ? test.status === 'true' || test.status === '1' : Boolean(test.status),
+          }));
+          setSkinTests(extractedData);
+        } else {
+          console.error('API did not return an array');
+          setSkinTests([]);
+        }
       } catch (error) {
         console.error("Lỗi khi lấy dữ liệu bộ câu hỏi:", error);
       }

@@ -53,7 +53,8 @@ table {
   margin: 0 auto;
 }
 
-th, td {
+th,
+td {
   padding: 12px 10px;
   text-align: left;
   border-bottom: 1px solid #eee;
@@ -68,11 +69,13 @@ th {
   background-color: #f8f9fa;
   font-weight: 600;
   color: #333;
-  width: 152px; /* Đảm bảo các cột có chiều rộng cố định là 152px */
+  width: 152px;
+  /* Đảm bảo các cột có chiều rộng cố định là 152px */
 }
 
 td img {
-  max-width: 100%; /* Đảm bảo hình ảnh không làm mở rộng cột */
+  max-width: 100%;
+  /* Đảm bảo hình ảnh không làm mở rộng cột */
   height: auto;
 }
 
@@ -161,6 +164,7 @@ tr:hover {
     transform: translateX(100%);
     opacity: 0;
   }
+
   to {
     transform: translateX(0);
     opacity: 1;
@@ -214,6 +218,7 @@ tr:hover {
     transform: translateY(-20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -394,7 +399,8 @@ tr:hover {
   .form-group input[type="text"],
   .form-group input[type="number"],
   .form-group textarea {
-    font-size: 16px; /* Better for mobile touch */
+    font-size: 16px;
+    /* Better for mobile touch */
   }
 
   .modal-actions {
@@ -574,7 +580,7 @@ tr:hover {
   color: #666;
 }
 
-.selected-file { 
+.selected-file {
   margin-top: 10px;
   font-size: 0.9em;
   color: #2196F3;

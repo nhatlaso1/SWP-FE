@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider, Navigate } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import theme from "./theme";
 import Home from "./pages/home/Home";
@@ -105,7 +105,8 @@ function App() {
         { path: "users", element: <UserPage /> },
         { path: "user/:id", element: <UserInfo /> },
       ],
-    }, {
+    },
+    {
       path: "staff",
       element: (
         <ProtectedRoute isAllowed={isAuthenticated && role === "Staff"} redirectPath="/">
@@ -119,6 +120,10 @@ function App() {
         { path: "products", element: <ProductManagement /> },
       ],
     },
+    {
+      path: "*",
+      element: <Navigate to="/" replace />
+    }
   ]);
 
   return (
