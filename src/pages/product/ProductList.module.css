@@ -48,6 +48,9 @@
 }
 
 .productCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -95,10 +98,12 @@
   font-weight: 600;
   margin: 10px 0;
   transition: color 0.3s ease;
+  text-align: left;
 }
 
 .priceContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 10px;
   margin: 10px 0;
@@ -121,6 +126,7 @@
 
 .ratingContainer {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 5px;
   margin: 5px 0;

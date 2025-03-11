@@ -11,6 +11,7 @@ export interface CartActions {
   removeItem: (id: any) => void;
   clearCart: () => void;
   createOrder: (body: any, voucher: number, token: string) => Promise<void>;
+  getShippingPrice: (body: any, inRegion: boolean, token: string) => Promise<any>;
 }
 
 export const initialCart: CartState = {
@@ -113,6 +114,25 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         set((state) => {
           state.loading.isLoading = false;
         });
+      }
+    },
+    getShippingPrice: async (body, inRegion, token) => {
+      try {
+        const url = `${BASE_URL}/Order/get_shipping_price?inRegion=${inRegion}`;
+        // Giả sử API sử dụng phương thức POST với body là danh sách orderDetailRequests
+        const response = await axios.post(
+          url,
+          body,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        return response.data;
+      } catch (error: any) {
+        console.error("Error fetching shipping price:", error);
+        throw error;
       }
     },
 

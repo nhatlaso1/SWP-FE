@@ -11,6 +11,7 @@ export const apiEndpoints = {
   Routine: "Routine",
   Category:"Category",
   Voucher:"Voucher",
+  Feedback:"Feedback",
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({

@@ -15,9 +15,6 @@ import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import CustomerLayout from "./layouts/CustomerLayout";
-import ProductList from "./pages/product/ProductList";
-import SaleProducts from "./pages/product/SaleProducts";
-import ProductDetail from "./pages/product/ProductDetail";
 import Cart from "./pages/cart/Cart";
 import Register from "./pages/register/Register";
 import Profile from "./pages/profile/Profile";
@@ -38,6 +35,12 @@ import UserPage from "./pages/admin/user/UserPage";
 import SkinType from "./pages/admin/skintype/SkinType";
 import Voucher from "./pages/admin/voucher/Voucher";
 import UserInfo from "./pages/admin/user/UserDetailPage";
+import Checkout from "./pages/checkout/Checkout";
+import CheckoutSuccess from "./pages/checkout/CheckoutCOD";
+import ProductList from "./pages/product/ProductList";
+import ProductDetail from "./pages/product/ProductDetail";
+import SaleProducts from "./pages/sale/SaleProducts";
+
 
 function App() {
   const user = useStore((store) => store.profile.user);
@@ -50,17 +53,10 @@ function App() {
 
   const isAuthenticated = !!localStorage.getItem("token");
 
-  // Log role mỗi lần user hoặc role thay đổi
-  useEffect(() => {
-    console.log("User:", user);
-    console.log("Token:", token);
-    console.log("Role:", role);
-  }, [user, token, role]);
-
   const router = createBrowserRouter([
     { path: "login", element: <Login /> },
     { path: "register", element: <Register /> },
-    { path: "cart", element: <Cart /> },
+
     {
       path: "",
       element: <CustomerLayout />,
@@ -76,13 +72,30 @@ function App() {
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
         {
+          path: "cart",
+          element: (
+            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+              <Cart />
+            </ProtectedRoute>
+          )
+        },
+        { path: "checkout", element: <Checkout /> },
+        {
           path: "profile",
           element: (
             <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
               <Profile />
             </ProtectedRoute>
           )
+        }, {
+          path: "order-success",
+          element: (
+            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+              <CheckoutSuccess />
+            </ProtectedRoute>
+          )
         },
+
       ],
     },
     {
