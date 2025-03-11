@@ -12,3 +12,22 @@ export const getAllVoucher = async (): Promise<any[]> => {
     throw error;
   }
 };
+
+export const getAllVoucherByCustomerId = async (token: string): Promise<any[]> => {
+  if (!token) throw new Error("Token is required"); // Ngăn chặn gọi API khi token rỗng
+
+  try {
+    const response = await apiClient.get(`${apiEndpoints.Voucher}/Get-all-voucher-by-customer-id`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = response.data;
+    return data?.$values || [];
+  } catch (error) {
+    console.error("Error fetching vouchers:", error);
+    throw error;
+  }
+};
+

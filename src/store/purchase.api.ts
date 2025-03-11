@@ -1,3 +1,4 @@
+import { Voucher } from './../types/purchase';
 import { Order, OrderDetail, PurchaseDetail, OrderCategory, SkinTypeWrapper } from "../types/purchase";
 import { apiClient, apiEndpoints } from "./utils.api";
 
@@ -77,6 +78,7 @@ export const getPurchaseDetail = async (
     });
 
     const data = response.data;
+    console.log(data);
     return mapApiToPurchaseDetail(data);
   } catch (error) {
     console.error("Error fetching purchase detail:", error);
@@ -84,7 +86,6 @@ export const getPurchaseDetail = async (
   }
 };
 
-// Map API PurchaseDetail response -> PurchaseDetail interface
 export const mapApiToPurchaseDetail = (apiData: any): PurchaseDetail => {
   return {
     $id: apiData.$id,
@@ -92,13 +93,41 @@ export const mapApiToPurchaseDetail = (apiData: any): PurchaseDetail => {
     orderCode: apiData.orderCode,
     fullName: apiData.fullName,
     address: apiData.address,
+    shippingPrice: apiData.shippingPrice,
+    paymentMethodName: apiData.paymentMethodName,
+    voucher: apiData.voucher
+      ? {
+        $id: apiData.voucher.$id || "",
+        voucherId: apiData.voucher.voucherId || 0,
+        voucherName: apiData.voucher.voucherName || "",
+        voucherCode: apiData.voucher.voucherCode || "",
+        description: apiData.voucher.description || "",
+        discountAmount: apiData.voucher.discountAmount || 0,
+        startDate: apiData.voucher.startDate || "",
+        endDate: apiData.voucher.endDate || "",
+        status: apiData.voucher.status ?? false,
+        minimumPurchase: apiData.voucher.minimumPurchase || 0,
+      }
+      : {
+        $id: "",
+        voucherId: 0,
+        voucherName: "",
+        voucherCode: "",
+        description: "",
+        discountAmount: 0,
+        startDate: "",
+        endDate: "",
+        status: false,
+        minimumPurchase: 0
+      },
     phoneNumber: apiData.phoneNumber,
     totalAmount: apiData.totalAmount,
     status: apiData.status,
     createdDate: apiData.createdDate,
     details: {
       $id: apiData.details?.$id || "",
-      $values: apiData.details?.$values.map((detail: any) => mapApiToOrderDetail(detail)) || [],
+      $values: apiData.details?.$values.map((detail: any) => detail) || [],
     },
   };
 };
+

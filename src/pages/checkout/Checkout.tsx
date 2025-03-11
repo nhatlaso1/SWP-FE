@@ -7,7 +7,7 @@ import {
   getDistrictsByProvince,
   getWardsByDistrict,
 } from "../../store/checkout.api";
-import { getAllVoucher } from "../../store/voucher.api";
+import { getAllVoucherByCustomerId } from "../../store/voucher.api";
 import { createPayment } from "../../store/payment.api"; // adjust path as needed
 import "./Checkout.scss";
 import { styled } from "@mui/material/styles";
@@ -38,8 +38,15 @@ import CartItem from "./CartItems";
 interface Voucher {
   voucherId: number;
   voucherName: string;
+  voucherCode: string;
+  description: string;
   discountAmount: number;
+  startDate: string;
+  endDate: string;
+  status: boolean;
+  minimumPurchase: number;
 }
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
@@ -78,8 +85,9 @@ const Checkout: React.FC = () => {
   const [voucher, setVoucher] = useState<number>(0);
   const [voucherList, setVoucherList] = useState<Voucher[]>([]);
   const [discount, setDiscount] = useState<number>(0);
-
-  const [subtotal, setSubtotal] = useState<number>(90000);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [subtotal, setSubtotal] = useState<number>(0);
   const [shippingFee, setShippingFee] = useState<number>(0);
 
   // Contact information
@@ -154,16 +162,24 @@ const Checkout: React.FC = () => {
     }
   }, [cart]);
 
-  // Fetch voucher list
   useEffect(() => {
+    if (!token) return; // Nếu chưa có token, không gọi API
+
     const fetchVoucherList = async () => {
+      setLoading(true);
+      setError(null);
+
       try {
-        const data = await getAllVoucher();
+        const data = await getAllVoucherByCustomerId(token);
         setVoucherList(data);
       } catch (error) {
+        setError("Error fetching voucher list.");
         console.error("Error fetching voucher list:", error);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchVoucherList();
   }, [token]);
 
@@ -219,15 +235,24 @@ const Checkout: React.FC = () => {
 
   // Apply voucher discount
   const applyVoucherHandler = () => {
-    let discountValue = 0;
     if (voucher !== 0) {
       const selectedVoucher = voucherList.find((v) => v.voucherId === voucher);
       if (selectedVoucher) {
-        discountValue = selectedVoucher.discountAmount;
+        // Kiểm tra nếu subtotal đủ điều kiện áp dụng voucher
+        if (subtotal >= selectedVoucher.minimumPurchase) {
+          setDiscount(Math.min(selectedVoucher.discountAmount, subtotal));
+        } else {
+          alert("Your order total is insufficient to apply this voucher.");
+          setDiscount(0);
+          setVoucher(0);
+        }
       }
+    } else {
+      setDiscount(0);
+      setVoucher(0);
     }
-    setDiscount(Math.min(discountValue, subtotal));
   };
+
 
   // Validate full name
   const validateName = (value: string) => {

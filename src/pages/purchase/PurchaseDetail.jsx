@@ -45,6 +45,7 @@ export default function PurchaseDetail() {
     async function fetchOrder() {
       try {
         const data = await getPurchaseDetail(id, token);
+        console.log(data);
         setOrder(data);
       } catch (error) {
         console.error("Error fetching purchase detail:", error);
@@ -78,7 +79,7 @@ export default function PurchaseDetail() {
     0
   );
   const shippingFee = order.shippingPrice || 0;
-  const voucherDiscount = order.voucherDiscount || 0;
+  const voucherDiscount = order.voucher.discountAmount || 0;
   const totalPayment =
     totalProductPrice + shippingFee - shopDiscount - voucherDiscount;
 
@@ -113,44 +114,45 @@ export default function PurchaseDetail() {
           />
         ))}
       </div>
-
-      {order.status.toLowerCase() === "complete" && (
-        <p className="order-message">
-          Your order is completed. Thank you for shopping with us!
+      <p className={`order-message ${order.status.toLowerCase()}`}>
+        {order.status.toLowerCase() === "complete" &&
+          "Your order is completed. Thank you for shopping with us!"}
+        {order.status.toLowerCase() === "confirmed" &&
+          "Your order has been confirmed and is being prepared for shipping."}
+        {order.status.toLowerCase() === "pending" &&
+          "Your order is pending and awaiting confirmation."}
+        {order.status.toLowerCase() === "shipping" &&
+          "Your order is on the way."}
+        {order.status.toLowerCase() === "returned" &&
+          "Your order has been returned."}
+        {order.status.toLowerCase() === "cancel" &&
+          "Your order has been canceled."}
+        {order.status.toLowerCase() === "denied" &&
+          "Your order has been denied."}
+      </p>
+      {order.paymentMethodName === "Payment when delivered (COD)" && (
+        <p className="order-message cod-message">
+          Please pay <strong>₫{order.totalAmount.toLocaleString()}</strong> upon
+          delivery.
         </p>
       )}
-      {order.status.toLowerCase() === "confirmed" && (
-        <p className="order-message">
-          Your order has been confirmed and is being prepared for shipping.
-        </p>
-      )}
-      {order.status.toLowerCase() === "shipping" && (
-        <p className="order-message">Your order is on the way.</p>
-      )}
-      {order.status.toLowerCase() === "returned" && (
-        <p className="order-message">Your order has been returned.</p>
-      )}
-      {order.status.toLowerCase() === "cancel" && (
-        <p className="order-message">Your order has been canceled.</p>
-      )}
-      {order.status.toLowerCase() === "denied" && (
-        <p className="order-message">Your order has been denied.</p>
-      )}
-
       <div className="customer-info">
-        <h3>Customer Information</h3>
+        <h3>🛍️ Customer Information</h3>
         <p>
-          <strong>Name:</strong> {order.fullName}
+          <strong>👤 Name:</strong> {order.fullName}
         </p>
         <p>
-          <strong>Phone:</strong> {order.phoneNumber}
+          <strong>📞 Phone:</strong> {order.phoneNumber}
         </p>
         <p>
-          <strong>Address:</strong> {order.address}
+          <strong>📍 Address:</strong> {order.address}
         </p>
         <p>
-          <strong>Order Date:</strong>{" "}
+          <strong>🕒 Order Date:</strong>{" "}
           {new Date(order.createdDate).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>💳 Payment Method:</strong> {order.paymentMethodName}
         </p>
       </div>
 
@@ -206,8 +208,11 @@ export default function PurchaseDetail() {
         </div>
         <div className="order-fee-line">
           <span className="label">Voucher Discount:</span>{" "}
-          <span className="value">-₫{voucherDiscount.toLocaleString()}</span>
+          <span className="value">
+            -₫{voucherDiscount ? voucherDiscount.toLocaleString() : "0"}
+          </span>
         </div>
+
         <div className="order-total">
           <span className="label">Total Payment:</span>{" "}
           <span className="value">₫{totalPayment.toLocaleString()}</span>

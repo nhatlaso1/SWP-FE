@@ -67,18 +67,43 @@
   color: #2e8b57;
 }
 
-/* Customer Info */
 .customer-info {
-  border: 1px solid #eee;
-  border-radius: 8px;
+  background-color: #f8f9fa; /* Nền xám nhạt */
   padding: 16px;
-  margin-bottom: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ */
+  border-left: 5px solid #007bff; /* Viền màu xanh */
+  width: 100%;
+  max-width: 500px;
+  margin: 20px auto; /* Căn giữa */
 }
+
 .customer-info h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  font-size: 18px;
+  font-size: 20px;
+  color: #007bff; /* Xanh dương */
+  margin-bottom: 12px;
 }
+
+.customer-info p {
+  font-size: 16px;
+  margin: 6px 0;
+  color: #333; /* Màu chữ */
+}
+
+.customer-info strong {
+  color: #555;
+}
+.order-message.cod-message {
+  color: white; /* Đỏ nổi bật */
+  font-weight: bold;
+  margin-top: 10px;
+  padding: 10px;
+  border: 2px dashed #d9534f;
+  background-color:#dd172c;
+  border-radius: 5px;
+  text-align: center;
+}
+
 
 /* Order Products */
 .order-products {
@@ -114,6 +139,48 @@
   font-size: 16px;
   color: #333;
 }
+.order-message {
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-align: center;
+  margin: 10px 0;
+  color:  #fa9785;
+  display: inline-block;
+  width: 100%;
+  max-width: 1000px;  
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Màu sắc cho từng trạng thái */
+.order-message.complete {
+  background-color: #4caf50; /* Xanh lá */
+}
+
+.order-message.confirmed {
+  background-color: #e7d1cf; /* Xanh dương */
+}
+.order-message.pending {
+  background-color: #f2e0de; /* Xanh dương */
+}
+.order-message.shipping {
+  color: white ;
+  background-color:  #fa9785; /* Cam */
+}
+
+.order-message.returned {
+  background-color: #9e9e9e; /* Xám */
+}
+
+.order-message.cancel {
+  background-color: #f44336; /* Đỏ */
+}
+
+.order-message.denied {
+  background-color: #000000; /* Đen */
+}
+
 .product-variant {
   margin: 0;
   font-size: 14px;

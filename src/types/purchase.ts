@@ -43,7 +43,7 @@ export interface Order {
   fullName: string;
   address: string;
   phoneNumber: string;
-  shippingPrice: number; // ✅ Thêm shippingPrice
+  shippingPrice: number;
   totalAmount: number;
   paymentMethodName: string;
   status: string;
@@ -58,9 +58,25 @@ export interface PurchaseDetail {
   orderCode: string;
   fullName: string;
   address: string;
+  shippingPrice: number;
+  paymentMethodName: string;
+  voucher: Voucher | null;
   phoneNumber: string;
   totalAmount: number;
   status: string;
   createdDate: string;
   details: OrderDetailWrapper;
+}
+
+export interface Voucher {
+  $id: string;
+  voucherId: number;
+  voucherName: string;
+  voucherCode: string;
+  description: string;
+  discountAmount: number | 0;
+  startDate: string;
+  endDate: string;
+  status: boolean;
+  minimumPurchase: number;
 }
