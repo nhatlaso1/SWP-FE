@@ -39,7 +39,7 @@ import Checkout from "./pages/checkout/Checkout";
 import CheckoutSuccess from "./pages/checkout/CheckoutCOD";
 import ProductList from "./pages/product/ProductList";
 import ProductDetail from "./pages/product/ProductDetail";
-import SaleProducts from "./pages/product/SaleProducts";
+import SaleProducts from "./pages/sale/SaleProducts";
 
 
 function App() {
@@ -71,12 +71,14 @@ function App() {
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
-        { path: "cart",
-           element: (
+        {
+          path: "cart",
+          element: (
             <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
-              <Cart/>
+              <Cart />
             </ProtectedRoute>
-          )},
+          )
+        },
         { path: "checkout", element: <Checkout /> },
         {
           path: "profile",

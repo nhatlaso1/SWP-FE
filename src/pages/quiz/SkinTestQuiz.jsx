@@ -19,7 +19,6 @@ import {
 import { useStore } from "../../store";
 import "./SkinTestQuiz.scss";
 
-
 const SkinTestQuiz = () => {
   const skinRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -79,8 +78,6 @@ const SkinTestQuiz = () => {
 
   return (
     <>
-      
-
       <div className="quiz-page" ref={skinRef}>
         {loading ? (
           <Box
@@ -463,8 +460,6 @@ const SkinTestQuiz = () => {
           </div>
         )}
       </div>
-
-      
     </>
   );
 };

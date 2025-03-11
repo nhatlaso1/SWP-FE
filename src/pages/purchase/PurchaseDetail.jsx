@@ -159,27 +159,107 @@ export default function PurchaseDetail() {
       <div className="order-products">
         <h3>Order Items</h3>
         {items.map((item) => (
-          <div className="product-row" key={item.orderDetailId}>
-            <div className="product-info-wrap">
+          <div
+            className="product-row"
+            key={item.orderDetailId}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "12px",
+            }}
+          >
+            {/* Bên trái: Hình + 4 dòng (Name, Category, Skin Types, Quantity) */}
+            <div
+              className="product-info-wrap"
+              style={{ display: "flex", flex: 1, alignItems: "flex-start" }}
+            >
               <img
                 src={item.productImage || "https://via.placeholder.com/100"}
                 alt={item.productName}
-                className="product-img"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  objectFit: "cover",
+                  marginRight: "8px",
+                  borderRadius: "4px",
+                }}
               />
-              <div className="product-info">
-                <h4>{item.productName}</h4>
-                <p className="product-variant">
-                  {item.size} x {item.quantity}
+              <div className="product-info" style={{ flexGrow: 1 }}>
+                {/* Dòng 1: Tên sản phẩm */}
+                <h4
+                  style={{
+                    margin: 0,
+                    fontSize: "16px",
+                    color: "#333",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {item.productName}
+                </h4>
+
+                {/* Dòng 2: Category */}
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    color: "#d9534f",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <strong>Category:</strong>{" "}
+                  {item.category?.categoryName || "N/A"}
+                </p>
+
+                {/* Dòng 3: Skin Types */}
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    color: "#5cb85c",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <strong>Skin Types:</strong>{" "}
+                  {Array.isArray(item.skinTypes?.$values) &&
+                  item.skinTypes.$values.length > 0
+                    ? item.skinTypes.$values
+                        .map((st) => st.skinTypeName)
+                        .join(", ")
+                    : "N/A"}
+                </p>
+
+                {/* Dòng 4: Quantity */}
+                <p style={{ margin: 0, fontSize: "14px" }}>
+                  <strong>Quantity:</strong> {item.quantity}
                 </p>
               </div>
             </div>
-            <div className="product-price">
+
+            {/* Bên phải: Giá cũ (nếu discount > 0) + Giá mới */}
+            <div
+              className="product-price"
+              style={{ textAlign: "right", minWidth: "100px" }}
+            >
               {item.discount > 0 && (
-                <p className="old-price">
+                <p
+                  className="old-price"
+                  style={{
+                    textDecoration: "line-through",
+                    color: "#999",
+                    margin: "0 0 4px 0",
+                  }}
+                >
                   ₫{(item.price * item.quantity).toLocaleString()}
                 </p>
               )}
-              <p className="new-price">
+              <p
+                className="new-price"
+                style={{
+                  color: "#e84343",
+                  fontWeight: "bold",
+                  margin: 0,
+                }}
+              >
                 ₫
                 {(
                   item.price *

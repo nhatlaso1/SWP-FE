@@ -74,7 +74,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ */
   border-left: 5px solid #007bff; /* Viền màu xanh */
   width: 100%;
-  max-width: 500px;
+  max-width: 1000px;
   margin: 20px auto; /* Căn giữa */
 }
 

@@ -7,7 +7,7 @@ interface CartItemProps {
     productName: string;
     productImage: string;
     category: string;
-    skintype: any;
+    skintype: any; // Expected to be an array of skin type objects
     price: number;
     quantity: number;
     note?: string;
@@ -43,25 +43,20 @@ const CartItem: React.FC<CartItemProps> = ({ product }) => {
           {product.productName}
         </Typography>
 
-        {/* Hiển thị category và dung tích */}
+        {/* Display Category */}
         <Typography variant="caption" color="text.secondary">
-          {`Phân loại: ${product.category}`}
+          {`Category: ${product.category}`}
         </Typography>
+        {/* Display Skin Types */}
         <Typography variant="caption" color="text.secondary" display="block">
-          {`Loại da: ${Array.isArray(product.skintype?.$values)
-            ? product.skintype.$values.map((s: any) => s.skinTypeName).join(", ")
+          {`Skin Type: ${Array.isArray(product.skintype)
+            ? product.skintype.map((s: any) => s.skinTypeName).join(", ")
             : product.skintype?.skinTypeName || ""
             }`}
         </Typography>
 
-        {/* Hiển thị note (nếu có) */}
-        {product.note && (
-          <Typography variant="caption" color="text.secondary">
-            {product.note}
-          </Typography>
-        )}
 
-        {/* Giá */}
+        {/* Price */}
         <Typography
           variant="body2"
           fontWeight="bold"
@@ -73,7 +68,7 @@ const CartItem: React.FC<CartItemProps> = ({ product }) => {
         </Typography>
       </CardContent>
 
-      {/* Số lượng (read-only) */}
+      {/* Quantity (read-only) */}
       <CardContent sx={{ padding: 0, display: "flex", alignItems: "center" }}>
         <Box
           sx={{
