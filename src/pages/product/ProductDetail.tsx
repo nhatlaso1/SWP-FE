@@ -70,8 +70,15 @@ interface Feedback {
   rating: number;
   comment: string;
   createdDate: string;
-}
+  customer: Customer;
 
+}
+interface Customer {
+  $id: string;
+  customerId: number;
+  fullName: string
+
+}
 interface ProductDetail {
   $id: string;
   productId: number;
@@ -299,6 +306,9 @@ const ProductDetail: React.FC = () => {
                   productName: product.productName,
                   price: product.price,
                   productImage: selectedImage || product.productImages.$values[0].productImage,
+                  category: product.category.categoryName,
+                  skintype: product.skinTypes.$values,
+                  quantity: quantity, 
                 });
               }}
             >
@@ -363,6 +373,9 @@ const ProductDetail: React.FC = () => {
                   {product.feedbacks.$values.map((feedback) => (
                     <ListItem key={feedback.feedbackId} className={styles.reviewItem}>
                       <Box sx={{ width: '100%' }}>
+                      <Typography variant="body1" fontWeight="bold" className={styles.reviewText}>
+                          {feedback.customer.fullName}
+                        </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>
                           <Rating value={feedback.rating} precision={0.1} readOnly size="small" />
                           <Typography variant="body2" className={styles.reviewDate}>

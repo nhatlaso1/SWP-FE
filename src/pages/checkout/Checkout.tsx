@@ -362,7 +362,6 @@ const Checkout: React.FC = () => {
       }
     } catch (error) {
       console.error("Error creating order:", error);
-      alert("There was an error creating your order. Please try again.");
     }
   };
 
@@ -370,7 +369,6 @@ const Checkout: React.FC = () => {
   const handlePayment = async () => {
     if (!orderIdRef.current) {
       console.error("Missing orderId. Cannot proceed with payment.");
-      alert("Order ID not found.");
       return;
     }
     try {

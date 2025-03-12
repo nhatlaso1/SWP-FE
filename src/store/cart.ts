@@ -1,3 +1,4 @@
+import CartItem from "../pages/checkout/CartItems";
 import type { StoreGet, StoreSet } from "../store";
 import axios from "../utils/axiosConfig";
 
@@ -34,12 +35,13 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         if (existingItem) {
           updatedCart = state.cart.cart.map((cartItem: any) =>
             cartItem.productId === item.productId
-              ? { ...cartItem, quantity: cartItem.quantity + 1 }
+              ? { ...cartItem, quantity: cartItem.quantity + item.quantity }
               : cartItem
           );
         } else {
-          updatedCart = [...state.cart.cart, { ...item, quantity: 1 }];
+          updatedCart = [...state.cart.cart, { ...item }];
         }
+
 
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         state.cart.cart = updatedCart;
