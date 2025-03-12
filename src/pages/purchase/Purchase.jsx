@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  Box,
-  Button,
-  Pagination,
-  TextField,
-  MenuItem,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Pagination, TextField, MenuItem } from "@mui/material";
 import { useStore } from "../../store";
 import { getAllUserOrders } from "../../store/purchase.api";
 import Review from "./Review";
@@ -17,33 +10,39 @@ export default function Purchase() {
   const navigate = useNavigate();
   const token = useStore((state) => state.profile.user?.token);
   const [orders, setOrders] = useState([]);
-  // selectedStatus: "", "pending", "shipping", "complete", "cancel"
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [selectedReviewDetail, setSelectedReviewDetail] = useState(null);
-
-  // Phân trang cho orders
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage, setOrdersPerPage] = useState(5);
+  const [ordersPerPage, setOrdersPerPage] = useState(10);
 
-  // Các trạng thái (filter orders)
   const statusTabs = [
     { key: "", label: "All" },
     { key: "pending", label: "Pending" },
+    { key: "confirmed", label: "Confirmed" },
     { key: "shipping", label: "Shipping" },
     { key: "complete", label: "Complete" },
+    { key: "returned", label: "Returned" },
     { key: "cancel", label: "Cancel" },
+    { key: "denied", label: "Denied" },
   ];
 
   useEffect(() => {
     const fetchOrders = async () => {
       if (!token) return;
       try {
-        // API getAllUserOrders trả về mảng Order theo trạng thái được truyền
         const data = await getAllUserOrders(selectedStatus, token);
-        console.log("Orders from API:", data);
-        setOrders(data);
-        // Reset trang mỗi khi filter thay đổi
+        console.log("Raw orders from API:", data);
+        // Nếu dữ liệu được bọc trong $values, lấy mảng orders từ đó
+        const ordersArray = data.$values ? data.$values : data;
+        // Sắp xếp đơn hàng theo createdDate (mới nhất lên đầu)
+        const sortedData = ordersArray.sort(
+          (a, b) =>
+            new Date(b.createdDate || 0).getTime() -
+            new Date(a.createdDate || 0).getTime()
+        );
+        console.log("Sorted orders:", sortedData);
+        setOrders(sortedData);
         setCurrentPage(1);
       } catch (error) {
         console.error("Error fetching orders:", error);
@@ -75,10 +74,12 @@ export default function Purchase() {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
+
   const handleOrdersPerPageChange = (event) => {
     setOrdersPerPage(Number(event.target.value));
     setCurrentPage(1);
   };
+
   return (
     <div className="purchase">
       <div className="status-tabs">
@@ -95,12 +96,13 @@ export default function Purchase() {
         </ul>
       </div>
 
-      {/* Order list */}
       {orders.length > 0 ? (
         currentOrders.map((order) => (
           <div key={order.orderId} className="order">
             <div className="order-header">
-              <div className="order-code">Order Code: {order.orderId}</div>
+              <div className="order-code">
+                Order Code: {order.orderCode ? order.orderCode : order.orderId}
+              </div>
               <div className="order-status">
                 <span className="status success">
                   {order.status === "complete"
@@ -110,7 +112,7 @@ export default function Purchase() {
               </div>
             </div>
 
-            {order.details.map((detail) => (
+            {(order.details.$values || order.details).map((detail) => (
               <div
                 key={detail.orderDetailId}
                 className="order-body"
@@ -167,7 +169,8 @@ export default function Purchase() {
             <div className="extra-info">
               {order.extraInfo && <p>{order.extraInfo}</p>}
               <p>
-                Order Date: {new Date(order.createdDate).toLocaleDateString()}
+                Payment Method: {order.paymentMethodName} | Order Date:{" "}
+                {new Date(order.createdDate).toLocaleDateString()}
               </p>
             </div>
           </div>
@@ -178,7 +181,6 @@ export default function Purchase() {
         </div>
       )}
 
-      {/* Phân trang */}
       {orders.length > 0 && (
         <Box className="pagination-container">
           <TextField
@@ -190,7 +192,7 @@ export default function Purchase() {
             size="small"
             sx={{ width: 150, mr: 2 }}
           >
-            {[5, 10, 25, 50].map((option) => (
+            {[10, 25, 50, 100].map((option) => (
               <MenuItem key={option} value={option}>
                 {option}
               </MenuItem>

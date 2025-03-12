@@ -1,16 +1,24 @@
 import React, { useState } from "react";
 import { FaStar, FaCamera, FaVideo } from "react-icons/fa";
 import "./Review.css";
+import { createFeedback } from "../../store/feedback.api";
+import { useStore } from "../../store";
 
 export default function Review({ isOpen, onClose, detail }) {
   const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState(
+    "Suitable Skin Types:\n\nFunctions:\n\nFeedback:"
+  );
+  const token = useStore(
+    (state) => state.profile.user && state.profile.user.token
+  );
 
-  // Hàm xử lý khi nhấn vào sao
+  // Handle star click to set rating
   const handleStarClick = (index) => {
     setRating(index + 1);
   };
 
-  // Hàm trả về text mô tả dựa trên số sao
+  // Return descriptive text based on rating
   const getRatingText = (rating) => {
     switch (rating) {
       case 1:
@@ -29,6 +37,37 @@ export default function Review({ isOpen, onClose, detail }) {
   };
 
   if (!isOpen) return null;
+
+  const handleSubmit = async () => {
+    if (!token) {
+      alert("Please login first!");
+      return;
+    }
+    if (!detail || !detail.productId) {
+      alert("Product information is missing!");
+      return;
+    }
+    const feedbackData = {
+      rating: rating,
+      comment: comment,
+      createdDate: new Date().toISOString(),
+      status: true,
+      productId: detail.productId,
+    };
+
+    try {
+      // Pass token as second parameter to createFeedback
+      await createFeedback(feedbackData, token);
+      alert("Thank you for your feedback!");
+      // Reset fields and close popup
+      setRating(0);
+      setComment("Suitable Skin Types:\n\nFunctions:\n\nFeedback:");
+      onClose();
+    } catch (error) {
+      console.error("Error creating feedback:", error);
+      alert("Failed to submit feedback. Please try again.");
+    }
+  };
 
   return (
     <div className="overlay" onClick={onClose}>
@@ -58,7 +97,6 @@ export default function Review({ isOpen, onClose, detail }) {
           </div>
         </div>
 
-        {/* Rating section for product quality */}
         <div className="rating-section">
           <p>Product Quality</p>
           <div className="stars">
@@ -77,23 +115,20 @@ export default function Review({ isOpen, onClose, detail }) {
           </div>
         </div>
 
-        {/* Text area for review content */}
         <textarea
           className="review-input"
           placeholder="Please share your thoughts about the product..."
-          defaultValue={`Suitable Skin Types:
-
-Functions:
-
-Feedback:`}
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
         ></textarea>
 
-        {/* Action buttons */}
         <div className="action-buttons">
           <button className="btn cancel" onClick={onClose}>
             Back
           </button>
-          <button className="btn submit">Submit</button>
+          <button className="btn submit" onClick={handleSubmit}>
+            Submit
+          </button>
         </div>
       </div>
     </div>

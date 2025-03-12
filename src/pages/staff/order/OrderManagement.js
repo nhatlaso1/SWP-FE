@@ -814,7 +814,7 @@ const OrderManagement = () => {
 
                     <Button onClick={() => handleStatusChange('Shipping', selectedOrder.orderId)} variant="contained" color="primary" sx={{ mr: 1 }}>
 
-                      Ship
+                      Delivery
 
                     </Button>
 

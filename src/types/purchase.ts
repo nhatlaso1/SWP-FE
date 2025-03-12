@@ -1,25 +1,82 @@
-// types/Order.ts
+// Interface cho danh mục sản phẩm
+export interface OrderCategory {
+  categoryId: number;
+  categoryName: string;
+}
 
-// Interface cho 1 Order Detail (chi tiết đơn hàng)
+// Interface cho loại da phù hợp với sản phẩm
+export interface SkinType {
+  skinTypeId: number;
+  skinTypeName: string;
+}
+
+// Wrapper cho danh sách loại da (do API trả về theo `$values`)
+export interface SkinTypeWrapper {
+  $id: string;
+  $values: SkinType[];
+}
+
+// Interface cho OrderDetail (chi tiết đơn hàng)
 export interface OrderDetail {
-    orderDetailId: number;
-    productId: number;
-    productName: string;
-    size: string;
-    quantity: number;
-    price: number;
-    discount: number;
-    productImage?: string; // optional, bổ sung nếu API trả về image
-  }
-  
-  // Interface cho 1 Order (đơn hàng)
-  export interface Order {
-    orderId: number;
-    totalAmount: number;
-    status: string;
-    createdDate: string;
-    address?: string;
-    phoneNumber?: string;
-    details: OrderDetail[];
-  }
-  
+  orderDetailId: number;
+  productId: number;
+  productName: string;
+  size: string;
+  quantity: number;
+  price: number;
+  discount: number;
+  productImage?: string;
+  category: OrderCategory;
+  skinTypes: SkinTypeWrapper;
+}
+
+// Wrapper cho trường `details` trong PurchaseDetail (do API trả về `$values`)
+export interface OrderDetailWrapper {
+  $id: string;
+  $values: OrderDetail[];
+}
+
+// Interface cho Order (đơn hàng thông thường)
+export interface Order {
+  orderId: number;
+  orderCode: string;
+  fullName: string;
+  address: string;
+  phoneNumber: string;
+  shippingPrice: number;
+  totalAmount: number;
+  paymentMethodName: string;
+  status: string;
+  createdDate: string;
+  details: OrderDetail[];
+}
+
+// Interface cho PurchaseDetail (đơn hàng chi tiết từ API)
+export interface PurchaseDetail {
+  $id: string;
+  orderId: number;
+  orderCode: string;
+  fullName: string;
+  address: string;
+  shippingPrice: number;
+  paymentMethodName: string;
+  voucher: Voucher | null;
+  phoneNumber: string;
+  totalAmount: number;
+  status: string;
+  createdDate: string;
+  details: OrderDetailWrapper;
+}
+
+export interface Voucher {
+  $id: string;
+  voucherId: number;
+  voucherName: string;
+  voucherCode: string;
+  description: string;
+  discountAmount: number | 0;
+  startDate: string;
+  endDate: string;
+  status: boolean;
+  minimumPurchase: number;
+}

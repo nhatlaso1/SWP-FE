@@ -786,10 +786,10 @@ const ProductManagement = () => {
                               borderRadius: '12px',
                               fontSize: '12px',
                               fontWeight: '500',
-                              backgroundColor: product.status === 'active' ? '#e8f5e9' : '#ffebee',
-                              color: product.status === 'active' ? '#2e7d32' : '#c62828',
+                              backgroundColor: '#e8f5e9',
+                              color: '#2e7d32',
                             }}>
-                              {product.status === 'active' ? 'Active' : 'Inactive'}
+                              Active
                             </span>
                           </td>
                         </tr>

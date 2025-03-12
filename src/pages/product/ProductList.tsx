@@ -25,7 +25,7 @@ import { useStore } from '../../store';
 import { FilterAPI, callApi } from '../../store/apiFilter';
 import styles from './ProductList.module.css';
 
-// Interfaces cho filter options
+// Interfaces for filter options
 interface Category {
   categoryId: number;
   categoryName: string;
@@ -47,14 +47,14 @@ interface SkinType {
   skinTypeName: string;
 }
 
-// Interface cho sản phẩm
+// Interface for Product
 interface Product {
   productId: number;
   productName: string;
   summary: string;
   quantity: number;
   price: number;
-  discount: number; // discount dưới dạng số thập phân, ví dụ: 0.1
+  discount: number; // discount as a decimal number, e.g., 0.1
   rating: number;
   productImage: string;
   brand: Brand;
@@ -64,7 +64,7 @@ interface Product {
   ingredients: { $values: Ingredient[] };
 }
 
-// Interface cho filter parameters khi gửi lên API lấy sản phẩm
+// Interface for filter parameters sent to the API to fetch products
 interface ProductFilterParams {
   pageIndex: number;
   pageSize: number;
@@ -78,8 +78,8 @@ interface ProductFilterParams {
 }
 
 /**
- * Hàm tiện ích parse dữ liệu trả về từ API.
- * Nếu API trả về dữ liệu dạng { $values: [...] } thì trả về mảng đó.
+ * Utility function to parse the API response.
+ * If the API returns data in the form { $values: [...] }, then return that array.
  */
 function parseData(response: any): any[] {
   if (response && response.$values) return response.$values;
@@ -88,7 +88,7 @@ function parseData(response: any): any[] {
 }
 
 /**
- * Hàm filter nội bộ dựa trên các tiêu chí được chọn.
+ * Local filter function based on the selected criteria.
  */
 function applyLocalFilter(products: Product[], filters: ProductFilterParams): Product[] {
   return products.filter((prod) => {
@@ -119,27 +119,27 @@ function applyLocalFilter(products: Product[], filters: ProductFilterParams): Pr
 }
 
 const ProductList: React.FC = () => {
-  // State cho sản phẩm, trạng thái tải và lỗi
+  // State for products, loading status, and error messages
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Phân trang frontend: mỗi trang 10 sản phẩm
+
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const localPageSize = 10;
+  const localPageSize = 12;
 
-  // Dữ liệu filter (lấy từ FilterAPI)
+  // Data for filter options (from FilterAPI)
   const [categories, setCategories] = useState<Category[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
   const [functions, setFunctions] = useState<FunctionType[]>([]);
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [skinTypes, setSkinTypes] = useState<SkinType[]>([]);
 
-  // Giá trị filter người dùng chọn (mặc định)
+  // User-selected filter values (default)
   const [filterParams, setFilterParams] = useState<ProductFilterParams>({
     pageIndex: 1,
-    pageSize: 999, // Backend trả về tối đa 999 sản phẩm
+    pageSize: 999, // Backend returns up to 999 products
     categoryIds: null,
     brandIds: null,
     functionIds: null,
@@ -153,7 +153,7 @@ const ProductList: React.FC = () => {
   const location = useLocation();
   const addItem = useStore((store) => store.addItem);
 
-  // Khi component mount, đọc currentPage từ URL (nếu có)
+  // When the component mounts, read currentPage from URL (if available)
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const savedPage = Number(searchParams.get('currentPage')) || 1;
@@ -162,7 +162,7 @@ const ProductList: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Lấy dữ liệu filter từ FilterAPI
+  // Fetch filter options from FilterAPI
   const fetchFilterOptions = async () => {
     try {
       const { brands, categories, functions, ingredients, skinTypes } = await FilterAPI.getAllFilters();
@@ -173,15 +173,15 @@ const ProductList: React.FC = () => {
       setSkinTypes(skinTypes || []);
     } catch (error) {
       console.error('Error fetching filter options:', error);
-      setError('Không thể tải dữ liệu filter.');
+      setError('Could not load filter options.');
     }
   };
 
   /**
-   * Gọi API để lấy toàn bộ sản phẩm.
-   * Sử dụng queryParams để yêu cầu backend trả về toàn bộ sản phẩm (pageSize=999)
-   * và bodyPayload chứa các filter (hoặc rỗng nếu reset).
-   * Sau đó áp dụng local filter (nếu không reset) và phân trang với 10 sản phẩm/trang.
+   * Calls the API to fetch all products.
+   * Uses queryParams to request the backend to return all products (pageSize=999)
+   * and bodyPayload with filters (or empty if reset).
+   * Then applies local filtering (if not reset) and paginates with 10 products per page.
    */
   const fetchAllProducts = async (pageNumber: number, resetAll: boolean = false) => {
     try {
@@ -196,17 +196,17 @@ const ProductList: React.FC = () => {
       };
 
       const bodyPayload = resetAll
-        ? {} // Khi reset, bỏ qua filter
+        ? {} // If resetting, ignore filters
         : {
-            BrandIds: filterParams.brandIds ? [filterParams.brandIds] : [],
-            Categories: filterParams.categoryIds ? [filterParams.categoryIds] : [],
-            FunctionIds: filterParams.functionIds ? [filterParams.functionIds] : [],
-            Ingredients: filterParams.ingredients ? [filterParams.ingredients] : [],
-            SkinTypes: filterParams.skinTypeIds ? [filterParams.skinTypeIds] : [],
-            MinPrice: filterParams.minPrice || 0,
-            MaxPrice: filterParams.maxPrice || 999999999,
-            Status: true,
-          };
+          BrandIds: filterParams.brandIds ? [filterParams.brandIds] : [],
+          Categories: filterParams.categoryIds ? [filterParams.categoryIds] : [],
+          FunctionIds: filterParams.functionIds ? [filterParams.functionIds] : [],
+          Ingredients: filterParams.ingredients ? [filterParams.ingredients] : [],
+          SkinTypes: filterParams.skinTypeIds ? [filterParams.skinTypeIds] : [],
+          MinPrice: filterParams.minPrice || 0,
+          MaxPrice: filterParams.maxPrice || 999999999,
+          Status: true,
+        };
 
       console.log('Query Params:', queryParams);
       console.log('Body Payload:', bodyPayload);
@@ -227,7 +227,7 @@ const ProductList: React.FC = () => {
       setCurrentPage(pageNumber);
     } catch (error) {
       console.error('Error fetching products:', error);
-      setError('Không thể tải danh sách sản phẩm.');
+      setError('Could not load product list.');
       setProducts([]);
       setTotalPages(0);
     } finally {
@@ -235,13 +235,13 @@ const ProductList: React.FC = () => {
     }
   };
 
-  // Xử lý thay đổi các trường filter
+  // Handle changes in filter fields
   const handleFilterChange =
     (key: keyof ProductFilterParams) =>
-    (event: SelectChangeEvent<number | string>) => {
-      const value = event.target.value === '' ? null : Number(event.target.value);
-      setFilterParams((prev) => ({ ...prev, [key]: value }));
-    };
+      (event: SelectChangeEvent<number | string>) => {
+        const value = event.target.value === '' ? null : Number(event.target.value);
+        setFilterParams((prev) => ({ ...prev, [key]: value }));
+      };
 
   const handleMinPriceChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilterParams((prev) => ({
@@ -257,13 +257,13 @@ const ProductList: React.FC = () => {
     }));
   };
 
-  // Nút "Áp dụng": sử dụng filter hiện tại, reset về trang 1 và cập nhật URL
+  // "Apply" button: use current filters, reset to page 1 and update the URL
   const handleApplyFilter = () => {
     navigate({ search: '?currentPage=1' });
     fetchAllProducts(1, false);
   };
 
-  // Nút "Đặt lại": reset các trường filter về mặc định, cập nhật URL và gọi API với body rỗng
+  // "Reset" button: reset filter fields to default, update the URL and call API with empty body
   const handleReset = () => {
     setFilterParams({
       pageIndex: 1,
@@ -291,21 +291,21 @@ const ProductList: React.FC = () => {
   return (
     <Container maxWidth="xl">
       <Typography variant="h4" align="center" sx={{ my: 4 }}>
-        Danh sách sản phẩm
+        Product List
       </Typography>
 
-      {/* Khối filter */}
+      {/* Filter block */}
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Danh mục</InputLabel>
+            <InputLabel>Category</InputLabel>
             <Select
               value={filterParams.categoryIds ?? ''}
               onChange={handleFilterChange('categoryIds')}
-              label="Danh mục"
+              label="Category"
             >
               <MenuItem value="">
-                <em>Không chọn</em>
+                <em>None</em>
               </MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat.categoryId} value={cat.categoryId}>
@@ -316,14 +316,14 @@ const ProductList: React.FC = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Thương hiệu</InputLabel>
+            <InputLabel>Brand</InputLabel>
             <Select
               value={filterParams.brandIds ?? ''}
               onChange={handleFilterChange('brandIds')}
-              label="Thương hiệu"
+              label="Brand"
             >
               <MenuItem value="">
-                <em>Không chọn</em>
+                <em>None</em>
               </MenuItem>
               {brands.map((brand) => (
                 <MenuItem key={brand.brandId} value={brand.brandId}>
@@ -334,14 +334,14 @@ const ProductList: React.FC = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Chức năng</InputLabel>
+            <InputLabel>Function</InputLabel>
             <Select
               value={filterParams.functionIds ?? ''}
               onChange={handleFilterChange('functionIds')}
-              label="Chức năng"
+              label="Function"
             >
               <MenuItem value="">
-                <em>Không chọn</em>
+                <em>None</em>
               </MenuItem>
               {functions.map((func) => (
                 <MenuItem key={func.functionId} value={func.functionId}>
@@ -352,14 +352,14 @@ const ProductList: React.FC = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Thành phần</InputLabel>
+            <InputLabel>Ingredient</InputLabel>
             <Select
               value={filterParams.ingredients ?? ''}
               onChange={handleFilterChange('ingredients')}
-              label="Thành phần"
+              label="Ingredient"
             >
               <MenuItem value="">
-                <em>Không chọn</em>
+                <em>None</em>
               </MenuItem>
               {ingredients.map((ing) => (
                 <MenuItem key={ing.ingredientId} value={ing.ingredientId}>
@@ -370,14 +370,14 @@ const ProductList: React.FC = () => {
           </FormControl>
 
           <FormControl sx={{ minWidth: 200 }}>
-            <InputLabel>Loại da</InputLabel>
+            <InputLabel>Skin Type</InputLabel>
             <Select
               value={filterParams.skinTypeIds ?? ''}
               onChange={handleFilterChange('skinTypeIds')}
-              label="Loại da"
+              label="Skin Type"
             >
               <MenuItem value="">
-                <em>Không chọn</em>
+                <em>None</em>
               </MenuItem>
               {skinTypes.map((skin) => (
                 <MenuItem key={skin.skinTypeId} value={skin.skinTypeId}>
@@ -388,14 +388,14 @@ const ProductList: React.FC = () => {
           </FormControl>
 
           <TextField
-            label="Giá tối thiểu"
+            label="Min Price"
             type="number"
             sx={{ width: 120 }}
             value={filterParams.minPrice}
             onChange={handleMinPriceChange}
           />
           <TextField
-            label="Giá tối đa"
+            label="Max Price"
             type="number"
             sx={{ width: 120 }}
             value={filterParams.maxPrice ?? ''}
@@ -403,24 +403,24 @@ const ProductList: React.FC = () => {
           />
         </Box>
 
-        {/* Nút Áp dụng & Đặt lại nằm cùng một hàng */}
+        {/* Apply & Reset Buttons */}
         <Box sx={{ display: 'flex', gap: 2, mt: 2 }}>
           <Button variant="contained" onClick={handleApplyFilter}>
-            Áp dụng
+            Apply
           </Button>
           <Button variant="contained" color="warning" onClick={handleReset}>
-            Đặt lại
+            Reset
           </Button>
         </Box>
       </Box>
 
-      {/* Danh sách sản phẩm */}
+      {/* Product list */}
       <Grid container spacing={3}>
         {products.length === 0 ? (
-          <Typography variant="h6">Không tìm thấy sản phẩm.</Typography>
+          <Typography variant="h6">No products found.</Typography>
         ) : (
           products.map((product) => {
-            // Tính giá cuối cùng nếu có discount
+            // Calculate final price if discount exists
             const hasDiscount = product.discount > 0;
             const finalPrice = hasDiscount ? product.price * (1 - product.discount) : product.price;
             return (
@@ -440,7 +440,7 @@ const ProductList: React.FC = () => {
                       {product.productName}
                     </Typography>
                     <Typography variant="body2">
-                      Thương hiệu: {product.brand.brandName}
+                      Brand: {product.brand.brandName}
                     </Typography>
                     <Rating value={product.rating} readOnly size="small" />
                     <Box sx={{ mt: 1 }}>
@@ -461,19 +461,33 @@ const ProductList: React.FC = () => {
                     </Box>
                     <Button
                       variant="contained"
+                      size="large"
                       fullWidth
                       sx={{ mt: 2 }}
-                      onClick={() =>
+                      onClick={() => {
+                        console.log("Adding product to cart:", product);
                         addItem({
                           productId: product.productId,
                           productName: product.productName,
+                          summary: product.summary,
                           price: product.price,
+                          discount: product.discount,
+                          rating: product.rating,
                           productImage: product.productImage,
-                        })
-                      }
+                          brand: product.brand?.brandName,
+                          category: product.category?.categoryName,
+                          // Pass skinTypes as an array: if product.skinTypes exists, extract $values, otherwise an empty array
+                          skintype: product.skinTypes?.$values || [],
+                          functions: product.functions?.$values || [],
+                          ingredients: product.ingredients?.$values || [],
+                          quantity: 1, // default quantity when adding to cart
+                        });
+                      }}
                     >
-                      Thêm vào giỏ
+                      Add to Cart
                     </Button>
+
+
                   </CardContent>
                 </Card>
               </Grid>
@@ -482,7 +496,7 @@ const ProductList: React.FC = () => {
         )}
       </Grid>
 
-      {/* Phân trang (frontend): hiển thị nếu có nhiều hơn 10 sản phẩm */}
+      {/* Pagination (frontend): display if there are more than 10 products */}
       {totalPages > 1 && (
         <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
           <Pagination

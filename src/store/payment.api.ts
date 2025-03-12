@@ -3,13 +3,12 @@ import { apiClient, apiEndpoints } from "./utils.api";
 
 export const createPayment = async (orderId: number, token: string): Promise<string> => {
   try {
-    
-      const response = await apiClient.post(
-        `${apiEndpoints.Payment}/payment?orderId=${orderId}`, // orderId trong query string
-        {},
+    const response = await apiClient.post(
+      `${apiEndpoints.Payment}/payment?orderId=${orderId}`,
+      {},
       {
         headers: {
-          Authorization: `Bearer ${token}`, // Xác thực người dùng bằng token
+          Authorization: `Bearer ${token}`,
         },
       }
     );
@@ -18,6 +17,12 @@ export const createPayment = async (orderId: number, token: string): Promise<str
     return response.data;
   } catch (error) {
     console.error("Error creating payment:", error);
+    
+    // Đảm bảo luôn có chuỗi hợp lệ cho JSON.parse
+    const cartString = localStorage.getItem('cart') ?? '[]';
+    const cart = JSON.parse(cartString);
+    
     throw error;
   }
 };
+

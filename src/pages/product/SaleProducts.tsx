@@ -10,7 +10,7 @@ import {
   Container,
   CircularProgress,
   Alert,
-  Rating,
+  Rating
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
@@ -26,74 +26,32 @@ interface Product {
   productImage: string;
 }
 
-interface PaginationData {
-  totalItems: number;
-  currentPage: number;
-  pageSize: number;
-  totalPages: number;
-}
-
 const SaleProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [allProducts, setAllProducts] = useState<Product[]>([]);
-
   const navigate = useNavigate();
 
-  const fetchAllProducts = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      let currentPage = 1;
-      let allFetchedProducts: Product[] = [];
-      let hasMorePages = true;
-
-      while (hasMorePages) {
-        console.log('Fetching products for page:', currentPage);
-        const response = await ProductAPI.getAll({
-          pageIndex: currentPage,
-          pageSize: 100, // Fetch 100 products per page
-          SortTypes: [""],
-          CategoryIds: [],
-          SizeTypes: [""],
-          Ingredients: [],
-          BrandIds: [],
-          FunctionIds: [],
-          MinPrice: 0,
-          MaxPrice: 999999999,
-          Status: true
-        });
-
-        if (response && response.products) {
-          // Filter products with discount > 0
-          const discountedProducts = response.products.filter(product => product.discount > 0);
-          allFetchedProducts = [...allFetchedProducts, ...discountedProducts];
-
-          // Check if we've reached the last page
-          if (!response.pagination || currentPage >= response.pagination.totalPages) {
-            hasMorePages = false;
-          } else {
-            currentPage++;
-          }
-        } else {
-          hasMorePages = false;
-        }
-      }
-
-      console.log('Total products with discount found:', allFetchedProducts.length);
-      setProducts(allFetchedProducts);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setError('Failed to load sale products. Please try again later.');
-      setProducts([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchAllProducts();
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const productsData = await ProductAPI.getAll();
+        const saleProducts = productsData.products.filter((product: Product) => product.discount > 0);
+        
+        console.log('Sale Products:', saleProducts);
+        setProducts(saleProducts);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to load sale products. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   if (loading) {

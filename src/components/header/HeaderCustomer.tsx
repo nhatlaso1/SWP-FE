@@ -5,6 +5,7 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  Drawer,
   IconButton,
   InputAdornment,
   Menu,
@@ -25,6 +26,7 @@ import { useFormik } from "formik";
 import { useStore } from "../../store";
 
 import "./HeaderCustomer.scss";
+import Cart from "../../pages/cart/Cart";
 
 interface IChangePasswordForm {
   oldPassword: string;
@@ -34,6 +36,7 @@ interface IChangePasswordForm {
 
 const HeaderCustomer: React.FC = () => {
   const [open, setOpen] = useState(false);
+  const [openCart, setOpenCart] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [prevScrollPos, setPrevScrollPos] = useState(window.scrollY);
   const [visible, setVisible] = useState(true);
@@ -104,21 +107,44 @@ const HeaderCustomer: React.FC = () => {
         </div>
 
         <div className="nav-wrap">
-          <Button variant="text" onClick={() => navigate("/")}>Home</Button>
-          <Button variant="text" onClick={() => navigate("/brands")}>Brand</Button>
-          <Button variant="text" onClick={() => navigate("/sales")}>For Sales</Button>
-          <Button variant="text" onClick={() => navigate("/products")}>Products</Button>
-          <Button variant="text" onClick={() => navigate("/blogs")}>Blog</Button>
-          <Button variant="text" onClick={() => navigate("/take-quiz")}>Quiz Skin Q&A</Button>
+          <Button variant="text" onClick={() => navigate("/")}>
+            Home
+          </Button>
+          <Button variant="text" onClick={() => navigate("/brands")}>
+            Brand
+          </Button>
+          <Button variant="text" onClick={() => navigate("/sales")}>
+            For Sales
+          </Button>
+          <Button variant="text" onClick={() => navigate("/products")}>
+            Products
+          </Button>
+          <Button variant="text" onClick={() => navigate("/blogs")}>
+            Blog
+          </Button>
+          <Button variant="text" onClick={() => navigate("/take-quiz")}>
+            Quiz Skin Q&A
+          </Button>
         </div>
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />|
-          <div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+          <div style={{ cursor: "pointer" }} onClick={() => setOpenCart(true)}>
             <ShoppingCartOutlinedIcon />
           </div>
-
-          <IconButton onClick={handleOpenMenu} className="header-staff__user-icon">
+          <Drawer
+            open={openCart}
+            anchor="right"
+            onClose={(reason) => {
+              setOpenCart(false);
+            }}
+          >
+            <Cart />
+          </Drawer>
+          <IconButton
+            onClick={handleOpenMenu}
+            className="header-staff__user-icon"
+          >
             <PersonIcon />
           </IconButton>
           <Menu
@@ -212,7 +238,6 @@ const HeaderCustomer: React.FC = () => {
             )}
           </Menu>
         </div> */}
-
 
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>Change Password</DialogTitle>

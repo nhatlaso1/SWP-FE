@@ -1,59 +1,58 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import "./PurchaseDetail.css";
-import { FaFileAlt, FaMoneyCheckAlt, FaTruck, FaBoxOpen } from "react-icons/fa";
+import {
+  FaFileAlt,
+  FaMoneyCheckAlt,
+  FaTruck,
+  FaBoxOpen,
+  FaUndo,
+  FaTimesCircle,
+} from "react-icons/fa";
 import StepItem from "../../components/step/StepItem";
+import "./PurchaseDetail.css";
+import { getPurchaseDetail } from "../../store/purchase.api";
+import { useStore } from "../../store";
+
+function getDoneSteps(status) {
+  const s = status.toLowerCase();
+  switch (s) {
+    case "pending":
+      return 1;
+    case "confirmed":
+      return 2;
+    case "shipping":
+      return 3;
+    case "complete":
+      return 5;
+    case "returned":
+      return 4;
+    case "cancel":
+    case "denied":
+      return 0;
+    default:
+      return 0;
+  }
+}
+
 export default function PurchaseDetail() {
   const { id } = useParams();
+  const token = useStore((state) => state.profile.user?.token);
 
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    const mockData = {
-      orderCode: id,
-      status: "Complete",
-
-      summaryMessage:
-        "Your order has been delivered successfully. Your order is now complete.",
-      address: {
-        name: "John Doe",
-        phone: "0900 000 000",
-        addressLine: "123 ABC Street, District 1, HCMC",
-        orderDate: "03/10/2025",
-        paymentMethod: "Bank Transfer",
-      },
-      shopName: "BEAUTYSC",
-      products: [
-        {
-          id: 1,
-          name: "Product 2",
-          variant: "100ml x1",
-          oldPrice: 220000,
-          newPrice: 200000,
-          img: "https://mint07.com/wp-content/uploads/2015/10/sua-rua-mat-Simple-Kind-To-Skin-Refreshing-Facial-Wash-Gel-review-1.jpg",
-        },
-        {
-          id: 1,
-          name: "Product 3",
-          variant: "1000ml x2",
-          oldPrice: 320000,
-          newPrice: 300000,
-          img: "https://mint07.com/wp-content/uploads/2015/10/sua-rua-mat-Simple-Kind-To-Skin-Refreshing-Facial-Wash-Gel-review-1.jpg",
-        },
-      ],
-      fee: {
-        productTotal: 540000,
-        shipping: 0,
-        discount: 40000,
-      },
-      note: "",
-    };
-
-    // Simulate async call
-    setTimeout(() => {
-      setOrder(mockData);
-    }, 2000);
-  }, [id]);
+    if (!id || !token) return;
+    async function fetchOrder() {
+      try {
+        const data = await getPurchaseDetail(id, token);
+        console.log(data);
+        setOrder(data);
+      } catch (error) {
+        console.error("Error fetching purchase detail:", error);
+      }
+    }
+    fetchOrder();
+  }, [id, token]);
 
   if (!order) {
     return (
@@ -69,6 +68,21 @@ export default function PurchaseDetail() {
       </div>
     );
   }
+
+  const items = order.details?.$values || [];
+  const totalProductPrice = items.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const shopDiscount = items.reduce(
+    (acc, item) => acc + item.price * item.discount * item.quantity,
+    0
+  );
+  const shippingFee = order.shippingPrice || 0;
+  const voucherDiscount = order.voucher.discountAmount || 0;
+  const totalPayment =
+    totalProductPrice + shippingFee - shopDiscount - voucherDiscount;
+
   const steps = [
     { label: "Order Placed", icon: <FaFileAlt /> },
     { label: "Payment Confirmed", icon: <FaMoneyCheckAlt /> },
@@ -76,27 +90,20 @@ export default function PurchaseDetail() {
     { label: "Order Received", icon: <FaBoxOpen /> },
     { label: "Completed", icon: <FaBoxOpen /> },
   ];
-  const doneSteps = 5;
-  // Calculate total amount
-  const totalAmount =
-    (order.fee.productTotal || 0) +
-    (order.fee.shipping || 0) -
-    (order.fee.discount || 0);
+  const doneSteps = getDoneSteps(order.status);
 
   return (
     <div className="order-detail-container">
-      {/* Header Bar */}
       <div className="order-header-bar">
         <button className="back-button" onClick={() => window.history.back()}>
-          Back
+          &lt; Back
         </button>
         <div className="order-info">
           <span className="order-code">Order Code: {order.orderCode}</span>
-          <span className="order-status-final"> | Order {order.status}</span>
+          <span className="order-status-final">| Status: {order.status}</span>
         </div>
       </div>
 
-      {/* Order Steps */}
       <div className="steps-container">
         {steps.map((step, index) => (
           <StepItem
@@ -107,88 +114,189 @@ export default function PurchaseDetail() {
           />
         ))}
       </div>
-
-      {/* Summary */}
-      <div className="order-summary-top">
-        <p>{order.summaryMessage}</p>
-        <div className="order-actions-top">
-          <button className="btn-review">Review</button>
-        </div>
-      </div>
-
-      {/* Shipping Address */}
-      <div className="shipping-address">
-        <h3>Shipping Address</h3>
-        <p>
-          {order.address.name} | {order.address.phone}
+      <p className={`order-message ${order.status.toLowerCase()}`}>
+        {order.status.toLowerCase() === "complete" &&
+          "Your order is completed. Thank you for shopping with us!"}
+        {order.status.toLowerCase() === "confirmed" &&
+          "Your order has been confirmed and is being prepared for shipping."}
+        {order.status.toLowerCase() === "pending" &&
+          "Your order is pending and awaiting confirmation."}
+        {order.status.toLowerCase() === "shipping" &&
+          "Your order is on the way."}
+        {order.status.toLowerCase() === "returned" &&
+          "Your order has been returned."}
+        {order.status.toLowerCase() === "cancel" &&
+          "Your order has been canceled."}
+        {order.status.toLowerCase() === "denied" &&
+          "Your order has been denied."}
+      </p>
+      {order.paymentMethodName === "Payment when delivered (COD)" && (
+        <p className="order-message cod-message">
+          Please pay <strong>₫{order.totalAmount.toLocaleString()}</strong> upon
+          delivery.
         </p>
-        <p>{order.address.addressLine}</p>
-        <div className="address-extra">
-          <p>Order Date: {order.address.orderDate}</p>
-          <p>Payment Method: {order.address.paymentMethod}</p>
-        </div>
+      )}
+      <div className="customer-info">
+        <h3>🛍️ Customer Information</h3>
+        <p>
+          <strong>👤 Name:</strong> {order.fullName}
+        </p>
+        <p>
+          <strong>📞 Phone:</strong> {order.phoneNumber}
+        </p>
+        <p>
+          <strong>📍 Address:</strong> {order.address}
+        </p>
+        <p>
+          <strong>🕒 Order Date:</strong>{" "}
+          {new Date(order.createdDate).toLocaleDateString()}
+        </p>
+        <p>
+          <strong>💳 Payment Method:</strong> {order.paymentMethodName}
+        </p>
       </div>
 
-      {/* Product List */}
       <div className="order-products">
-        <div className="shop-header">
-          <span className="shop-name">{order.shopName}</span>
-        </div>
-        {order.products.map((product) => (
-          <div className="product-row" key={product.id}>
-            <div className="product-info-wrap">
+        <h3>Order Items</h3>
+        {items.map((item) => (
+          <div
+            className="product-row"
+            key={item.orderDetailId}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              marginBottom: "12px",
+            }}
+          >
+            {/* Bên trái: Hình + 4 dòng (Name, Category, Skin Types, Quantity) */}
+            <div
+              className="product-info-wrap"
+              style={{ display: "flex", flex: 1, alignItems: "flex-start" }}
+            >
               <img
-                src={product.img}
-                alt={product.name}
-                className="product-img"
+                src={item.productImage || "https://via.placeholder.com/100"}
+                alt={item.productName}
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  objectFit: "cover",
+                  marginRight: "8px",
+                  borderRadius: "4px",
+                }}
               />
-              <div className="product-info">
-                <h4>{product.name}</h4>
-                <p className="product-variant">Variant: {product.variant}</p>
+              <div className="product-info" style={{ flexGrow: 1 }}>
+                {/* Dòng 1: Tên sản phẩm */}
+                <h4
+                  style={{
+                    margin: 0,
+                    fontSize: "16px",
+                    color: "#333",
+                    marginBottom: "4px",
+                  }}
+                >
+                  {item.productName}
+                </h4>
+
+                {/* Dòng 2: Category */}
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    color: "#d9534f",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <strong>Category:</strong>{" "}
+                  {item.category?.categoryName || "N/A"}
+                </p>
+
+                {/* Dòng 3: Skin Types */}
+                <p
+                  style={{
+                    margin: 0,
+                    fontSize: "14px",
+                    color: "#5cb85c",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <strong>Skin Types:</strong>{" "}
+                  {Array.isArray(item.skinTypes?.$values) &&
+                  item.skinTypes.$values.length > 0
+                    ? item.skinTypes.$values
+                        .map((st) => st.skinTypeName)
+                        .join(", ")
+                    : "N/A"}
+                </p>
+
+                {/* Dòng 4: Quantity */}
+                <p style={{ margin: 0, fontSize: "14px" }}>
+                  <strong>Quantity:</strong> {item.quantity}
+                </p>
               </div>
             </div>
-            <div className="product-price">
-              {product.oldPrice && (
-                <p className="old-price">
-                  ₫{product.oldPrice.toLocaleString()}
+
+            {/* Bên phải: Giá cũ (nếu discount > 0) + Giá mới */}
+            <div
+              className="product-price"
+              style={{ textAlign: "right", minWidth: "100px" }}
+            >
+              {item.discount > 0 && (
+                <p
+                  className="old-price"
+                  style={{
+                    textDecoration: "line-through",
+                    color: "#999",
+                    margin: "0 0 4px 0",
+                  }}
+                >
+                  ₫{(item.price * item.quantity).toLocaleString()}
                 </p>
               )}
-              <p className="new-price">₫{product.newPrice.toLocaleString()}</p>
+              <p
+                className="new-price"
+                style={{
+                  color: "#e84343",
+                  fontWeight: "bold",
+                  margin: 0,
+                }}
+              >
+                ₫
+                {(
+                  item.price *
+                  (1 - item.discount) *
+                  item.quantity
+                ).toLocaleString()}
+              </p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Payment Summary */}
       <div className="order-payment-summary">
+        <h3>Payment Summary</h3>
         <div className="order-fee-line">
-          <span>Product Total:</span>
-          <span>₫{order.fee.productTotal.toLocaleString()}</span>
-        </div>
-        <div className="order-fee-line">
-          <span>Shipping Fee:</span>
-          <span>₫{order.fee.shipping.toLocaleString()}</span>
+          <span className="label">Subtotal:</span>{" "}
+          <span className="value">₫{totalProductPrice.toLocaleString()}</span>
         </div>
         <div className="order-fee-line">
-          <span>Discount:</span>
-          <span>-₫{order.fee.discount.toLocaleString()}</span>
+          <span className="label">Shipping Fee:</span>{" "}
+          <span className="value">₫{shippingFee.toLocaleString()}</span>
         </div>
-        <div className="order-total">
-          <span>Total:</span>
-          <strong>₫{totalAmount.toLocaleString()}</strong>
+        <div className="order-fee-line">
+          <span className="label">Product Discount:</span>{" "}
+          <span className="value">-₫{shopDiscount.toLocaleString()}</span>
         </div>
-        <p className="order-note">{order.note}</p>
-      </div>
+        <div className="order-fee-line">
+          <span className="label">Voucher Discount:</span>{" "}
+          <span className="value">
+            -₫{voucherDiscount ? voucherDiscount.toLocaleString() : "0"}
+          </span>
+        </div>
 
-      {/* Footer Actions */}
-      <div className="order-footer-actions">
-        <button className="btn-back" onClick={() => window.history.back()}>
-          Back
-        </button>
-        {order.status.toLowerCase() !== "complete" &&
-          order.status.toLowerCase() !== "cancel" && (
-            <button className="btn-finish">Complete</button>
-          )}
+        <div className="order-total">
+          <span className="label">Total Payment:</span>{" "}
+          <span className="value">₫{totalPayment.toLocaleString()}</span>
+        </div>
       </div>
     </div>
   );

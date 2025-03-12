@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { 
-  Box, 
-  Grid, 
-  Card, 
-  CardMedia, 
-  CardContent, 
-  Typography, 
+import {
+  Box,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  Typography,
   Button,
   Container,
   CircularProgress,
@@ -15,25 +15,44 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
+import { useStore } from '../../store';
 
-// Định nghĩa interface cho Brand
+// Define interfaces for Brand, Category, and SkinType
 interface Brand {
   $id: string;
   brandId: number;
   brandName: string;
 }
 
-// Cập nhật interface Product để thuộc tính brand là một object kiểu Brand
+interface Category {
+  $id: string;
+  categoryId: number;
+  categoryName: string;
+}
+
+interface SkinType {
+  $id: string;
+  skinTypeId: number;
+  skinTypeName: string;
+}
+
+// Update Product interface to include category and skinTypes with proper formatting
 interface Product {
   $id: string;
   productId: number;
   productName: string;
   summary: string;
+  quantity: number;
   price: number;
   discount: number;
   rating: number;
   productImage: string;
   brand: Brand;
+  category: Category;
+  skinTypes: {
+    $id: string;
+    $values: SkinType[];
+  };
 }
 
 interface PaginationData {
@@ -46,11 +65,11 @@ interface PaginationData {
 const BrandList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
-  // selectedBrand ban đầu là null, nghĩa là chưa chọn brand nào
+  // Initially, no brand is selected
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const addItem = useStore((store) => store.addItem);
   const navigate = useNavigate();
 
   const fetchAllProducts = async () => {
@@ -65,7 +84,7 @@ const BrandList: React.FC = () => {
         console.log('Fetching products for page:', currentPage);
         const response = await ProductAPI.getAll({
           pageIndex: currentPage,
-          pageSize: 100, // Lấy 100 sản phẩm mỗi trang
+          pageSize: 100, // Fetch 100 products per page
           SortTypes: [""],
           CategoryIds: [],
           SizeTypes: [""],
@@ -91,7 +110,7 @@ const BrandList: React.FC = () => {
 
       setProducts(allFetchedProducts);
 
-      // Trích xuất danh sách tên brand duy nhất từ các sản phẩm
+      // Extract unique brand names from the products
       const brandSet = new Set<string>();
       allFetchedProducts.forEach(product => {
         if (product.brand && product.brand.brandName) {
@@ -112,7 +131,7 @@ const BrandList: React.FC = () => {
     fetchAllProducts();
   }, []);
 
-  // Hàm toggle chọn/deselect brand
+  // Toggle select/deselect brand
   const handleBrandClick = (brand: string) => {
     if (selectedBrand === brand) {
       setSelectedBrand(null);
@@ -121,8 +140,8 @@ const BrandList: React.FC = () => {
     }
   };
 
-  // Lọc sản phẩm theo brand nếu đã chọn
-  const filteredProducts = selectedBrand 
+  // Filter products by selected brand
+  const filteredProducts = selectedBrand
     ? products.filter(product => product.brand.brandName === selectedBrand)
     : [];
 
@@ -146,11 +165,11 @@ const BrandList: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography 
-        variant="h4" 
-        component="h1" 
-        gutterBottom 
-        align="center" 
+      <Typography
+        variant="h4"
+        component="h1"
+        gutterBottom
+        align="center"
         sx={{ mb: 4 }}
       >
         Products by Brand
@@ -160,11 +179,11 @@ const BrandList: React.FC = () => {
         Select a Brand:
       </Typography>
 
-      {/* Hiển thị danh sách các brand dưới dạng Card */}
+      {/* Display brand list as Cards */}
       <Grid container spacing={2} justifyContent="center">
         {brands.map((brand) => (
           <Grid item key={brand} xs={12} sm={6} md={4} lg={3}>
-            <Card 
+            <Card
               sx={{
                 border: selectedBrand === brand ? '2px solid #1976d2' : '1px solid #ccc',
               }}
@@ -181,7 +200,7 @@ const BrandList: React.FC = () => {
         ))}
       </Grid>
 
-      {/* Nếu đã chọn brand thì hiển thị sản phẩm tương ứng */}
+      {/* If a brand is selected, display its products */}
       {selectedBrand && (
         <>
           <Typography variant="h5" component="h2" align="center" sx={{ mt: 4, mb: 2 }}>
@@ -195,10 +214,10 @@ const BrandList: React.FC = () => {
             <Grid container spacing={4}>
               {filteredProducts.map((product) => (
                 <Grid item key={product.productId} xs={12} sm={6} md={4} lg={3}>
-                  <Card 
-                    sx={{ 
-                      height: '100%', 
-                      display: 'flex', 
+                  <Card
+                    sx={{
+                      height: '100%',
+                      display: 'flex',
                       flexDirection: 'column',
                       position: 'relative',
                       '&:hover': {
@@ -257,15 +276,33 @@ const BrandList: React.FC = () => {
                           </Typography>
                         )}
                       </Box>
-                      <Button 
-                        variant="contained" 
+                      <Button
+                        variant="contained"
                         fullWidth
                         sx={{
                           mt: 'auto',
                           backgroundColor: 'primary.main',
                           '&:hover': {
                             backgroundColor: 'primary.dark',
-                          }
+                          },
+                        }}
+                        onClick={() => {
+                          console.log("Adding product to cart:", product);
+                          addItem({
+                            productId: product.productId,
+                            productName: product.productName,
+                            productImage: product.productImage,
+                            // Use the category name from the product.category object
+                            category: product.category?.categoryName || "",
+                            // Extract skin types as an array from the product.skinTypes object
+                            skintype: product.skinTypes?.$values || [],
+                            // Calculate final price using discount (if any)
+                            price: product.price * (1 - product.discount),
+                            // Default quantity is 1 when adding to cart
+                            quantity: 1,
+                            // Use the product summary as an optional note
+                            note: product.summary,
+                          });
                         }}
                       >
                         Add to Cart
@@ -279,7 +316,7 @@ const BrandList: React.FC = () => {
         </>
       )}
 
-      {/* Nếu chưa chọn brand nào thì hiển thị thông báo nhắc chọn brand */}
+      {/* If no brand is selected, prompt user to select one */}
       {!selectedBrand && (
         <Typography variant="h6" align="center" sx={{ mt: 4 }}>
           Please select a brand to view its products.
