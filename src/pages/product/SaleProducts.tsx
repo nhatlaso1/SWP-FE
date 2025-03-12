@@ -40,6 +40,7 @@ const SaleProducts: React.FC = () => {
         setError(null);
 
         const productsData = await ProductAPI.getAll();
+
         console.log('Received Products Data:', productsData);
         const saleProducts = productsData.products
           .filter((product: Product) => product.discount > 0)

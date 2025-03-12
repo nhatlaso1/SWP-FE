@@ -470,6 +470,7 @@ export const ProductAPI = {
 
       });
 
+
       return response.data;
 
     } catch (error) {
@@ -495,6 +496,7 @@ export const ProductAPI = {
         params: { productId }
 
       });
+
 
       return response.data;
 
@@ -612,4 +614,52 @@ export const ProductAPI = {
 
 
 
+
+export const activateProduct = async (productId) => {
+
+  try {
+
+    const response = await api.patch(`/Product/active-product`, null, {
+
+      params: { productId }
+
+    });
+
+    return response.data;
+
+  } catch (error) {
+
+    console.error('Error activating product:', error);
+
+    throw new Error('Không thể kích hoạt sản phẩm');
+
+  }
+
+};
+
+
+
+// Ngừng kích hoạt sản phẩm
+
+export const deactivateProduct = async (productId) => {
+
+  try {
+
+    const response = await api.patch(`/Product/inactive-product`, null, {
+
+      params: { productId }
+
+    });
+
+    return response.data;
+
+  } catch (error) {
+
+    console.error('Error deactivating product:', error);
+
+    throw new Error('Không thể ngừng kích hoạt sản phẩm');
+
+  }
+
+};
 

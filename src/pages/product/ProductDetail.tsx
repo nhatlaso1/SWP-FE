@@ -142,8 +142,10 @@ const ProductDetail: React.FC = () => {
         }
 
         setProduct(data);
+
         const defaultImage = 'path/to/default/image.jpg'; // Provide a path to a default image
         setSelectedImage(data.productImages.$values.length > 0 ? data.productImages.$values[0].productImage : defaultImage);
+
       } catch (error) {
         console.error('Error fetching product detail:', error);
         setError('Failed to load product details. Please try again later.');
@@ -228,6 +230,7 @@ const ProductDetail: React.FC = () => {
                 No images available
               </Typography>
             )}
+
           </Grid>
 
           <Grid item xs={12} md={6}>
@@ -276,6 +279,7 @@ const ProductDetail: React.FC = () => {
               </ListItem>
               <ListItem>
                 <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Available Quantity</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.quantity}</Typography>} />
+
               </ListItem>
             </List>
 
@@ -368,6 +372,7 @@ const ProductDetail: React.FC = () => {
               <Typography variant="h6" className={styles.sectionTitle}>
                 Customer Feedback & Ratings
               </Typography>
+
               {product.feedbacks.$values.filter(feedback => feedback.status).length > 0 ? (
                 <List>
                   {product.feedbacks.$values.filter(feedback => feedback.status).map((feedback) => (

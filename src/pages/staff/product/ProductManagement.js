@@ -545,6 +545,7 @@ const ProductManagement = () => {
       showNotificationMessage('Tạo sản phẩm thành công!', 'success');
     } catch (error) {
       console.error('Error in handleCreateProduct:', error);
+
       console.error('Error response:', error.response);
       const errorMessage = error.response?.data?.detail
         || error.response?.data?.message
@@ -562,6 +563,7 @@ const ProductManagement = () => {
     try {
       await ProductAPI.activate(productId);
       showNotificationMessage('Kích hoạt sản phẩm thành công!', 'success');
+
       setSelectedProduct(prev => ({ ...prev, status: true }));
       await fetchProducts(currentPage);
     } catch (error) {
@@ -575,6 +577,7 @@ const ProductManagement = () => {
       showNotificationMessage('Ngừng kích hoạt sản phẩm thành công!', 'success');
       setSelectedProduct(prev => ({ ...prev, status: false }));
       await fetchProducts(currentPage);
+
     } catch (error) {
       showNotificationMessage(error.message || 'Không thể ngừng kích hoạt sản phẩm', 'error');
     }
@@ -789,6 +792,7 @@ const ProductManagement = () => {
                               borderRadius: '12px',
                               fontSize: '12px',
                               fontWeight: '500',
+
                               backgroundColor: product.status ? '#e8f5e9' : '#ffebee',
                               color: product.status ? '#2e7d32' : '#c62828',
                             }}>
@@ -902,7 +906,9 @@ const ProductManagement = () => {
                     <strong>Size:</strong> {selectedProduct.size}
                   </div>
                   <div>
+
                     <strong>Status:</strong> {selectedProduct.status ? 'Active' : 'Inactive'}
+
                   </div>
                 </div>
               </div>
@@ -1026,6 +1032,7 @@ const ProductManagement = () => {
               >
                 Deactivate Product
               </button>
+
             </div>
           </div>
         )}
