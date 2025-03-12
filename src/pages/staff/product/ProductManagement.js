@@ -545,6 +545,7 @@ const ProductManagement = () => {
       showNotificationMessage('Tạo sản phẩm thành công!', 'success');
     } catch (error) {
       console.error('Error in handleCreateProduct:', error);
+      console.error('Error response:', error.response);
       const errorMessage = error.response?.data?.detail
         || error.response?.data?.message
         || error.message
@@ -561,7 +562,8 @@ const ProductManagement = () => {
     try {
       await ProductAPI.activate(productId);
       showNotificationMessage('Kích hoạt sản phẩm thành công!', 'success');
-      await fetchProducts(); // Refresh the product list
+      setSelectedProduct(prev => ({ ...prev, status: true }));
+      await fetchProducts(currentPage);
     } catch (error) {
       showNotificationMessage(error.message || 'Không thể kích hoạt sản phẩm', 'error');
     }
@@ -571,7 +573,8 @@ const ProductManagement = () => {
     try {
       await ProductAPI.deactivate(productId);
       showNotificationMessage('Ngừng kích hoạt sản phẩm thành công!', 'success');
-      await fetchProducts(); // Refresh the product list
+      setSelectedProduct(prev => ({ ...prev, status: false }));
+      await fetchProducts(currentPage);
     } catch (error) {
       showNotificationMessage(error.message || 'Không thể ngừng kích hoạt sản phẩm', 'error');
     }
@@ -786,10 +789,10 @@ const ProductManagement = () => {
                               borderRadius: '12px',
                               fontSize: '12px',
                               fontWeight: '500',
-                              backgroundColor: '#e8f5e9',
-                              color: '#2e7d32',
+                              backgroundColor: product.status ? '#e8f5e9' : '#ffebee',
+                              color: product.status ? '#2e7d32' : '#c62828',
                             }}>
-                              Active
+                              {product.status ? 'Active' : 'Inactive'}
                             </span>
                           </td>
                         </tr>
@@ -899,7 +902,7 @@ const ProductManagement = () => {
                     <strong>Size:</strong> {selectedProduct.size}
                   </div>
                   <div>
-                    <strong>Status:</strong> {selectedProduct.status}
+                    <strong>Status:</strong> {selectedProduct.status ? 'Active' : 'Inactive'}
                   </div>
                 </div>
               </div>
@@ -1005,27 +1008,24 @@ const ProductManagement = () => {
               >
                 Edit Product
               </button>
-              {selectedProduct.status === 'active' ? (
-                <button
-                  onClick={() => handleDeactivateProduct(selectedProduct.productId)}
-                  style={{
-                    ...primaryButtonStyle,
-                    backgroundColor: '#f44336'
-                  }}
-                >
-                  Deactivate Product
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleActivateProduct(selectedProduct.productId)}
-                  style={{
-                    ...primaryButtonStyle,
-                    backgroundColor: '#4CAF50'
-                  }}
-                >
-                  Activate Product
-                </button>
-              )}
+              <button
+                onClick={() => handleActivateProduct(selectedProduct.productId)}
+                style={{
+                  ...primaryButtonStyle,
+                  backgroundColor: '#4CAF50'
+                }}
+              >
+                Activate Product
+              </button>
+              <button
+                onClick={() => handleDeactivateProduct(selectedProduct.productId)}
+                style={{
+                  ...primaryButtonStyle,
+                  backgroundColor: '#f44336'
+                }}
+              >
+                Deactivate Product
+              </button>
             </div>
           </div>
         )}

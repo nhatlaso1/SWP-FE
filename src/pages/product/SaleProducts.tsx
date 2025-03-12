@@ -24,6 +24,7 @@ interface Product {
   discount: number;
   rating: number;
   productImage: string;
+  status: boolean;
 }
 
 const SaleProducts: React.FC = () => {
@@ -39,9 +40,12 @@ const SaleProducts: React.FC = () => {
         setError(null);
 
         const productsData = await ProductAPI.getAll();
-        const saleProducts = productsData.products.filter((product: Product) => product.discount > 0);
+        console.log('Received Products Data:', productsData);
+        const saleProducts = productsData.products
+          .filter((product: Product) => product.discount > 0)
+          .filter((product: Product) => product.status);
+        console.log('Filtered Sale Products:', saleProducts);
         
-        console.log('Sale Products:', saleProducts);
         setProducts(saleProducts);
       } catch (error) {
         console.error('Error fetching data:', error);

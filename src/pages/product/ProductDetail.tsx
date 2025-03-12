@@ -142,9 +142,8 @@ const ProductDetail: React.FC = () => {
         }
 
         setProduct(data);
-        if (data.productImages.$values.length > 0) {
-          setSelectedImage(data.productImages.$values[0].productImage);
-        }
+        const defaultImage = 'path/to/default/image.jpg'; // Provide a path to a default image
+        setSelectedImage(data.productImages.$values.length > 0 ? data.productImages.$values[0].productImage : defaultImage);
       } catch (error) {
         console.error('Error fetching product detail:', error);
         setError('Failed to load product details. Please try again later.');
@@ -205,24 +204,30 @@ const ProductDetail: React.FC = () => {
                 sx={{ objectFit: 'contain' }}
               />
             </Card>
-            <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
-              {product.productImages.$values.map((image) => (
-                <ImageListItem
-                  key={image.productImageId}
-                  className={`${styles.thumbnailItem} ${
-                    selectedImage === image.productImage ? styles.thumbnailSelected : ''
-                  }`}
-                  onClick={() => setSelectedImage(image.productImage)}
-                >
-                  <img
-                    src={image.productImage}
-                    alt={`${product.productName}-${image.productImageId}`}
-                    loading="lazy"
-                    style={{ height: '100%', objectFit: 'cover' }}
-                  />
-                </ImageListItem>
-              ))}
-            </ImageList>
+            {product.productImages.$values.length > 0 ? (
+              <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
+                {product.productImages.$values.map((image) => (
+                  <ImageListItem
+                    key={image.productImageId}
+                    className={`${styles.thumbnailItem} ${
+                      selectedImage === image.productImage ? styles.thumbnailSelected : ''
+                    }`}
+                    onClick={() => setSelectedImage(image.productImage)}
+                  >
+                    <img
+                      src={image.productImage}
+                      alt={`${product.productName}-${image.productImageId}`}
+                      loading="lazy"
+                      style={{ height: '100%', objectFit: 'cover' }}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No images available
+              </Typography>
+            )}
           </Grid>
 
           <Grid item xs={12} md={6}>
