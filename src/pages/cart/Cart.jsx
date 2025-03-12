@@ -82,7 +82,7 @@ const Cart = () => {
           sx={{
             py: 2,
             overflowY: "auto",
-            height: "calc(100vh - 390px)",
+            height: "calc(100vh - 348px)",
           }}
         >
           {formik.values.products.map((product, index) => (
@@ -172,7 +172,7 @@ const Cart = () => {
 
         <Box sx={{ m: 0, background: "#1a1a1a" }}>
           <img
-            style={{ objectFit: "cover", height: 180 }}
+            style={{ objectFit: "cover", height: 160 }}
             width={"100%"}
             src="cart-bg.avif.jpg"
             alt=""
@@ -186,8 +186,9 @@ const Cart = () => {
             justifyContent="space-between"
             alignItems={"center"}
             m={0}
-            mb={2}
-            p={2}
+            mb={1}
+            py={1}
+            px={2}
           >
             Total:{" "}
             <span style={{ fontSize: "1.5rem", color: "#f44336" }}>
@@ -205,7 +206,7 @@ const Cart = () => {
               mb: 2,
               fontSize: "1.1rem",
             }}
-             onClick={() => navigate("/checkout")}
+            onClick={() => navigate("/checkout")}
           >
             Payment
           </Button>

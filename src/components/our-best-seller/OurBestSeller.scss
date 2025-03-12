@@ -19,6 +19,9 @@
 
       img {
         width: 100%;
+        max-width: 308px;
+        height: 286px;
+        object-fit: cover;
       }
 
       .product-info {

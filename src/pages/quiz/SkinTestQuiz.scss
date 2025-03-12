@@ -50,11 +50,12 @@
 
 .quiz-result-container {
   max-width: 75%;
-  margin: 32px auto;
+  margin: auto;
   background: white;
+  padding: 32px 0;
 
   button {
-    padding: 12px 48px;
+    padding: 8px 16px;
     font-size: 16px;
     text-transform: uppercase;
   }
@@ -158,14 +159,13 @@
 
       .section-use {
         display: grid;
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: max-content 1fr;
         gap: 32px;
         margin: 32px 16px 48px 16px;
 
         .product-item {
           img {
-            // width: 100%;
-            width: 150px;
+            width: 186px;
             aspect-ratio: 1 / 1;
             object-fit: cover;
             border-radius: 16px;
@@ -179,6 +179,7 @@
           }
 
           .product-price {
+            text-align: left;
             font-size: 20px;
             font-weight: 500;
             margin-bottom: 16px;
@@ -214,7 +215,7 @@
 
             .other-product-item {
               img {
-                width: 150px;
+                width: 100%;
                 aspect-ratio: 1 / 1;
                 object-fit: cover;
                 border-radius: 16px;
@@ -222,6 +223,9 @@
 
               .product-info {
                 padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0;
 
                 .name {
                   color: #87ceff;
