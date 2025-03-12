@@ -35,9 +35,7 @@ export default function Purchase() {
       try {
         const data = await getAllUserOrders(selectedStatus, token);
         console.log("Raw orders from API:", data);
-        // If the data is wrapped in $values, extract the orders array
         const ordersArray = data.$values ? data.$values : data;
-        // Sort orders by createdDate (newest first)
         const sortedData = ordersArray.sort(
           (a, b) =>
             new Date(b.createdDate || 0).getTime() -
@@ -54,17 +52,14 @@ export default function Purchase() {
     fetchOrders();
   }, [token, selectedStatus]);
 
-  // Capture the query parameter "status" when redirected back to this page
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const status = params.get("status");
     if (status === "success") {
       alert("Payment successful!");
-      // Optionally update order status or refetch orders here if needed.
     } else if (status === "fail") {
       alert("Payment failed. Please try again!");
     }
-    // Remove the query parameter from the URL
     if (status) {
       navigate(location.pathname, { replace: true });
     }
@@ -98,7 +93,6 @@ export default function Purchase() {
     setCurrentPage(1);
   };
 
-  // Update order status in state if needed (e.g., after successful payment)
   const updateOrderStatus = (orderId, newStatus) => {
     setOrders((prevOrders) =>
       prevOrders.map((order) =>
@@ -107,12 +101,9 @@ export default function Purchase() {
     );
   };
 
-  // Call the rePayment API and redirect to the provided URL from the backend.
   const handlePayment = async (orderId) => {
     try {
       const redirectUrl = await rePayment(orderId, token);
-      // After rePayment API returns, the browser will redirect to the URL,
-      // e.g., http://yourfrontend.com/purchase?status=success or ?status=fail
       window.location.href = redirectUrl;
     } catch (error) {
       console.error("Error during payment:", error);
@@ -137,98 +128,151 @@ export default function Purchase() {
       </div>
 
       {orders.length > 0 ? (
-        currentOrders.map((order) => (
-          <div key={order.orderId} className="order">
-            <div className="order-header">
-              <div className="order-code">
-                Order Code: {order.orderCode ? order.orderCode : order.orderId}
-              </div>
-              <div className="order-status">
-                <span className="status success">
-                  {order.status === "complete"
-                    ? "Delivered Successfully"
-                    : order.status}
-                </span>
-              </div>
-            </div>
+        currentOrders.map((order) => {
+          // Tính tổng tiền đơn hàng theo: tổng giá sản phẩm sau discount + shippingPrice - voucherDiscount (nếu có)
+          const orderDetails = order.details.$values || order.details;
+          const computedTotal =
+            orderDetails.reduce((acc, detail) => {
+              const productTotal =
+                detail.discount > 0
+                  ? detail.price * (1 - detail.discount) * detail.quantity
+                  : detail.price * detail.quantity;
+              return acc + productTotal;
+            }, 0) +
+            (order.shippingPrice || 0) -
+            (order.voucher?.discountAmount || 0);
 
-            {(order.details.$values || order.details).map((detail) => (
-              <div
-                key={detail.orderDetailId}
-                className="order-body"
-                style={{ cursor: "pointer" }}
-                onClick={() => handleOrderAction("/product", detail.productId)}
-              >
-                <img
-                  src={detail.productImage || "https://via.placeholder.com/100"}
-                  alt={detail.productName}
-                  className="product-img"
-                />
-                <div className="product-info">
-                  <h3 className="product-title">{detail.productName}</h3>
-                  <p className="product-variant">
-                    {detail.size &&
-                      `Variant: ${detail.size} x${detail.quantity}`}
-                  </p>
+          return (
+            <div key={order.orderId} className="order">
+              <div className="order-header">
+                <div className="order-code">
+                  Order Code:{" "}
+                  {order.orderCode ? order.orderCode : order.orderId}
                 </div>
-                <div className="product-price">
-                  {detail.oldPrice && (
-                    <span className="old-price">{detail.oldPrice} VND</span>
-                  )}
-                  <span className="new-price">{detail.price} VND</span>
+                <div className="order-status">
+                  <span className="status success">
+                    {order.status === "complete"
+                      ? "Delivered Successfully"
+                      : order.status}
+                  </span>
                 </div>
+              </div>
 
-                {order.status && order.status.toLowerCase() === "complete" && (
+              {orderDetails.map((detail) => (
+                <div
+                  key={detail.orderDetailId}
+                  className="order-body"
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    handleOrderAction("/product", detail.productId)
+                  }
+                >
+                  <img
+                    src={
+                      detail.productImage || "https://via.placeholder.com/100"
+                    }
+                    alt={detail.productName}
+                    className="product-img"
+                  />
+                  <div className="product-info">
+                    <h3 className="product-title">{detail.productName}</h3>
+                    <p className="product-variant">
+                      {detail.size &&
+                        `Variant: ${detail.size} x${detail.quantity}`}
+                    </p>
+                  </div>
+                  <div className="product-price">
+                    {detail.discount > 0 ? (
+                      <>
+                        <span
+                          className="old-price"
+                          style={{
+                            textDecoration: "line-through",
+                            color: "#999",
+                            marginRight: "8px",
+                          }}
+                        >
+                          ₫{detail.price.toLocaleString()}
+                        </span>
+                        <span
+                          className="new-price"
+                          style={{
+                            color: "#e84343",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ₫
+                          {(
+                            detail.price *
+                            (1 - detail.discount)
+                          ).toLocaleString()}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="new-price">
+                        ₫{detail.price.toLocaleString()}
+                      </span>
+                    )}
+                  </div>
+
+                  {order.status &&
+                    order.status.toLowerCase() === "complete" && (
+                      <button
+                        className="btn btn-rating"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleReviewClick(detail);
+                        }}
+                      >
+                        Review
+                      </button>
+                    )}
+                </div>
+              ))}
+
+              <div className="order-footer">
+                <div className="total">
+                  Total:{" "}
+                  <span className="price">
+                    ₫{computedTotal.toLocaleString()} VND
+                  </span>
+                </div>
+                <div className="actions">
                   <button
                     className="btn btn-rating"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleReviewClick(detail);
-                    }}
+                    onClick={() =>
+                      handleOrderAction("/purchase", order.orderId)
+                    }
                   >
-                    Review
+                    View Detail
                   </button>
-                )}
-              </div>
-            ))}
 
-            <div className="order-footer">
-              <div className="total">
-                Total: <span className="price">{order.totalAmount} VND</span>
+                  {order.status.toLowerCase() === "pending" &&
+                    order.paymentMethodName === "Payment by card (VNPAY)" && (
+                      <button
+                        className="btn btn-pay"
+                        onClick={() => handlePayment(order.orderId)}
+                      >
+                        Re-Pay
+                      </button>
+                    )}
+                </div>
               </div>
-              <div className="actions">
-                <button
-                  className="btn btn-rating"
-                  onClick={() => handleOrderAction("/purchase", order.orderId)}
-                >
-                  View Detail
-                </button>
 
-                {/* Display "Re-Pay" button if the order is pending and the payment method is "Payment by card (VNPAY)" */}
-                {order.status.toLowerCase() === "pending" &&
-                  order.paymentMethodName === "Payment by card (VNPAY)" && (
-                    <button
-                      className="btn btn-pay"
-                      onClick={() => handlePayment(order.orderId)}
-                    >
-                      Re-Pay
-                    </button>
-                  )}
+              <div className="extra-info">
+                {order.extraInfo && <p>{order.extraInfo}</p>}
+                <p>
+                  Payment Method: {order.paymentMethodName}
+                  {order.status.toLowerCase() === "pending" &&
+                    order.paymentMethodName === "Payment by card (VNPAY)" &&
+                    " (Payment Failed)"}{" "}
+                  | Order Date:{" "}
+                  {new Date(order.createdDate).toLocaleDateString()}
+                </p>
               </div>
             </div>
-
-            <div className="extra-info">
-              {order.extraInfo && <p>{order.extraInfo}</p>}
-              <p>
-                Payment Method: {order.paymentMethodName}
-                {order.status.toLowerCase() === "pending" &&
-                  order.paymentMethodName === "Payment by card (VNPAY)" &&
-                  " (Payment Failed)"}{" "}
-                | Order Date: {new Date(order.createdDate).toLocaleDateString()}
-              </p>
-            </div>
-          </div>
-        ))
+          );
+        })
       ) : (
         <div className="order">
           <p>No orders found.</p>

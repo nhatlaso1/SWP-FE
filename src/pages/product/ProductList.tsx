@@ -470,7 +470,7 @@ const ProductList: React.FC = () => {
                           productId: product.productId,
                           productName: product.productName,
                           summary: product.summary,
-                          price: product.price,
+                          price: product.price * (1 - product.discount),
                           discount: product.discount,
                           rating: product.rating,
                           productImage: product.productImage,
