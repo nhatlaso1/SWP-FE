@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Button, Pagination, TextField, MenuItem } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Box, Pagination, TextField, MenuItem } from "@mui/material";
 import { useStore } from "../../store";
 import { getAllUserOrders } from "../../store/purchase.api";
+import { rePayment } from "../../store/payment.api"; // Your rePayment API
 import Review from "./Review";
 import "./Purchase.css";
 
 export default function Purchase() {
   const navigate = useNavigate();
+  const location = useLocation();
   const token = useStore((state) => state.profile.user?.token);
   const [orders, setOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("");
@@ -33,9 +35,9 @@ export default function Purchase() {
       try {
         const data = await getAllUserOrders(selectedStatus, token);
         console.log("Raw orders from API:", data);
-        // Nếu dữ liệu được bọc trong $values, lấy mảng orders từ đó
+        // If the data is wrapped in $values, extract the orders array
         const ordersArray = data.$values ? data.$values : data;
-        // Sắp xếp đơn hàng theo createdDate (mới nhất lên đầu)
+        // Sort orders by createdDate (newest first)
         const sortedData = ordersArray.sort(
           (a, b) =>
             new Date(b.createdDate || 0).getTime() -
@@ -51,6 +53,22 @@ export default function Purchase() {
 
     fetchOrders();
   }, [token, selectedStatus]);
+
+  // Capture the query parameter "status" when redirected back to this page
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const status = params.get("status");
+    if (status === "success") {
+      alert("Payment successful!");
+      // Optionally update order status or refetch orders here if needed.
+    } else if (status === "fail") {
+      alert("Payment failed. Please try again!");
+    }
+    // Remove the query parameter from the URL
+    if (status) {
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.search, navigate]);
 
   const totalPages = Math.ceil(orders.length / ordersPerPage);
   const currentOrders = orders.slice(
@@ -78,6 +96,28 @@ export default function Purchase() {
   const handleOrdersPerPageChange = (event) => {
     setOrdersPerPage(Number(event.target.value));
     setCurrentPage(1);
+  };
+
+  // Update order status in state if needed (e.g., after successful payment)
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.orderId === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+  };
+
+  // Call the rePayment API and redirect to the provided URL from the backend.
+  const handlePayment = async (orderId) => {
+    try {
+      const redirectUrl = await rePayment(orderId, token);
+      // After rePayment API returns, the browser will redirect to the URL,
+      // e.g., http://yourfrontend.com/purchase?status=success or ?status=fail
+      window.location.href = redirectUrl;
+    } catch (error) {
+      console.error("Error during payment:", error);
+      alert("An error occurred during payment. Please try again!");
+    }
   };
 
   return (
@@ -133,9 +173,9 @@ export default function Purchase() {
                 </div>
                 <div className="product-price">
                   {detail.oldPrice && (
-                    <span className="old-price">{detail.oldPrice}vnđ</span>
+                    <span className="old-price">{detail.oldPrice} VND</span>
                   )}
-                  <span className="new-price">{detail.price}vnđ</span>
+                  <span className="new-price">{detail.price} VND</span>
                 </div>
 
                 {order.status && order.status.toLowerCase() === "complete" && (
@@ -154,7 +194,7 @@ export default function Purchase() {
 
             <div className="order-footer">
               <div className="total">
-                Total: <span className="price">{order.totalAmount}vnđ</span>
+                Total: <span className="price">{order.totalAmount} VND</span>
               </div>
               <div className="actions">
                 <button
@@ -163,14 +203,28 @@ export default function Purchase() {
                 >
                   View Detail
                 </button>
+
+                {/* Display "Re-Pay" button if the order is pending and the payment method is "Payment by card (VNPAY)" */}
+                {order.status.toLowerCase() === "pending" &&
+                  order.paymentMethodName === "Payment by card (VNPAY)" && (
+                    <button
+                      className="btn btn-pay"
+                      onClick={() => handlePayment(order.orderId)}
+                    >
+                      Re-Pay
+                    </button>
+                  )}
               </div>
             </div>
 
             <div className="extra-info">
               {order.extraInfo && <p>{order.extraInfo}</p>}
               <p>
-                Payment Method: {order.paymentMethodName} | Order Date:{" "}
-                {new Date(order.createdDate).toLocaleDateString()}
+                Payment Method: {order.paymentMethodName}
+                {order.status.toLowerCase() === "pending" &&
+                  order.paymentMethodName === "Payment by card (VNPAY)" &&
+                  " (Payment Failed)"}{" "}
+                | Order Date: {new Date(order.createdDate).toLocaleDateString()}
               </p>
             </div>
           </div>

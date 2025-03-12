@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { FaStar, FaCamera, FaVideo } from "react-icons/fa";
+import { FaStar } from "react-icons/fa";
 import "./Review.css";
 import { createFeedback } from "../../store/feedback.api";
 import { useStore } from "../../store";
 
 export default function Review({ isOpen, onClose, detail }) {
-  const [rating, setRating] = useState(0);
+  const [rating, setRating] = useState(0.0);
+  const [hoverRating, setHoverRating] = useState(0.0); // Trạng thái khi hover
   const [comment, setComment] = useState(
     "Suitable Skin Types:\n\nFunctions:\n\nFeedback:"
   );
@@ -13,27 +14,25 @@ export default function Review({ isOpen, onClose, detail }) {
     (state) => state.profile.user && state.profile.user.token
   );
 
-  // Handle star click to set rating
-  const handleStarClick = (index) => {
-    setRating(index + 1);
+  const handleStarClick = (value) => {
+    setRating(value);
   };
 
-  // Return descriptive text based on rating
+  const handleMouseMove = (event, index) => {
+    const rect = event.target.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const percent = offsetX / rect.width;
+    const newRating = index + percent + 0.1;
+    setHoverRating(parseFloat(newRating.toFixed(1))); // Làm tròn đến 1 chữ số thập phân
+  };
+
   const getRatingText = (rating) => {
-    switch (rating) {
-      case 1:
-        return "Poor";
-      case 2:
-        return "Fair";
-      case 3:
-        return "Good";
-      case 4:
-        return "Very Good";
-      case 5:
-        return "Excellent";
-      default:
-        return "Rate this product";
-    }
+    if (rating >= 4.5) return "Excellent";
+    if (rating >= 3.5) return "Very Good";
+    if (rating >= 2.5) return "Good";
+    if (rating >= 1.5) return "Fair";
+    if (rating >= 0.5) return "Poor";
+    return "Rate this product";
   };
 
   if (!isOpen) return null;
@@ -56,10 +55,8 @@ export default function Review({ isOpen, onClose, detail }) {
     };
 
     try {
-      // Pass token as second parameter to createFeedback
       await createFeedback(feedbackData, token);
       alert("Thank you for your feedback!");
-      // Reset fields and close popup
       setRating(0);
       setComment("Suitable Skin Types:\n\nFunctions:\n\nFeedback:");
       onClose();
@@ -100,18 +97,26 @@ export default function Review({ isOpen, onClose, detail }) {
         <div className="rating-section">
           <p>Product Quality</p>
           <div className="stars">
-            {[...Array(5)].map((_, index) => (
-              <FaStar
-                key={index}
-                className="star"
-                onClick={() => handleStarClick(index)}
-                style={{
-                  color: index < rating ? "#ffc107" : "#e4e5e9",
-                  cursor: "pointer",
-                }}
-              />
-            ))}
-            <span className="rate-text">{getRatingText(rating)}</span>
+            {[...Array(5)].map((_, index) => {
+              return (
+                <FaStar
+                  key={index}
+                  className="star"
+                  onMouseMove={(e) => handleMouseMove(e, index)}
+                  onMouseLeave={() => setHoverRating(0)}
+                  onClick={() => handleStarClick(hoverRating || rating)}
+                  style={{
+                    color:
+                      (hoverRating || rating) > index ? "#ffc107" : "#e4e5e9",
+                    cursor: "pointer",
+                  }}
+                />
+              );
+            })}
+            <span className="rate-text">
+              {(hoverRating || rating).toFixed(1)} -{" "}
+              {getRatingText(hoverRating || rating)}
+            </span>
           </div>
         </div>
 

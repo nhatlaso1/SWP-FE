@@ -47,7 +47,6 @@ interface Voucher {
   minimumPurchase: number;
 }
 
-
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: "#fff",
   ...theme.typography.body2,
@@ -64,7 +63,7 @@ const Item = styled(Paper)(({ theme }) => ({
 const Checkout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  // Lấy trạng thái thanh toán từ URL nếu có
+  // Get payment status from URL if available
   const queryParams = new URLSearchParams(location.search);
   const paymentStatus = queryParams.get("status");
 
@@ -107,7 +106,7 @@ const Checkout: React.FC = () => {
 
   // Popup state
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  // Loading state
+  // Loading state for payment verification
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Restore form state if available from location.state
@@ -132,7 +131,7 @@ const Checkout: React.FC = () => {
     }
   }, [location.state]);
 
-  // Nếu URL chứa paymentStatus, hiển thị loading trong 3 giây rồi popup
+  // If URL contains paymentStatus, show loading for 3 seconds then display the popup
   useEffect(() => {
     if (paymentStatus) {
       setIsLoading(true);
@@ -151,7 +150,7 @@ const Checkout: React.FC = () => {
       .catch((error) => console.error("Error fetching provinces:", error));
   }, [navigate]);
 
-  // Calculate subtotal based on cart
+  // Calculate subtotal based on the cart
   useEffect(() => {
     if (cart) {
       const totalPrice = cart.reduce(
@@ -163,7 +162,7 @@ const Checkout: React.FC = () => {
   }, [cart]);
 
   useEffect(() => {
-    if (!token) return; // Nếu chưa có token, không gọi API
+    if (!token) return; // If no token, do not call API
 
     const fetchVoucherList = async () => {
       setLoading(true);
@@ -192,7 +191,7 @@ const Checkout: React.FC = () => {
       }
       const provinceName =
         provinces.find((p) => p.code === selectedProvince)?.name || "";
-      const inRegion = provinceName === "Thành phố Hồ Chí Minh";
+      const inRegion = provinceName === "Ho Chi Minh City"; // Use English name for the city
       const orderDetails = cart.map((item: any) => ({
         productId: item.productId || item.id,
         quantity: item.quantity,
@@ -238,7 +237,7 @@ const Checkout: React.FC = () => {
     if (voucher !== 0) {
       const selectedVoucher = voucherList.find((v) => v.voucherId === voucher);
       if (selectedVoucher) {
-        // Kiểm tra nếu subtotal đủ điều kiện áp dụng voucher
+        // Check if subtotal meets the voucher's minimum purchase requirement
         if (subtotal >= selectedVoucher.minimumPurchase) {
           setDiscount(Math.min(selectedVoucher.discountAmount, subtotal));
         } else {
@@ -252,7 +251,6 @@ const Checkout: React.FC = () => {
       setVoucher(0);
     }
   };
-
 
   // Validate full name
   const validateName = (value: string) => {
@@ -297,12 +295,12 @@ const Checkout: React.FC = () => {
 
   // Function to handle order placement
   const handleOrder = async () => {
-    // Nếu cart rỗng thì không tiếp tục
+    // If cart is empty, do not continue
     if (!cart || cart.length === 0) {
       return;
     }
 
-    // Nếu chưa đăng nhập, lưu formData và chuyển hướng tới login
+    // If not logged in, save formData and redirect to login
     if (!token) {
       const formData = {
         name,
@@ -328,7 +326,7 @@ const Checkout: React.FC = () => {
       districts.find((d) => d.code === selectedDistrict)?.name || "";
     const wardName = wards.find((w) => w.code === selectedWard)?.name || "";
     const fullAddress = `${streetAddress}, ${wardName}, ${districtName}, ${provinceName}`;
-    const inRegion = provinceName === "Thành phố Hồ Chí Minh";
+    const inRegion = provinceName === "Ho Chi Minh City";
 
     const requestPayload = {
       paymentMethodId,
@@ -352,14 +350,14 @@ const Checkout: React.FC = () => {
       console.log("Order created successfully:", response);
       orderIdRef.current = response.orderId;
 
-      // Clear cart sau khi tạo order thành công
+      // Clear the cart after order creation
       clearCart();
 
       if (paymentMethodId === 1) {
-        // COD: Chuyển hướng trực tiếp tới order success
+        // COD: Redirect directly to order success page
         navigate("/order-success");
       } else if (paymentMethodId === 2) {
-        // Bank Payment: Gọi hàm thanh toán
+        // Bank Payment: Call the payment handler
         await handlePayment();
       }
     } catch (error) {
@@ -372,72 +370,67 @@ const Checkout: React.FC = () => {
   const handlePayment = async () => {
     if (!orderIdRef.current) {
       console.error("Missing orderId. Cannot proceed with payment.");
-      alert("Không tìm thấy mã đơn hàng.");
+      alert("Order ID not found.");
       return;
     }
     try {
       if (!token) {
         console.error("No token found. Please log in.");
-        alert("Bạn cần đăng nhập để thanh toán.");
+        alert("You need to log in to make a payment.");
         return;
       }
       const paymentUrl = await createPayment(orderIdRef.current, token);
       console.log("Received payment URL:", paymentUrl);
       if (paymentUrl && paymentUrl.startsWith("http")) {
-        window.location.href = paymentUrl; // Điều hướng tới cổng thanh toán
+        window.location.href = paymentUrl; // Redirect to payment gateway
       } else {
         console.error("Invalid payment URL:", paymentUrl);
-        alert("Không thể lấy liên kết thanh toán. Vui lòng thử lại.");
+        alert("Unable to retrieve payment link. Please try again.");
       }
     } catch (error: any) {
       console.error("Error calling payment API:", error.response || error.message);
-      alert("Đã xảy ra lỗi khi kết nối với cổng thanh toán.");
+      alert("An error occurred while connecting to the payment gateway.");
     }
   };
 
-  // Popup hiển thị sau khi loading kết thúc (chỉ xuất hiện khi URL có paymentStatus)
+  // Popup displayed after loading completes (only appears when URL has paymentStatus)
   const renderPopup = () => {
     if (!paymentStatus) return null;
     return (
       <Dialog open={showPopup} onClose={() => { }}>
         <DialogTitle>
           {paymentStatus === "fail"
-            ? "Thanh toán thất bại"
+            ? "Payment Failed"
             : paymentStatus === "success"
-              ? "Thanh toán thành công"
-              : "Thanh toán"}
+              ? "Payment Successful"
+              : "Payment"}
         </DialogTitle>
         <DialogContent>
           <Typography variant="body1">
             {paymentStatus === "fail"
-              ? "Vui lòng kiểm tra lại và thực hiện thanh toán lại trong vòng 3 ngày."
+              ? "Please check your payment and try again within 3 days."
               : paymentStatus === "success"
-                ? "Cảm ơn bạn đã đặt hàng."
-                : "Thanh toán đã được hoàn thành."}
+                ? "Thank you for your order."
+                : "Payment has been completed."}
           </Typography>
         </DialogContent>
         <DialogActions>
           {paymentStatus === "fail" ? (
             <>
               <Button onClick={() => navigate("/")} variant="contained" color="secondary">
-                Về trang chủ
+                Go to Homepage
               </Button>
               <Button onClick={() => navigate(`/purchase/`)} variant="contained" color="secondary">
-                Kiểm tra đơn hàng
+                Check Orders
               </Button>
             </>
           ) : paymentStatus === "success" ? (
             <>
-              <Button
-                onClick={() => navigate(`/purchase/`)}
-                variant="contained"
-                color="primary"
-              >
-                Theo dõi đơn hàng
+              <Button onClick={() => navigate(`/purchase/`)} variant="contained" color="primary">
+                Track Order
               </Button>
-
               <Button onClick={() => navigate("/products")} variant="contained" color="primary">
-                Tiếp tục mua hàng
+                Continue Shopping
               </Button>
             </>
           ) : (
@@ -446,23 +439,22 @@ const Checkout: React.FC = () => {
                 OK
               </Button>
               <Button onClick={() => navigate("/products")} variant="contained" color="primary">
-                Tiếp tục mua hàng
+                Continue Shopping
               </Button>
             </>
           )}
         </DialogActions>
-
       </Dialog>
     );
   };
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      {/* Nếu có paymentStatus trong URL, hiển thị loading & popup sau 3 giây */}
+      {/* If paymentStatus exists in URL, display loading and popup after 3 seconds */}
       {isLoading && (
         <Box className="loading-container" sx={{ textAlign: "center", my: 2 }}>
           <Typography variant="h6">
-            Verify payment information...{" "}
+            Verifying payment information...{" "}
             <img src="/loading-quiz-result.svg" alt="Loading" className="loading-img" />
           </Typography>
         </Box>
@@ -483,7 +475,15 @@ const Checkout: React.FC = () => {
                   onChange={handleNameChange}
                 />
                 {nameError && (
-                  <span className="error-message" style={{ color: "#f44336", marginLeft: "8px", fontSize: "0.9rem", display: "inline-block" }}>
+                  <span
+                    className="error-message"
+                    style={{
+                      color: "#f44336",
+                      marginLeft: "8px",
+                      fontSize: "0.9rem",
+                      display: "inline-block",
+                    }}
+                  >
                     {nameError}
                   </span>
                 )}
@@ -498,7 +498,15 @@ const Checkout: React.FC = () => {
                   onChange={handlePhoneChange}
                 />
                 {phoneError && (
-                  <span className="error-message" style={{ color: "#f44336", marginLeft: "8px", fontSize: "0.9rem", display: "inline-block" }}>
+                  <span
+                    className="error-message"
+                    style={{
+                      color: "#f44336",
+                      marginLeft: "8px",
+                      fontSize: "0.9rem",
+                      display: "inline-block",
+                    }}
+                  >
                     {phoneError}
                   </span>
                 )}
@@ -508,7 +516,10 @@ const Checkout: React.FC = () => {
             <div className="address-section">
               <div className="input-group">
                 <label htmlFor="province">Select Province/City</label>
-                <select id="province" onChange={(e) => handleProvinceChange(Number(e.target.value))}>
+                <select
+                  id="province"
+                  onChange={(e) => handleProvinceChange(Number(e.target.value))}
+                >
                   <option value="">Select Province/City</option>
                   {provinces.map((province) => (
                     <option key={province.code} value={province.code}>
@@ -519,7 +530,11 @@ const Checkout: React.FC = () => {
               </div>
               <div className="input-group">
                 <label htmlFor="district">Select District</label>
-                <select id="district" onChange={(e) => handleDistrictChange(Number(e.target.value))} disabled={!selectedProvince}>
+                <select
+                  id="district"
+                  onChange={(e) => handleDistrictChange(Number(e.target.value))}
+                  disabled={!selectedProvince}
+                >
                   <option value="">Select District</option>
                   {districts.map((district) => (
                     <option key={district.code} value={district.code}>
@@ -530,7 +545,11 @@ const Checkout: React.FC = () => {
               </div>
               <div className="input-group">
                 <label htmlFor="ward">Select Ward</label>
-                <select id="ward" onChange={(e) => handleWardChange(Number(e.target.value))} disabled={!selectedDistrict}>
+                <select
+                  id="ward"
+                  onChange={(e) => handleWardChange(Number(e.target.value))}
+                  disabled={!selectedDistrict}
+                >
                   <option value="">Select Ward</option>
                   {wards.map((ward) => (
                     <option key={ward.code} value={ward.code}>
@@ -587,7 +606,7 @@ const Checkout: React.FC = () => {
                   value={voucher}
                   onChange={(e) => setVoucher(Number(e.target.value))}
                 >
-                  <MenuItem value={0}>No apply</MenuItem>
+                  <MenuItem value={0}>None</MenuItem>
                   {voucherList.map((v) => (
                     <MenuItem key={v.voucherId} value={v.voucherId}>
                       {v.voucherName} - {v.discountAmount.toLocaleString("en-US")}₫ off
@@ -637,7 +656,7 @@ const Checkout: React.FC = () => {
                   <ListItemText primary="Shipping Fee" secondary={`${shippingFee.toLocaleString("en-US")} ₫`} />
                 </ListItem>
               </List>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "16px", margin: "15px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", margin: "15px", marginTop: "16px" }}>
                 <Typography variant="h6" fontWeight="bold">
                   Total: {total.toLocaleString("en-US")} ₫
                 </Typography>
@@ -651,9 +670,9 @@ const Checkout: React.FC = () => {
                     Boolean(phoneError) ||
                     !name.trim() ||
                     !phone ||
-                    !streetAddress.trim() || // Kiểm tra nhập địa chỉ
-                    !selectedProvince ||       // Kiểm tra chọn tỉnh/thành phố
-                    !selectedDistrict ||       // Kiểm tra chọn quận/huyện
+                    !streetAddress.trim() || // Check address input
+                    !selectedProvince ||       // Check if province is selected
+                    !selectedDistrict ||       // Check if district is selected
                     !selectedWard ||
                     (cart && cart.length === 0)
                   }

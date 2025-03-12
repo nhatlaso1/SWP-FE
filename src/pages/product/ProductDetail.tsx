@@ -180,7 +180,7 @@ const ProductDetail: React.FC = () => {
   const averageRating =
     product.feedbacks.$values.length > 0
       ? product.feedbacks.$values.reduce((acc, feedback) => acc + feedback.rating, 0) /
-        product.feedbacks.$values.length
+      product.feedbacks.$values.length
       : 0;
 
   // Tính giá sau discount: nếu có discount, finalPrice = price * (1 - discount)
@@ -205,9 +205,8 @@ const ProductDetail: React.FC = () => {
               {product.productImages.$values.map((image) => (
                 <ImageListItem
                   key={image.productImageId}
-                  className={`${styles.thumbnailItem} ${
-                    selectedImage === image.productImage ? styles.thumbnailSelected : ''
-                  }`}
+                  className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''
+                    }`}
                   onClick={() => setSelectedImage(image.productImage)}
                 >
                   <img
