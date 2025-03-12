@@ -464,7 +464,12 @@ export const ProductAPI = {
 
     try {
 
-      const response = await api.patch(`/Product/activate-product/${productId}`);
+      const response = await api.patch(`/Product/active-product`, null, {
+
+        params: { productId }
+
+      });
+
 
       return response.data;
 
@@ -486,7 +491,12 @@ export const ProductAPI = {
 
     try {
 
-      const response = await api.patch(`/Product/deactivate-product/${productId}`);
+      const response = await api.patch(`/Product/inactive-product`, null, {
+
+        params: { productId }
+
+      });
+
 
       return response.data;
 
@@ -604,7 +614,6 @@ export const ProductAPI = {
 
 
 
-// Kích hoạt sản phẩm
 
 export const activateProduct = async (productId) => {
 
@@ -653,3 +662,4 @@ export const deactivateProduct = async (productId) => {
   }
 
 };
+

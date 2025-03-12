@@ -62,6 +62,7 @@ interface Product {
   skinTypes: { $values: SkinType[] };
   functions: { $values: FunctionType[] };
   ingredients: { $values: Ingredient[] };
+  status: boolean;
 }
 
 // Interface for filter parameters sent to the API to fetch products
@@ -92,6 +93,7 @@ function parseData(response: any): any[] {
  */
 function applyLocalFilter(products: Product[], filters: ProductFilterParams): Product[] {
   return products.filter((prod) => {
+    if (!prod.status) return false; // Filter out inactive products
     if (filters.categoryIds && prod.category.categoryId !== filters.categoryIds) return false;
     if (filters.brandIds && prod.brand.brandId !== filters.brandIds) return false;
     if (
