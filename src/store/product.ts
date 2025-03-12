@@ -54,7 +54,7 @@ export function productsActions(set: StoreSet, get: StoreGet): ProductsActions {
       try {
         const response = await axios.get(`${BASE_URL}/Product/get-new-product`);
         set((state) => {
-          state.products.bestSellersProducts = response.data?.$values || [];
+          state.products.newInProducts = response.data?.$values || [];
         });
       } catch (error: any) {
         set((state) => {

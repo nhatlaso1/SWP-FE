@@ -1,9 +1,19 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Carousel from "react-multi-carousel";
 
 import "./NewIn.scss";
+import { useStore } from "../../store";
+import { useNavigate } from "react-router-dom";
 
 const NewIn: React.FC = () => {
+  const navigate = useNavigate();
+  const fetchNewInProducts = useStore((state) => state.fetchNewInProducts);
+  const newInProducts = useStore((state) => state.products.newInProducts);
+
+  useEffect(() => {
+    fetchNewInProducts();
+  }, []);
+
   return (
     <div className="new-in-container">
       <h2 className="title">New In</h2>
@@ -62,58 +72,24 @@ const NewIn: React.FC = () => {
           slidesToSlide={1}
           swipeable
         >
-          <div className="product-item">
-            <img src="/products/product-5.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-6.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-7.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
-          <div className="product-item">
-            <img src="/products/product-8.png" alt="category-item" />
-            <div className="product-info">
-              <p className="name">
-                Beautya Capture Total Dreamskin Care & Perfect
-              </p>
-              <p className="desc">
-                Plumping Gloss - Instant and Long-Term Volume Effect - 24h
-                Hydration
-              </p>
-              <p className="price">$76.00</p>
-            </div>
-          </div>
+          {newInProducts &&
+            newInProducts.map((product) => (
+              <div
+                className="product-item"
+                key={product.$id}
+                onClick={() => navigate(`/product/${product.productId}`)}
+              >
+                <img
+                  src={product.productImage || "/products/product-5.png"}
+                  alt="category-item"
+                />
+                <div className="product-info">
+                  <p className="name">{product.productName}</p>
+                  <p className="desc">{product.summary}</p>
+                  <p className="price">${product.price}</p>
+                </div>
+              </div>
+            ))}
         </Carousel>
       </div>
     </div>

@@ -18,8 +18,10 @@ import {
 
 import { useStore } from "../../store";
 import "./SkinTestQuiz.scss";
+import { useNavigate } from "react-router-dom";
 
 const SkinTestQuiz = () => {
+  const navigate = useNavigate();
   const skinRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const fetchQuestionsSkinTest = useStore(
@@ -78,7 +80,11 @@ const SkinTestQuiz = () => {
 
   return (
     <>
-      <div className="quiz-page" ref={skinRef}>
+      <div
+        className="quiz-page"
+        style={{ backgroundColor: step === 3 ? "white" : "" }}
+        ref={skinRef}
+      >
         {loading ? (
           <Box
             display="flex"
@@ -310,7 +316,7 @@ const SkinTestQuiz = () => {
                                       routineDetail[0].routineSteps.$values[0].category.products.$values
                                         .slice(1)
                                         .map((product) => (
-                                          <div className="other-product-item">
+                                          <div className="other-product-item"  onClick={() => navigate(`/product/${product.productId}`)}>
                                             <img
                                               src={
                                                 product.productImages.$values[0]
@@ -429,7 +435,7 @@ const SkinTestQuiz = () => {
                                       routineDetail[1].routineSteps.$values[0].category.products.$values
                                         .slice(1)
                                         .map((product) => (
-                                          <div className="other-product-item">
+                                          <div className="other-product-item" onClick={() => navigate(`/product/${product.productId}`)}>
                                             <img
                                               src={
                                                 product.productImages.$values[0]
