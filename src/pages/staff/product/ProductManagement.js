@@ -206,7 +206,7 @@ const ProductManagement = () => {
         setTotalItems(response.pagination.totalItems);
         setTotalPages(response.pagination.totalPages);
         setCurrentPage(response.pagination.currentPage);
-        
+
         console.log('Total products loaded:', response.products.length);
         console.log('Total pages:', response.pagination.totalPages);
         console.log('Current page:', response.pagination.currentPage);
@@ -303,14 +303,14 @@ const ProductManagement = () => {
 
   const handleEditProduct = (product) => {
     console.log('Original product data:', product);
-    
+
     // Get all existing images from productImages
     const existingImages = product.productImages?.$values?.map(img => ({
       id: img.productImageId,
       url: img.productImage,
       isExisting: true
     })) || [];
-    
+
     console.log('Initialized existing images:', existingImages);
 
     setEditedProduct({
@@ -521,7 +521,7 @@ const ProductManagement = () => {
       // Lấy danh sách sản phẩm mới và tính toán trang cuối
       const response = await ProductAPI.getAll({ pageIndex: 1 });
       const lastPage = Math.ceil(response.pagination.totalItems / itemsPerPage);
-      
+
       // Chuyển đến trang cuối cùng để hiển thị sản phẩm mới
       await fetchProducts(lastPage);
       setCurrentPage(lastPage);
@@ -617,7 +617,7 @@ const ProductManagement = () => {
   const handleEditFormSubmit = async () => {
     try {
       setLoading(true);
-      
+
       // Validate required fields
       if (!editedProduct.productName?.trim()) {
         throw new Error('Product name is required');
@@ -686,7 +686,7 @@ const ProductManagement = () => {
       await ProductAPI.update(editedProduct.productId, updateData);
       showNotificationMessage('Product updated successfully!', 'success');
       setShowEditForm(false);
-      
+
       // Refresh product details and list with a small delay
       setTimeout(async () => {
         await fetchProductDetail(editedProduct.productId);
@@ -755,7 +755,7 @@ const ProductManagement = () => {
                         <tr
                           key={product.productId}
                           onClick={() => handleViewDetails(product)}
-                          style={{ 
+                          style={{
                             cursor: 'pointer',
                             transition: 'background-color 0.2s',
                             ':hover': { backgroundColor: '#f5f5f5' }
@@ -799,7 +799,7 @@ const ProductManagement = () => {
                 </div>
 
                 {totalPages > 1 && (
-                  <div style={{ 
+                  <div style={{
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -965,12 +965,14 @@ const ProductManagement = () => {
                   </tr>
                 </thead>
                 <tbody>
+                  {console.log("Ingredients Data:", selectedProduct.ingredients?.$values)}
                   {selectedProduct.ingredients?.$values.map(ingredient => (
                     <tr key={ingredient.ingredientId}>
                       <td style={tdStyle}>{ingredient.ingredientName}</td>
                       <td style={tdStyle}>{ingredient.concentration}%</td>
                     </tr>
                   ))}
+
                 </tbody>
               </table>
             </div>
@@ -1034,7 +1036,7 @@ const ProductManagement = () => {
           <div style={modalStyle}>
             <div style={modalContentStyle}>
               <h2 style={{ marginBottom: '20px', color: '#333' }}>Thêm sản phẩm mới</h2>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <div style={formGroupStyle}>
@@ -1326,7 +1328,7 @@ const ProductManagement = () => {
           <div style={modalStyle}>
             <div style={modalContentStyle}>
               <h2 style={{ marginBottom: '20px', color: '#333' }}>Chỉnh sửa sản phẩm</h2>
-              
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <div style={formGroupStyle}>

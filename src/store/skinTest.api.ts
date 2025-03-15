@@ -1,6 +1,6 @@
 import { apiClient, apiEndpoints } from "./utils.api"; // Import axios instance và apiEndpoints
-import { 
-  SkinTest, 
+import {
+  SkinTest,
   ApiSkinTest,
 } from "../types/SkinTest";
 
@@ -30,6 +30,7 @@ export const createSkinTest = async (skinTest: SkinTest, token: string): Promise
       {
         headers: { Authorization: `Bearer ${token}` },
       }
+      
     );
     return response.data;
   } catch (error) {
@@ -50,7 +51,7 @@ export const getAllSkinTests = async (token: string): Promise<ApiResponse> => {
     const response = await apiClient.get(`${apiEndpoints.SkinTest}/get-all-skin-test`, {
       headers: { Authorization: `Bearer ${token}` },
     });
-    return response.data; 
+    return response.data;
   } catch (error) {
     console.error("Error fetching all skin tests:", error);
     throw error;

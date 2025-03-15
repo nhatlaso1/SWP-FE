@@ -40,6 +40,8 @@ import CheckoutSuccess from "./pages/checkout/CheckoutCOD";
 import ProductList from "./pages/product/ProductList";
 import ProductDetail from "./pages/product/ProductDetail";
 import SaleProducts from "./pages/sale/SaleProducts";
+import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
+import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 
 
 function App() {
@@ -112,11 +114,15 @@ function App() {
         { path: "skintests", element: <SkinTest /> },
         { path: "routines", element: <Routine /> },
         { path: "vouchers", element: <Voucher /> },
+        { path: "voucher/:id", element: <CreateVoucher /> },
         { path: "skintypes", element: <SkinType /> },
+        { path: "skintype/:id", element: <CreateSkinType /> },
         { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
         { path: "users", element: <UserPage /> },
         { path: "user/:id", element: <UserInfo /> },
+        { path: "createvoucher", element: <CreateVoucher /> },
+        { path: "createskintype", element: <CreateSkinType /> },
       ],
     }, {
       path: "staff",

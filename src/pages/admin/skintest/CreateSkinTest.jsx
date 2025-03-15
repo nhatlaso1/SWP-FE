@@ -51,7 +51,7 @@ const CreateSkinTest = () => {
         ...prev.skinTypeQuestions,
         {
           skinTypeQuestionId: Date.now(),
-          description: "",
+          description: "abc",
           status: true, // Mặc định là Single Choice
           skinTypeAnswers: [],
         },

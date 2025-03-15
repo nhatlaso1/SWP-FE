@@ -47,7 +47,7 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
-const BASE_URL = "https://localhost:7130/api/Authentication";
+const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
 
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {
@@ -182,7 +182,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         formData.append("Birthday", values.birthday);
         formData.append("Image", "");
         await axios.patch(
-          `https://localhost:7130/api/Customer/update-profile`,
+          `https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Customer/update-profile`,
           formData,
           {
             headers: {

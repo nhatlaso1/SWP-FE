@@ -1,9 +1,4 @@
-// Dành cho giao diện hiển thị (nội bộ ứng dụng)
-export interface ListSkinTest {
-  skinTestId?: number;
-  skinTestName: string;
-  status: boolean; // true: Active (Single Choice), false: Inactive (Multiple Choice)
-}
+
 
 export interface SkinTest {
   skinTestId?: number;
