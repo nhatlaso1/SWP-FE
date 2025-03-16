@@ -1,5 +1,5 @@
 import type { StoreGet, StoreSet } from "../store";
-import axios from "../utils/axiosConfig";
+import { apiClient, apiEndpoints } from "./utils.api";
 
 export interface ProductsState {
   products: any[];
@@ -19,16 +19,14 @@ export const initialProducts: ProductsState = {
 };
 
 export function productsActions(set: StoreSet, get: StoreGet): ProductsActions {
-  const BASE_URL = `https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api`;
-
   return {
     fetchBestSellersProducts: async () => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(
-          `${BASE_URL}/Product/get-best-seller-product`
+        const response = await apiClient.get(
+          `${apiEndpoints.Product}/get-best-seller-product`
         );
         set((state) => {
           state.products.bestSellersProducts = response.data?.$values || [];
@@ -52,7 +50,7 @@ export function productsActions(set: StoreSet, get: StoreGet): ProductsActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(`${BASE_URL}/Product/get-new-product`);
+        const response = await apiClient.get(`${apiEndpoints.Product}/get-new-product`);
         set((state) => {
           state.products.newInProducts = response.data?.$values || [];
         });

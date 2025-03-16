@@ -1,6 +1,6 @@
 import type { StoreGet, StoreSet } from "../store";
-import axios from "../utils/axiosConfig";
 import { NavigateFunction } from "react-router-dom";
+import { apiClient, apiEndpoints } from "./utils.api";
 
 export interface UserProfile {
   $id: string;
@@ -47,8 +47,6 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
-const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
-
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {
     const message =
@@ -79,10 +77,13 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/login`, {
-          email,
-          password,
-        });
+        const response = await apiClient.post(
+          `${apiEndpoints.Authentication}/login`,
+          {
+            email,
+            password,
+          }
+        );
         const { token } = response.data || {};
 
         if (token) {
@@ -117,7 +118,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.delete(`${BASE_URL}/logout`);
+        await apiClient.delete(`${apiEndpoints.Authentication}/logout`);
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         set((state) => {
@@ -140,7 +141,9 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(`${BASE_URL}/profile`);
+        const response = await apiClient.get(
+          `${apiEndpoints.Authentication}/profile`
+        );
         //Dummy data
         // const response = {
         //   data: {
@@ -181,8 +184,8 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         formData.append("PhoneNumber", values.phoneNumber);
         formData.append("Birthday", values.birthday);
         formData.append("Image", "");
-        await axios.patch(
-          `https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Customer/update-profile`,
+        await apiClient.patch(
+          `${apiEndpoints.Customer}/update-profile`,
           formData,
           {
             headers: {
@@ -205,7 +208,10 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/register`, body);
+        const response = await apiClient.post(
+          `${apiEndpoints.Authentication}/register`,
+          body
+        );
         const status = response?.data?.status;
         const message = response?.data?.detail || "Register successfully!";
         set((state) => {
@@ -246,7 +252,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.put(`${BASE_URL}/refresh`);
+        await apiClient.put(`${apiEndpoints.Authentication}/refresh`);
         handleSuccess("Token refreshed successfully");
       } catch (error) {
         handleError(error);
@@ -262,7 +268,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.put(`${BASE_URL}/change-password`, {
+        await apiClient.put(`${apiEndpoints.Customer}/change-password`, {
           oldPassword,
           newPassword,
         });

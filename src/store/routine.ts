@@ -1,5 +1,5 @@
 import type { StoreGet, StoreSet } from "../store";
-import axios from "../utils/axiosConfig";
+import { apiClient, apiEndpoints } from "./utils.api";
 
 export interface RoutineState {
   skinTypeQuestions: any;
@@ -19,8 +19,6 @@ export const initialRoutine: RoutineState = {
   routineDetail: undefined,
 };
 
-const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api";
-
 export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
   return {
     determineSkinType: async (answers) => {
@@ -31,8 +29,8 @@ export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
         const body = {
           listUserAnswer: answers,
         };
-        const response = await axios.post(
-          `${BASE_URL}/SkinTest/determine-skin-type`,
+        const response = await apiClient.post(
+          `${apiEndpoints.SkinTest}/determine-skin-type`,
           body
         );
         // Dummy data
@@ -63,8 +61,8 @@ export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(
-          `${BASE_URL}/SkinTest/get-skin-test?skinTestId=1`
+        const response = await apiClient.get(
+          `${apiEndpoints.SkinTest}/get-skin-test?skinTestId=1`
         );
         // Dummy data
         // const response = {
@@ -551,8 +549,8 @@ export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(
-          `${BASE_URL}/Routine/get-routine-by-skin-type-id?skinTypeId=${skinTypeId}`
+        const response = await apiClient.get(
+          `${apiEndpoints.Routine}/get-routine-by-skin-type-id?skinTypeId=${skinTypeId}`
         );
         // Dummy data
         // const response = {
