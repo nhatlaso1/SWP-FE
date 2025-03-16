@@ -9,7 +9,7 @@ import HeaderGuest from "../components/header/HeaderGuest";
 const CustomerLayout: React.FC = () => {
   const user = useStore((store) => store.profile.user);
   const isAuthenticated = !!localStorage.getItem("token");
-  const role = user?.role || "Guest";
+  const role = user?.role || localStorage.getItem("role") || "Guest";
 
   return (
     <Box component="main" flex={1} p={3} sx={{ overflowY: "auto" }}>
