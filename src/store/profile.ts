@@ -47,7 +47,7 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
-const BASE_URL = "https://localhost:7130/api/Authentication";
+const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
 
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {

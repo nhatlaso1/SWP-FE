@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-const apiBaseUrl: string = "https://localhost:7130/api";
+const API_URL: string = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api";
 
 export const apiEndpoints = {
   SkinTest: "SkinTest",
@@ -15,7 +15,7 @@ export const apiEndpoints = {
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({
-  baseURL: apiBaseUrl,
+  baseURL: API_URL,
   headers: {
     "Content-Type": "application/json",
   },

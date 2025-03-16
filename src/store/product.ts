@@ -19,7 +19,7 @@ export const initialProducts: ProductsState = {
 };
 
 export function productsActions(set: StoreSet, get: StoreGet): ProductsActions {
-  const BASE_URL = `https://localhost:7130/api`;
+  const BASE_URL = `https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api`;
 
   return {
     fetchBestSellersProducts: async () => {

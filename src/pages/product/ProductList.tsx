@@ -432,7 +432,12 @@ const ProductList: React.FC = () => {
                     component="img"
                     image={product.productImage}
                     alt={product.productName}
-                    sx={{ height: 200, cursor: 'pointer' }}
+                    sx={{ 
+                      width: '100%',
+                      aspectRatio: '1/1',
+                      objectFit: 'cover',
+                      cursor: 'pointer'
+                    }}
                     onClick={() =>
                       navigate(`/product/${product.productId}?currentPage=${currentPage}`)
                     }

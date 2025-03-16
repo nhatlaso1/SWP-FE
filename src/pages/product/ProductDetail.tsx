@@ -266,16 +266,13 @@ const ProductDetail: React.FC = () => {
 
             <List>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Size</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.size}</Typography>} />
+                <ListItemText primary={<Typography variant="subtitle1">Size</Typography>} secondary={<Typography variant="body1">{product.size}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Brand</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.brand.brandName}</Typography>} />
+                <ListItemText primary={<Typography variant="subtitle1">Brand</Typography>} secondary={<Typography variant="body1">{product.brand.brandName}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Category</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.category.categoryName}</Typography>} />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Available Quantity</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.quantity}</Typography>} />
+                <ListItemText primary={<Typography variant="subtitle1">Category</Typography>} secondary={<Typography variant="body1">{product.category.categoryName}</Typography>} />
               </ListItem>
             </List>
 

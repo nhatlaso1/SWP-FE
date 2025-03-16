@@ -21,8 +21,8 @@ export default function SerumMoisturizerArticle() {
       <section className="article-intro">
         <p>
           Many of my patients and Reddit followers alike often ask me this
-          question: “Do I need to use a serum and a moisturizer, or can I pick
-          one?”{" "}
+          question: "Do I need to use a serum and a moisturizer, or can I pick
+          one?"{" "}
           <strong>
             The answer for most people is yes, you do need both a serum and
             moisturizer.
@@ -33,7 +33,7 @@ export default function SerumMoisturizerArticle() {
           both into your skin care regimen based on your skin type.
         </p>
         <p>
-          First, if you don’t already know your skin type, take the quiz to find
+          First, if you don't already know your skin type, take the quiz to find
           out so you will know which advice to follow.
         </p>
         <button className="quiz-button" onClick={handleQuizClick}>
@@ -59,7 +59,7 @@ export default function SerumMoisturizerArticle() {
           alt="Serum vs Moisturizer Banner"
           className="article-banner"
         />
-        <h2>Serum vs. Moisturizer: What’s the Difference?</h2>
+        <h2>Serum vs. Moisturizer: What's the Difference?</h2>
         <p>
           Serums and moisturizers are often confused because they sometimes have
           a similar consistency. However, they are two different products with
@@ -77,16 +77,16 @@ export default function SerumMoisturizerArticle() {
           than serums and contain ingredients that hydrate and seal moisture
           into the skin.{" "}
           <a
-            href="http://localhost:3000/product/1"
+            href="/product/1"
             className="inline-link"
             rel="noreferrer"
           >
             Barrier repair moisturizers
           </a>{" "}
-          go a step further and mimic the skin’s natural lipid structure to
+          go a step further and mimic the skin's natural lipid structure to
           strengthen its natural barrier, which not only keeps moisture in but
           also keeps irritants out. In other words, while some serums may
-          contain hydrating ingredients, they don’t quite fill the special 1:1
+          contain hydrating ingredients, they don't quite fill the special 1:1
           ratio of directly targeting specific skin concerns plus sealing in
           moisture.
         </p>
@@ -115,7 +115,7 @@ export default function SerumMoisturizerArticle() {
             <h4>Benefits of Moisturizers</h4>
             <ul>
               <li>Hydrate the skin and prevent dryness</li>
-              <li>Reinforce the skin’s protective barrier</li>
+              <li>Reinforce the skin's protective barrier</li>
               <li>Provide occlusion</li>
               <li>
                 Increase the absorption of serums and other skin care products
@@ -136,9 +136,9 @@ export default function SerumMoisturizerArticle() {
         <h2>When to Combine Serums &amp; Moisturizers</h2>
         <p>
           If you have a specific skin concern like hyperpigmentation, fine
-          lines, or rosacea, it’s typically best to use a serum targeted for
+          lines, or rosacea, it's typically best to use a serum targeted for
           that issue first, then follow with a moisturizer suitable for your
-          skin type. If you’re extremely oily and not prone to dryness, you may
+          skin type. If you're extremely oily and not prone to dryness, you may
           find that a serum alone is sufficient, especially if that serum
           contains hydrating ingredients like hyaluronic acid.
         </p>

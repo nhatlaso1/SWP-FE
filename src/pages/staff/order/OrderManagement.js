@@ -316,19 +316,13 @@ const OrderManagement = () => {
 
       } else if (newStatus === 'Denied') {
 
-        // For COD (paymentMethodId = 1), use denyOrder
+        // Use denyOrder for all payment methods
 
-        if (paymentMethodId === 1 || 
+        const success = await denyOrder(targetOrderId);
 
-           (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+        if (success) {
 
-          const success = await denyOrder(targetOrderId);
-
-          if (success) {
-
-            updatedStatus = 'Denied';
-
-          }
+          updatedStatus = 'Denied';
 
         }
 
@@ -589,10 +583,15 @@ const OrderManagement = () => {
 
 
   const totalAmount = selectedOrder?.details.reduce((total, detail) => {
-
-    return total + (detail.price * detail.quantity);
-
+    // Calculate price after discount for each item
+    const priceAfterDiscount = detail.price * (1 - detail.discount);
+    return total + (priceAfterDiscount * detail.quantity);
   }, 0) || 0;
+
+
+
+  // Add shipping fee to total
+  const finalTotalAmount = totalAmount + (selectedOrder?.shippingPrice || 0);
 
 
 
@@ -616,7 +615,7 @@ const OrderManagement = () => {
 
           { label: 'Shipping Fee', value: selectedOrder.shippingPrice.toLocaleString() + 'đ' },
 
-          { label: 'Total Amount', value: selectedOrder.totalAmount.toLocaleString() + 'đ' }
+          { label: 'Total Amount', value: finalTotalAmount.toLocaleString() + 'đ' }
 
         ].map((item, index) => (
 
@@ -961,21 +960,15 @@ const OrderManagement = () => {
                         <TableCell colSpan={4} />
 
                         <TableCell align="right">
-
+                          <Typography variant="subtitle1">Subtotal:</Typography>
                           <Typography variant="subtitle1">Shipping Fee:</Typography>
-
                           <Typography variant="subtitle1"><strong>Total Amount:</strong></Typography>
-
                         </TableCell>
-
                         <TableCell align="right">
-
+                          <Typography variant="subtitle1">{totalAmount.toLocaleString()}đ</Typography>
                           <Typography variant="subtitle1">{selectedOrder.shippingPrice.toLocaleString()}đ</Typography>
-
-                          <Typography variant="subtitle1"><strong>{selectedOrder.totalAmount.toLocaleString()}đ</strong></Typography>
-
+                          <Typography variant="subtitle1"><strong>{finalTotalAmount.toLocaleString()}đ</strong></Typography>
                         </TableCell>
-
                       </TableRow>
 
                     </TableBody>

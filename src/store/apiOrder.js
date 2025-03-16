@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://localhost:7130/api';
+const API_URL = 'https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api';
 
 export const getAllOrders = async (status) => {
   try {
@@ -86,7 +86,7 @@ export const getOrderStatuses = () => {
 
 export const completeOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/complete-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/complete-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -98,7 +98,7 @@ export const completeOrder = async (orderId) => {
 
 export const cancelOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/cancel-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/cancel-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -110,7 +110,7 @@ export const cancelOrder = async (orderId) => {
 
 export const denyOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/deny-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/deny-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -122,7 +122,7 @@ export const denyOrder = async (orderId) => {
 
 export const confirmOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/confirm-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/confirm-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -134,7 +134,7 @@ export const confirmOrder = async (orderId) => {
 
 export const shippingOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/shipping-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/shipping-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -146,7 +146,7 @@ export const shippingOrder = async (orderId) => {
 
 export const returnOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://localhost:7130/api/Order/return-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/return-order`, null, {
       params: { orderId }
     });
     return response.status === 200;

@@ -11,33 +11,13 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState({ message: '', type: 'success' });
-  const [showProductForm, setShowProductForm] = useState(false);
-  const [showProductDetails, setShowProductDetails] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [productForm, setProductForm] = useState({
-    productId: '',
-    productName: '',
-    summary: '',
-    price: '',
-    discount: '',
-    quantity: '',
-    size: '',
-    status: 'active',
-    brand_id: '',
-    category_id: '',
-    productImage: null
-  });
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
   const [functions, setFunctions] = useState([]);
   const [ingredients, setIngredients] = useState([]);
   const [skinTypes, setSkinTypes] = useState([]);
-  const [isEditing, setIsEditing] = useState(false);
   const [editedProduct, setEditedProduct] = useState(null);
-  const [hasChanges, setHasChanges] = useState(false);
-  const [dragActive, setDragActive] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
-  const [imageUploadType, setImageUploadType] = useState('file');
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newProduct, setNewProduct] = useState({
     productName: '',
@@ -56,7 +36,6 @@ const ProductManagement = () => {
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [showEditForm, setShowEditForm] = useState(false);
 
@@ -184,6 +163,109 @@ const ProductManagement = () => {
     margin: '4px',
   };
 
+  const textareaStyle = {
+    ...inputStyle,
+    minHeight: '150px',
+    resize: 'vertical',
+    fontFamily: 'inherit',
+    lineHeight: '1.5'
+  };
+
+  const dropdownStyle = {
+    position: 'relative',
+    width: '100%',
+    marginBottom: '8px'
+  };
+
+  const dropdownButtonStyle = {
+    ...inputStyle,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    cursor: 'pointer',
+    backgroundColor: 'white',
+    minHeight: '38px'
+  };
+
+  const dropdownContentStyle = {
+    position: 'absolute',
+    top: '100%',
+    left: '0',
+    right: '0',
+    maxHeight: '250px',
+    overflowY: 'auto',
+    backgroundColor: 'white',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    zIndex: 1000,
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+  };
+
+  const dropdownItemStyle = {
+    padding: '8px 12px',
+    cursor: 'pointer',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    transition: 'background-color 0.2s',
+    ':hover': {
+      backgroundColor: '#f5f5f5'
+    }
+  };
+
+  const selectedItemsStyle = {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '4px',
+    padding: '4px'
+  };
+
+  const selectedItemStyle = {
+    backgroundColor: '#e3f2fd',
+    borderRadius: '16px',
+    padding: '2px 8px',
+    fontSize: '12px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '4px'
+  };
+
+  const [dropdownStates, setDropdownStates] = useState({
+    skinTypes: false,
+    functions: false,
+    ingredients: false,
+    editSkinTypes: false,
+    editFunctions: false,
+    editIngredients: false
+  });
+
+  const toggleDropdown = (dropdown) => {
+    setDropdownStates(prev => ({
+      ...prev,
+      [dropdown]: !prev[dropdown]
+    }));
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.dropdown-container')) {
+        setDropdownStates({
+          skinTypes: false,
+          functions: false,
+          ingredients: false,
+          editSkinTypes: false,
+          editFunctions: false,
+          editIngredients: false
+        });
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   const handlePageChange = async (pageNumber) => {
     setCurrentPage(pageNumber);
     await fetchProducts(pageNumber);
@@ -203,18 +285,15 @@ const ProductManagement = () => {
 
       if (response && response.products) {
         setProducts(response.products);
-        setTotalItems(response.pagination.totalItems);
         setTotalPages(response.pagination.totalPages);
         setCurrentPage(response.pagination.currentPage);
         
         console.log('Total products loaded:', response.products.length);
         console.log('Total pages:', response.pagination.totalPages);
         console.log('Current page:', response.pagination.currentPage);
-        console.log('Total items:', response.pagination.totalItems);
       } else {
         console.error('Invalid response format:', response);
         setProducts([]);
-        setTotalItems(0);
         setTotalPages(0);
         setCurrentPage(1);
       }
@@ -222,7 +301,6 @@ const ProductManagement = () => {
       console.error('Error fetching products:', err);
       setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
       setProducts([]);
-      setTotalItems(0);
       setTotalPages(0);
       setCurrentPage(1);
     } finally {
@@ -301,10 +379,27 @@ const ProductManagement = () => {
     setTimeout(() => setNotification({ message: '', type: 'success' }), 3000);
   };
 
+  const handleViewDetails = (product) => {
+    setSelectedProduct(null);
+    fetchProductDetail(product.productId);
+  };
+
+  const fetchProductDetail = async (productId) => {
+    try {
+      const detail = await ProductAPI.getDetail(productId);
+      setSelectedProduct(detail);
+    } catch (error) {
+      setError('Không thể lấy chi tiết sản phẩm');
+    }
+  };
+
+  const handleBackToList = () => {
+    setSelectedProduct(null);
+  };
+
   const handleEditProduct = (product) => {
     console.log('Original product data:', product);
     
-    // Get all existing images from productImages
     const existingImages = product.productImages?.$values?.map(img => ({
       id: img.productImageId,
       url: img.productImage,
@@ -331,126 +426,103 @@ const ProductManagement = () => {
         concentration: ing.concentration
       })) || [],
       functions: product.functions?.$values?.map(func => func.functionId) || [],
-      images: existingImages, // Store images with additional metadata
+      images: existingImages,
       productImages: product.productImages
     });
     setShowEditForm(true);
   };
 
-  const handleViewDetails = (product) => {
-    setSelectedProduct(null);
-    setShowProductDetails(true);
-    fetchProductDetail(product.productId);
-  };
-
-  const fetchProductDetail = async (productId) => {
-    try {
-      const detail = await ProductAPI.getDetail(productId);
-      setSelectedProduct(detail);
-    } catch (error) {
-      setError('Không thể lấy chi tiết sản phẩm');
-    }
-  };
-
-  const handleBackToList = () => {
-    setSelectedProduct(null);
-    setShowProductDetails(false);
-  };
-
-  const handleEditDetailClick = () => {
-    setIsEditing(true);
-    setEditedProduct({
-      productId: selectedProduct.productId,
-      ...selectedProduct,
-      brand_id: selectedProduct.brand?.brandId,
-      category_id: selectedProduct.category?.categoryId,
-      skinTypes: selectedProduct.skinTypes,
-      ingredients: selectedProduct.ingredients,
-      functions: selectedProduct.functions,
-      productImages: selectedProduct.productImages,
-      isRecommended: selectedProduct.isRecommended || false
-    });
-  };
-
-  const handleDetailChange = (field, value) => {
-    setEditedProduct(prev => ({
+  const handleNewProductChange = (field, value) => {
+    setNewProduct(prev => ({
       ...prev,
       [field]: value
     }));
-    setHasChanges(true);
   };
 
-  const handleSaveChanges = async () => {
+  const handleImageFile = (file) => {
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        handleNewProductChange('images', [e.target.result]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEditFormSubmit = async () => {
     try {
       setLoading(true);
-
-      if (!editedProduct.productId) {
-        throw new Error('Không tìm thấy ID sản phẩm');
+      
+      if (!editedProduct.productName?.trim()) {
+        throw new Error('Product name is required');
       }
-
 
       const price = parseFloat(editedProduct.price);
       const quantity = parseInt(editedProduct.quantity);
       const discount = parseFloat(editedProduct.discount);
-      const brandId = parseInt(editedProduct.brand_id);
-      const categoryId = parseInt(editedProduct.category_id);
+      const weight = parseFloat(editedProduct.weight);
+      const brandId = parseInt(editedProduct.brandId);
+      const categoryId = parseInt(editedProduct.categoryId);
 
       if (isNaN(price) || price < 0) {
-        throw new Error('Giá sản phẩm không hợp lệ');
+        throw new Error('Invalid price');
       }
       if (isNaN(quantity) || quantity < 0) {
-        throw new Error('Số lượng sản phẩm không hợp lệ');
+        throw new Error('Invalid quantity');
       }
       if (isNaN(discount) || discount < 0 || discount > 1) {
-        throw new Error('Giảm giá phải từ 0 đến 1');
+        throw new Error('Discount must be between 0 and 1');
+      }
+      if (isNaN(weight) || weight < 0) {
+        throw new Error('Invalid weight');
       }
       if (isNaN(brandId) || brandId <= 0) {
-        throw new Error('Vui lòng chọn thương hiệu');
+        throw new Error('Please select a brand');
       }
       if (isNaN(categoryId) || categoryId <= 0) {
-        throw new Error('Vui lòng chọn danh mục');
+        throw new Error('Please select a category');
       }
 
+      const allImageUrls = editedProduct.images.map(img => img.url || img);
+
+      console.log('All image URLs to be updated:', allImageUrls);
+
+      const ingredientsData = editedProduct.ingredients.map(ing => ({
+        ingredientId: ing.ingredientId,
+        concentration: ing.concentration || ''
+      }));
+
       const updateData = {
-        productName: editedProduct.productName?.trim() || '',
-        size: editedProduct.size?.trim() || '',
-        price,
-        quantity,
-        discount,
+        productName: editedProduct.productName.trim(),
+        size: editedProduct.size.trim(),
+        price: price,
+        weight: weight,
+        quantity: quantity,
+        discount: discount,
         summary: editedProduct.summary?.trim() || '',
         isRecommended: Boolean(editedProduct.isRecommended),
-        brandId,
-        categoryId,
-        skinTypeIds: Array.isArray(editedProduct.skinTypes)
-          ? editedProduct.skinTypes.map(skin => skin)
-          : [],
-        ingredientConcentrations: Array.isArray(editedProduct.ingredients)
-          ? editedProduct.ingredients.map(ing => ({
-            ingredientId: ing.ingredientId,
-            concentration: ing.concentration || 1
-          }))
-          : [],
-        functionIds: Array.isArray(editedProduct.functions)
-          ? editedProduct.functions.map(func => func)
-          : [],
-        imageUrls: Array.isArray(editedProduct.productImages)
-          ? editedProduct.productImages.map(img => img)
-          : [],
+        brandId: brandId,
+        categoryId: categoryId,
+        skinTypeIds: editedProduct.skinTypes || [],
+        ingredientConcentrations: ingredientsData,
+        functionIds: editedProduct.functions || [],
+        imageUrls: allImageUrls,
         status: editedProduct.status
       };
 
-      console.log('Updating product with ID:', editedProduct.productId);
-      console.log('Update data:', updateData);
+      console.log('Update data being sent:', updateData);
 
       await ProductAPI.update(editedProduct.productId, updateData);
-      await fetchProducts(); // Refresh the product list
-      await fetchProductDetail(editedProduct.productId);
-      setIsEditing(false);
-      setHasChanges(false);
-      showNotificationMessage('Cập nhật sản phẩm thành công!', 'success');
+      showNotificationMessage('Product updated successfully!', 'success');
+      setShowEditForm(false);
+      
+      setTimeout(async () => {
+        await fetchProductDetail(editedProduct.productId);
+        await fetchProducts(currentPage);
+      }, 500);
     } catch (error) {
-      console.error('Error in handleSaveChanges:', error);
-      showNotificationMessage(error.message || 'Không thể cập nhật sản phẩm. Vui lòng thử lại!', 'error');
+      console.error('Error updating product:', error);
+      showNotificationMessage(error.message || 'Failed to update product', 'error');
     } finally {
       setLoading(false);
     }
@@ -461,12 +533,10 @@ const ProductManagement = () => {
       setLoading(true);
       setError(null);
 
-      // Validate required fields
       if (!newProduct.productName?.trim()) {
-        throw new Error('Vui lòng nhập tên sản phẩm');
+        throw new Error('Please enter product name');
       }
 
-      // Validate numeric fields
       const price = parseFloat(newProduct.price);
       const quantity = parseInt(newProduct.quantity);
       const discount = parseFloat(newProduct.discount);
@@ -474,31 +544,31 @@ const ProductManagement = () => {
       const categoryId = parseInt(newProduct.categoryId);
 
       if (isNaN(price) || price < 0) {
-        throw new Error('Giá sản phẩm không hợp lệ');
+        throw new Error('Invalid price');
       }
       if (isNaN(quantity) || quantity < 0) {
-        throw new Error('Số lượng sản phẩm không hợp lệ');
+        throw new Error('Invalid quantity');
       }
       if (isNaN(discount) || discount < 0 || discount > 1) {
-        throw new Error('Giảm giá phải từ 0 đến 1');
+        throw new Error('Discount must be between 0 and 1');
       }
       if (isNaN(brandId) || brandId <= 0) {
-        throw new Error('Vui lòng chọn thương hiệu');
+        throw new Error('Please select a brand');
       }
       if (isNaN(categoryId) || categoryId <= 0) {
-        throw new Error('Vui lòng chọn danh mục');
+        throw new Error('Please select a category');
       }
 
       const productToCreate = {
-        productName: newProduct.productName || 'Sản phẩm mới',
-        summary: newProduct.summary || 'Mô tả sản phẩm',
-        size: newProduct.size || 'M',
-        price: parseFloat(newProduct.price) || 100,
-        quantity: parseInt(newProduct.quantity) || 10,
-        discount: parseFloat(newProduct.discount) || 0.1,
+        productName: newProduct.productName,
+        summary: newProduct.summary,
+        size: newProduct.size,
+        price: price,
+        quantity: quantity,
+        discount: discount,
         isRecommended: newProduct.isRecommended,
-        brandId: parseInt(newProduct.brandId) || 1,
-        categoryId: parseInt(newProduct.categoryId) || 1,
+        brandId: brandId,
+        categoryId: categoryId,
         skinTypes: newProduct.skinTypes,
         ingredients: newProduct.ingredients,
         functions: newProduct.functions,
@@ -511,18 +581,15 @@ const ProductManagement = () => {
       console.log('Create product response:', createResponse);
 
       if (!createResponse) {
-        throw new Error('Không nhận được phản hồi khi tạo sản phẩm');
+        throw new Error('No response received when creating product');
       }
 
-      // Đợi một chút trước khi làm mới danh sách
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       console.log('Refreshing product list...');
-      // Lấy danh sách sản phẩm mới và tính toán trang cuối
       const response = await ProductAPI.getAll({ pageIndex: 1 });
       const lastPage = Math.ceil(response.pagination.totalItems / itemsPerPage);
       
-      // Chuyển đến trang cuối cùng để hiển thị sản phẩm mới
       await fetchProducts(lastPage);
       setCurrentPage(lastPage);
 
@@ -542,14 +609,14 @@ const ProductManagement = () => {
         functions: [],
         images: []
       });
-      showNotificationMessage('Tạo sản phẩm thành công!', 'success');
+      showNotificationMessage('Product created successfully!', 'success');
     } catch (error) {
       console.error('Error in handleCreateProduct:', error);
       console.error('Error response:', error.response);
       const errorMessage = error.response?.data?.detail
         || error.response?.data?.message
         || error.message
-        || 'Không thể tạo sản phẩm. Vui lòng thử lại!';
+        || 'Failed to create product. Please try again!';
 
       showNotificationMessage(errorMessage, 'error');
       setError(errorMessage);
@@ -577,129 +644,6 @@ const ProductManagement = () => {
       await fetchProducts(currentPage);
     } catch (error) {
       showNotificationMessage(error.message || 'Không thể ngừng kích hoạt sản phẩm', 'error');
-    }
-  };
-
-  const handleNewProductChange = (field, value) => {
-    setNewProduct(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleDrag = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
-  };
-
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragActive(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleImageFile(e.dataTransfer.files[0]);
-    }
-  };
-
-  const handleImageFile = (file) => {
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImageUrl(e.target.result);
-        handleNewProductChange('images', [e.target.result]);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleEditFormSubmit = async () => {
-    try {
-      setLoading(true);
-      
-      // Validate required fields
-      if (!editedProduct.productName?.trim()) {
-        throw new Error('Product name is required');
-      }
-
-      // Validate numeric fields
-      const price = parseFloat(editedProduct.price);
-      const quantity = parseInt(editedProduct.quantity);
-      const discount = parseFloat(editedProduct.discount);
-      const weight = parseFloat(editedProduct.weight);
-      const brandId = parseInt(editedProduct.brandId);
-      const categoryId = parseInt(editedProduct.categoryId);
-
-      if (isNaN(price) || price < 0) {
-        throw new Error('Invalid price');
-      }
-      if (isNaN(quantity) || quantity < 0) {
-        throw new Error('Invalid quantity');
-      }
-      if (isNaN(discount) || discount < 0 || discount > 1) {
-        throw new Error('Discount must be between 0 and 1');
-      }
-      if (isNaN(weight) || weight < 0) {
-        throw new Error('Invalid weight');
-      }
-      if (isNaN(brandId) || brandId <= 0) {
-        throw new Error('Please select a brand');
-      }
-      if (isNaN(categoryId) || categoryId <= 0) {
-        throw new Error('Please select a category');
-      }
-
-      // Get all image URLs (both existing and new)
-      const allImageUrls = editedProduct.images.map(img => img.url || img);
-
-      console.log('All image URLs to be updated:', allImageUrls);
-
-      // Prepare ingredients data with proper structure
-      const ingredientsData = editedProduct.ingredients.map(ing => ({
-        ingredientId: ing.ingredientId,
-        concentration: parseFloat(ing.concentration) || 0
-      }));
-
-      // Prepare update data
-      const updateData = {
-        productName: editedProduct.productName.trim(),
-        size: editedProduct.size.trim(),
-        price: price,
-        weight: weight,
-        quantity: quantity,
-        discount: discount,
-        summary: editedProduct.summary?.trim() || '',
-        isRecommended: Boolean(editedProduct.isRecommended),
-        brandId: brandId,
-        categoryId: categoryId,
-        skinTypeIds: editedProduct.skinTypes || [],
-        ingredientConcentrations: ingredientsData,
-        functionIds: editedProduct.functions || [],
-        imageUrls: allImageUrls,
-        status: editedProduct.status
-      };
-
-      console.log('Update data being sent:', updateData);
-
-      // Send update request
-      await ProductAPI.update(editedProduct.productId, updateData);
-      showNotificationMessage('Product updated successfully!', 'success');
-      setShowEditForm(false);
-      
-      // Refresh product details and list with a small delay
-      setTimeout(async () => {
-        await fetchProductDetail(editedProduct.productId);
-        await fetchProducts(currentPage);
-      }, 500);
-    } catch (error) {
-      console.error('Error updating product:', error);
-      showNotificationMessage(error.message || 'Failed to update product', 'error');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -1033,12 +977,12 @@ const ProductManagement = () => {
         {showCreateForm && (
           <div style={modalStyle}>
             <div style={modalContentStyle}>
-              <h2 style={{ marginBottom: '20px', color: '#333' }}>Thêm sản phẩm mới</h2>
+              <h2 style={{ marginBottom: '20px', color: '#333' }}>Add New Product</h2>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Tên sản phẩm:</label>
+                    <label style={labelStyle}>Product Name:</label>
                     <input
                       type="text"
                       value={newProduct.productName}
@@ -1048,11 +992,11 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Mô tả:</label>
+                    <label style={labelStyle}>Description:</label>
                     <textarea
                       value={newProduct.summary}
                       onChange={(e) => handleNewProductChange('summary', e.target.value)}
-                      style={inputStyle}
+                      style={textareaStyle}
                     />
                   </div>
 
@@ -1068,7 +1012,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Trọng lượng (g):</label>
+                    <label style={labelStyle}>Weight (g):</label>
                     <input
                       type="number"
                       value={newProduct.weight}
@@ -1079,7 +1023,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Giá:</label>
+                    <label style={labelStyle}>Price:</label>
                     <input
                       type="number"
                       value={newProduct.price}
@@ -1090,7 +1034,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Số lượng:</label>
+                    <label style={labelStyle}>Quantity:</label>
                     <input
                       type="number"
                       value={newProduct.quantity}
@@ -1101,7 +1045,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Giảm giá:</label>
+                    <label style={labelStyle}>Discount:</label>
                     <input
                       type="number"
                       value={newProduct.discount}
@@ -1116,13 +1060,13 @@ const ProductManagement = () => {
 
                 <div>
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Thương hiệu:</label>
+                    <label style={labelStyle}>Brand:</label>
                     <select
                       value={newProduct.brandId}
                       onChange={(e) => handleNewProductChange('brandId', e.target.value)}
                       style={inputStyle}
                     >
-                      <option value="">Chọn thương hiệu</option>
+                      <option value="">Select Brand</option>
                       {brands.map(brand => (
                         <option key={brand.brandId} value={brand.brandId}>
                           {brand.brandName}
@@ -1132,13 +1076,13 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Danh mục:</label>
+                    <label style={labelStyle}>Category:</label>
                     <select
                       value={newProduct.categoryId}
                       onChange={(e) => handleNewProductChange('categoryId', e.target.value)}
                       style={inputStyle}
                     >
-                      <option value="">Chọn danh mục</option>
+                      <option value="">Select Category</option>
                       {categories.map(category => (
                         <option key={category.categoryId} value={category.categoryId}>
                           {category.categoryName}
@@ -1148,92 +1092,227 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Loại da:</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {skinTypes.map(skin => (
-                        <label key={skin.skinTypeId} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <input
-                            type="checkbox"
-                            checked={newProduct.skinTypes.includes(skin.skinTypeId)}
-                            onChange={(e) => {
-                              const newSkinTypes = e.target.checked
-                                ? [...newProduct.skinTypes, skin.skinTypeId]
-                                : newProduct.skinTypes.filter(id => id !== skin.skinTypeId);
-                              handleNewProductChange('skinTypes', newSkinTypes);
-                            }}
-                          />
-                          {skin.skinTypeName}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Chức năng:</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {functions.map(func => (
-                        <label key={func.functionId} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <input
-                            type="checkbox"
-                            checked={newProduct.functions.includes(func.functionId)}
-                            onChange={(e) => {
-                              const newFunctions = e.target.checked
-                                ? [...newProduct.functions, func.functionId]
-                                : newProduct.functions.filter(id => id !== func.functionId);
-                              handleNewProductChange('functions', newFunctions);
-                            }}
-                          />
-                          {func.functionName}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Thành phần:</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {ingredients.map(ing => (
-                        <div key={ing.ingredientId} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <input
-                              type="checkbox"
-                              checked={newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
-                              onChange={(e) => {
-                                const newIngredients = e.target.checked
-                                  ? [...newProduct.ingredients, { ingredientId: ing.ingredientId, concentration: 0 }]
-                                  : newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId);
-                                handleNewProductChange('ingredients', newIngredients);
-                              }}
-                            />
-                            {ing.ingredientName}
-                          </label>
-                          {newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
-                            <input
-                              type="number"
-                              value={newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration || 0}
-                              onChange={(e) => {
-                                const newIngredients = newProduct.ingredients.map(i =>
-                                  i.ingredientId === ing.ingredientId
-                                    ? { ...i, concentration: parseFloat(e.target.value) || 0 }
-                                    : i
-                                );
-                                handleNewProductChange('ingredients', newIngredients);
-                              }}
-                              min="0"
-                              max="100"
-                              step="0.1"
-                              style={{ ...inputStyle, width: '80px' }}
-                            />
+                    <label style={labelStyle}>Skin Types:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('skinTypes')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {newProduct.skinTypes.length > 0 ? (
+                            skinTypes
+                              .filter(skin => newProduct.skinTypes.includes(skin.skinTypeId))
+                              .map(skin => (
+                                <span key={skin.skinTypeId} style={selectedItemStyle}>
+                                  {skin.skinTypeName}
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNewProductChange('skinTypes', 
+                                        newProduct.skinTypes.filter(id => id !== skin.skinTypeId)
+                                      );
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Skin Types</span>
                           )}
                         </div>
-                      ))}
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.skinTypes && (
+                        <div style={dropdownContentStyle}>
+                          {skinTypes.map(skin => (
+                            <div
+                              key={skin.skinTypeId}
+                              style={dropdownItemStyle}
+                              onClick={() => {
+                                const isSelected = newProduct.skinTypes.includes(skin.skinTypeId);
+                                handleNewProductChange('skinTypes',
+                                  isSelected
+                                    ? newProduct.skinTypes.filter(id => id !== skin.skinTypeId)
+                                    : [...newProduct.skinTypes, skin.skinTypeId]
+                                );
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={newProduct.skinTypes.includes(skin.skinTypeId)}
+                                onChange={(e) => {}}
+                              />
+                              {skin.skinTypeName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Functions:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('functions')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {newProduct.functions.length > 0 ? (
+                            functions
+                              .filter(func => newProduct.functions.includes(func.functionId))
+                              .map(func => (
+                                <span key={func.functionId} style={selectedItemStyle}>
+                                  {func.functionName}
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNewProductChange('functions', 
+                                        newProduct.functions.filter(id => id !== func.functionId)
+                                      );
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Functions</span>
+                          )}
+                        </div>
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.functions && (
+                        <div style={dropdownContentStyle}>
+                          {functions.map(func => (
+                            <div
+                              key={func.functionId}
+                              style={dropdownItemStyle}
+                              onClick={() => {
+                                const isSelected = newProduct.functions.includes(func.functionId);
+                                handleNewProductChange('functions',
+                                  isSelected
+                                    ? newProduct.functions.filter(id => id !== func.functionId)
+                                    : [...newProduct.functions, func.functionId]
+                                );
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={newProduct.functions.includes(func.functionId)}
+                                onChange={(e) => {}}
+                              />
+                              {func.functionName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Ingredients:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('ingredients')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {newProduct.ingredients.length > 0 ? (
+                            ingredients
+                              .filter(ing => newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId))
+                              .map(ing => (
+                                <span key={ing.ingredientId} style={selectedItemStyle}>
+                                  {ing.ingredientName} 
+                                  ({newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}%)
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleNewProductChange('ingredients',
+                                        newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      );
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Ingredients</span>
+                          )}
+                        </div>
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.ingredients && (
+                        <div style={dropdownContentStyle}>
+                          {ingredients.map(ing => (
+                            <div
+                              key={ing.ingredientId}
+                              style={{ ...dropdownItemStyle, flexWrap: 'wrap' }}
+                            >
+                              <div 
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}
+                                onClick={() => {
+                                  const isSelected = newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
+                                  handleNewProductChange('ingredients',
+                                    isSelected
+                                      ? newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      : [...newProduct.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
+                                  );
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    const isSelected = newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
+                                    handleNewProductChange('ingredients',
+                                      isSelected
+                                        ? newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                        : [...newProduct.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
+                                    );
+                                  }}
+                                />
+                                <span>{ing.ingredientName}</span>
+                              </div>
+                              {newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
+                                <div style={{ width: '100%', paddingLeft: '24px', marginTop: '4px' }}>
+                                  <input
+                                    type="number"
+                                    value={newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}
+                                    onChange={(e) => {
+                                      const newIngredients = newProduct.ingredients.map(i =>
+                                        i.ingredientId === ing.ingredientId
+                                          ? { ...i, concentration: e.target.value === '' ? '' : parseFloat(e.target.value) }
+                                          : i
+                                      );
+                                      handleNewProductChange('ingredients', newIngredients);
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    style={{ ...inputStyle, width: '80px' }}
+                                  />
+                                  <span style={{ marginLeft: '4px' }}>%</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               <div style={formGroupStyle}>
-                <label style={labelStyle}>Hình ảnh sản phẩm:</label>
+                <label style={labelStyle}>Product Images:</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                   {newProduct.images.map((image, index) => (
                     <div key={index} style={{ position: 'relative' }}>
@@ -1272,7 +1351,7 @@ const ProductManagement = () => {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
                       type="text"
-                      placeholder="Nhập URL hình ảnh"
+                      placeholder="Enter image URL"
                       style={{ ...inputStyle, width: '200px' }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.value.trim()) {
@@ -1284,7 +1363,7 @@ const ProductManagement = () => {
                     />
                     <button
                       onClick={() => {
-                        const input = document.querySelector('input[placeholder="Nhập URL hình ảnh"]');
+                        const input = document.querySelector('input[placeholder="Enter image URL"]');
                         const imageUrl = input.value.trim();
                         if (imageUrl) {
                           handleNewProductChange('images', [...newProduct.images, imageUrl]);
@@ -1297,7 +1376,7 @@ const ProductManagement = () => {
                         height: '36px'
                       }}
                     >
-                      Thêm
+                      Add
                     </button>
                   </div>
                 </div>
@@ -1309,13 +1388,13 @@ const ProductManagement = () => {
                   style={primaryButtonStyle}
                   disabled={loading}
                 >
-                  {loading ? 'Đang tạo...' : 'Tạo sản phẩm'}
+                  {loading ? 'Creating...' : 'Create Product'}
                 </button>
                 <button
                   onClick={() => setShowCreateForm(false)}
                   style={secondaryButtonStyle}
                 >
-                  Huỷ
+                  Cancel
                 </button>
               </div>
             </div>
@@ -1325,12 +1404,12 @@ const ProductManagement = () => {
         {showEditForm && (
           <div style={modalStyle}>
             <div style={modalContentStyle}>
-              <h2 style={{ marginBottom: '20px', color: '#333' }}>Chỉnh sửa sản phẩm</h2>
+              <h2 style={{ marginBottom: '20px', color: '#333' }}>Edit Product</h2>
               
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
                 <div>
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Tên sản phẩm:</label>
+                    <label style={labelStyle}>Product Name:</label>
                     <input
                       type="text"
                       value={editedProduct.productName}
@@ -1340,11 +1419,11 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Mô tả:</label>
+                    <label style={labelStyle}>Description:</label>
                     <textarea
                       value={editedProduct.summary}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, summary: e.target.value }))}
-                      style={inputStyle}
+                      style={textareaStyle}
                     />
                   </div>
 
@@ -1360,7 +1439,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Trọng lượng (g):</label>
+                    <label style={labelStyle}>Weight (g):</label>
                     <input
                       type="number"
                       value={editedProduct.weight}
@@ -1371,7 +1450,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Giá:</label>
+                    <label style={labelStyle}>Price:</label>
                     <input
                       type="number"
                       value={editedProduct.price}
@@ -1382,7 +1461,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Số lượng:</label>
+                    <label style={labelStyle}>Quantity:</label>
                     <input
                       type="number"
                       value={editedProduct.quantity}
@@ -1393,7 +1472,7 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Giảm giá:</label>
+                    <label style={labelStyle}>Discount:</label>
                     <input
                       type="number"
                       value={editedProduct.discount}
@@ -1408,13 +1487,13 @@ const ProductManagement = () => {
 
                 <div>
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Thương hiệu:</label>
+                    <label style={labelStyle}>Brand:</label>
                     <select
                       value={editedProduct.brandId}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, brandId: e.target.value }))}
                       style={inputStyle}
                     >
-                      <option value="">Chọn thương hiệu</option>
+                      <option value="">Select Brand</option>
                       {brands.map(brand => (
                         <option key={brand.brandId} value={brand.brandId}>
                           {brand.brandName}
@@ -1424,13 +1503,13 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Danh mục:</label>
+                    <label style={labelStyle}>Category:</label>
                     <select
                       value={editedProduct.categoryId}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, categoryId: e.target.value }))}
                       style={inputStyle}
                     >
-                      <option value="">Chọn danh mục</option>
+                      <option value="">Select Category</option>
                       {categories.map(category => (
                         <option key={category.categoryId} value={category.categoryId}>
                           {category.categoryName}
@@ -1440,92 +1519,237 @@ const ProductManagement = () => {
                   </div>
 
                   <div style={formGroupStyle}>
-                    <label style={labelStyle}>Loại da:</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {skinTypes.map(skin => (
-                        <label key={skin.skinTypeId} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <input
-                            type="checkbox"
-                            checked={editedProduct.skinTypes.includes(skin.skinTypeId)}
-                            onChange={(e) => {
-                              const newSkinTypes = e.target.checked
-                                ? [...editedProduct.skinTypes, skin.skinTypeId]
-                                : editedProduct.skinTypes.filter(id => id !== skin.skinTypeId);
-                              setEditedProduct(prev => ({ ...prev, skinTypes: newSkinTypes }));
-                            }}
-                          />
-                          {skin.skinTypeName}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Chức năng:</label>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                      {functions.map(func => (
-                        <label key={func.functionId} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                          <input
-                            type="checkbox"
-                            checked={editedProduct.functions.includes(func.functionId)}
-                            onChange={(e) => {
-                              const newFunctions = e.target.checked
-                                ? [...editedProduct.functions, func.functionId]
-                                : editedProduct.functions.filter(id => id !== func.functionId);
-                              setEditedProduct(prev => ({ ...prev, functions: newFunctions }));
-                            }}
-                          />
-                          {func.functionName}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Thành phần:</label>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {ingredients.map(ing => (
-                        <div key={ing.ingredientId} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <label style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                            <input
-                              type="checkbox"
-                              checked={editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
-                              onChange={(e) => {
-                                const newIngredients = e.target.checked
-                                  ? [...editedProduct.ingredients, { ingredientId: ing.ingredientId, concentration: 0 }]
-                                  : editedProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId);
-                                setEditedProduct(prev => ({ ...prev, ingredients: newIngredients }));
-                              }}
-                            />
-                            {ing.ingredientName}
-                          </label>
-                          {editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
-                            <input
-                              type="number"
-                              value={editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration || 0}
-                              onChange={(e) => {
-                                const newIngredients = editedProduct.ingredients.map(i =>
-                                  i.ingredientId === ing.ingredientId
-                                    ? { ...i, concentration: parseFloat(e.target.value) || 0 }
-                                    : i
-                                );
-                                setEditedProduct(prev => ({ ...prev, ingredients: newIngredients }));
-                              }}
-                              min="0"
-                              max="100"
-                              step="0.1"
-                              style={{ ...inputStyle, width: '80px' }}
-                            />
+                    <label style={labelStyle}>Skin Types:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('editSkinTypes')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {editedProduct.skinTypes.length > 0 ? (
+                            skinTypes
+                              .filter(skin => editedProduct.skinTypes.includes(skin.skinTypeId))
+                              .map(skin => (
+                                <span key={skin.skinTypeId} style={selectedItemStyle}>
+                                  {skin.skinTypeName}
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditedProduct(prev => ({
+                                        ...prev,
+                                        skinTypes: prev.skinTypes.filter(id => id !== skin.skinTypeId)
+                                      }));
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Skin Types</span>
                           )}
                         </div>
-                      ))}
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.editSkinTypes && (
+                        <div style={dropdownContentStyle}>
+                          {skinTypes.map(skin => (
+                            <div
+                              key={skin.skinTypeId}
+                              style={dropdownItemStyle}
+                              onClick={() => {
+                                const isSelected = editedProduct.skinTypes.includes(skin.skinTypeId);
+                                setEditedProduct(prev => ({
+                                  ...prev,
+                                  skinTypes: isSelected
+                                    ? prev.skinTypes.filter(id => id !== skin.skinTypeId)
+                                    : [...prev.skinTypes, skin.skinTypeId]
+                                }));
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={editedProduct.skinTypes.includes(skin.skinTypeId)}
+                                onChange={(e) => {}}
+                              />
+                              {skin.skinTypeName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Functions:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('editFunctions')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {editedProduct.functions.length > 0 ? (
+                            functions
+                              .filter(func => editedProduct.functions.includes(func.functionId))
+                              .map(func => (
+                                <span key={func.functionId} style={selectedItemStyle}>
+                                  {func.functionName}
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditedProduct(prev => ({
+                                        ...prev,
+                                        functions: prev.functions.filter(id => id !== func.functionId)
+                                      }));
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Functions</span>
+                          )}
+                        </div>
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.editFunctions && (
+                        <div style={dropdownContentStyle}>
+                          {functions.map(func => (
+                            <div
+                              key={func.functionId}
+                              style={dropdownItemStyle}
+                              onClick={() => {
+                                const isSelected = editedProduct.functions.includes(func.functionId);
+                                setEditedProduct(prev => ({
+                                  ...prev,
+                                  functions: isSelected
+                                    ? prev.functions.filter(id => id !== func.functionId)
+                                    : [...prev.functions, func.functionId]
+                                }));
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={editedProduct.functions.includes(func.functionId)}
+                                onChange={(e) => {}}
+                              />
+                              {func.functionName}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div style={formGroupStyle}>
+                    <label style={labelStyle}>Ingredients:</label>
+                    <div className="dropdown-container" style={dropdownStyle}>
+                      <div 
+                        style={dropdownButtonStyle}
+                        onClick={() => toggleDropdown('editIngredients')}
+                      >
+                        <div style={selectedItemsStyle}>
+                          {editedProduct.ingredients.length > 0 ? (
+                            ingredients
+                              .filter(ing => editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId))
+                              .map(ing => (
+                                <span key={ing.ingredientId} style={selectedItemStyle}>
+                                  {ing.ingredientName} 
+                                  ({editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}%)
+                                  <span
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditedProduct(prev => ({
+                                        ...prev,
+                                        ingredients: prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      }));
+                                    }}
+                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                  >
+                                    ×
+                                  </span>
+                                </span>
+                              ))
+                          ) : (
+                            <span style={{ color: '#666' }}>Select Ingredients</span>
+                          )}
+                        </div>
+                        <span>▼</span>
+                      </div>
+                      {dropdownStates.editIngredients && (
+                        <div style={dropdownContentStyle}>
+                          {ingredients.map(ing => (
+                            <div
+                              key={ing.ingredientId}
+                              style={{ ...dropdownItemStyle, flexWrap: 'wrap' }}
+                            >
+                              <div 
+                                style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}
+                                onClick={() => {
+                                  const isSelected = editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
+                                  setEditedProduct(prev => ({
+                                    ...prev,
+                                    ingredients: isSelected
+                                      ? prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      : [...prev.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
+                                  }));
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
+                                  onChange={(e) => {
+                                    e.stopPropagation();
+                                    const isSelected = editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
+                                    setEditedProduct(prev => ({
+                                      ...prev,
+                                      ingredients: isSelected
+                                        ? prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                        : [...prev.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
+                                    }));
+                                  }}
+                                />
+                                <span>{ing.ingredientName}</span>
+                              </div>
+                              {editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
+                                <div style={{ width: '100%', paddingLeft: '24px', marginTop: '4px' }}>
+                                  <input
+                                    type="number"
+                                    value={editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}
+                                    onChange={(e) => {
+                                      const newIngredients = editedProduct.ingredients.map(i =>
+                                        i.ingredientId === ing.ingredientId
+                                          ? { ...i, concentration: e.target.value === '' ? '' : parseFloat(e.target.value) }
+                                          : i
+                                      );
+                                      setEditedProduct(prev => ({
+                                        ...prev,
+                                        ingredients: newIngredients
+                                      }));
+                                    }}
+                                    onClick={(e) => e.stopPropagation()}
+                                    min="0"
+                                    max="100"
+                                    step="0.1"
+                                    style={{ ...inputStyle, width: '80px' }}
+                                  />
+                                  <span style={{ marginLeft: '4px' }}>%</span>
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
               <div style={formGroupStyle}>
-                <label style={labelStyle}>Hình ảnh sản phẩm:</label>
+                <label style={labelStyle}>Product Images:</label>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
                   {editedProduct.images?.map((image, index) => (
                     <div key={index} style={{ position: 'relative' }}>
@@ -1568,7 +1792,7 @@ const ProductManagement = () => {
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <input
                       type="text"
-                      placeholder="Nhập URL hình ảnh"
+                      placeholder="Enter image URL"
                       style={{ ...inputStyle, width: '200px' }}
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.value.trim()) {
@@ -1583,7 +1807,7 @@ const ProductManagement = () => {
                     />
                     <button
                       onClick={() => {
-                        const input = document.querySelector('input[placeholder="Nhập URL hình ảnh"]');
+                        const input = document.querySelector('input[placeholder="Enter image URL"]');
                         const imageUrl = input.value.trim();
                         if (imageUrl) {
                           setEditedProduct(prev => ({
@@ -1599,7 +1823,7 @@ const ProductManagement = () => {
                         height: '36px'
                       }}
                     >
-                      Thêm
+                      Add
                     </button>
                   </div>
                 </div>
@@ -1611,13 +1835,13 @@ const ProductManagement = () => {
                   disabled={loading}
                   style={primaryButtonStyle}
                 >
-                  {loading ? 'Đang lưu...' : 'Lưu thay đổi'}
+                  {loading ? 'Saving...' : 'Save Changes'}
                 </button>
                 <button
                   onClick={() => setShowEditForm(false)}
                   style={secondaryButtonStyle}
                 >
-                  Huỷ
+                  Cancel
                 </button>
               </div>
             </div>

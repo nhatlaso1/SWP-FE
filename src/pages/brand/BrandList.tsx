@@ -47,6 +47,7 @@ interface Product {
   discount: number;
   rating: number;
   productImage: string;
+  status: boolean; // true for active, false for inactive
   brand: Brand;
   category: Category;
   skinTypes: {
@@ -97,7 +98,9 @@ const BrandList: React.FC = () => {
         });
 
         if (response && response.products) {
-          allFetchedProducts = [...allFetchedProducts, ...response.products];
+          // Filter out inactive products
+          const activeProducts = response.products.filter(product => product.status === true);
+          allFetchedProducts = [...allFetchedProducts, ...activeProducts];
           if (!response.pagination || currentPage >= response.pagination.totalPages) {
             hasMorePages = false;
           } else {
@@ -244,10 +247,14 @@ const BrandList: React.FC = () => {
                     )}
                     <CardMedia
                       component="img"
-                      height="200"
                       image={product.productImage}
                       alt={product.productName}
-                      sx={{ objectFit: 'cover', cursor: 'pointer' }}
+                      sx={{ 
+                        width: '100%',
+                        aspectRatio: '1/1',
+                        objectFit: 'cover',
+                        cursor: 'pointer'
+                      }}
                       onClick={() => navigate(`/product/${product.productId}`)}
                     />
                     <CardContent sx={{ flexGrow: 1 }}>
