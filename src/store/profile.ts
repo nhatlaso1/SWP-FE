@@ -47,6 +47,8 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
+const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
+
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {
     const message =
@@ -90,7 +92,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           const payload = JSON.parse(atob(token.split(".")[1]));
           const role =
             payload[
-              "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
             ];
 
           set((state) => {
@@ -287,5 +289,6 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.profile.error = error;
       });
     },
+
   };
 }

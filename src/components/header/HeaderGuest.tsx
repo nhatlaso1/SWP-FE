@@ -120,7 +120,7 @@ const HeaderGuest: React.FC = () => {
 
         <div className="searchbar-wrap">
           <SearchOutlinedIcon />
-          |<div style={{ cursor: "pointer" }} onClick={() => navigate("/login")}>
+          |<div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
             <ShoppingCartOutlinedIcon />
           </div>
           <Button variant="text" onClick={() => navigate("/login")}>

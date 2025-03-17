@@ -30,7 +30,7 @@ export const createSkinTest = async (skinTest: SkinTest, token: string): Promise
       {
         headers: { Authorization: `Bearer ${token}` },
       }
-      
+
     );
     return response.data;
   } catch (error) {

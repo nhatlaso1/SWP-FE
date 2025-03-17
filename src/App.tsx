@@ -13,9 +13,7 @@ import ProductManagement from "./pages/staff/product/ProductManagement";
 import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
-import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import CustomerLayout from "./layouts/CustomerLayout";
-import Cart from "./pages/cart/Cart";
 import Register from "./pages/register/Register";
 import Profile from "./pages/profile/Profile";
 import SkinTestDetail from "./pages/admin/skintest/SkinTestDetail";
@@ -64,7 +62,7 @@ function App() {
       element: <CustomerLayout />,
       children: [
         { path: "/", element: <Home /> },
-        { path: "take-quiz", element: <SkinTestQuiz /> },
+        // { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
@@ -73,14 +71,14 @@ function App() {
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
-        {
-          path: "cart",
-          element: (
-            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
-              <Cart />
-            </ProtectedRoute>
-          )
-        },
+        // {
+        //   path: "cart",
+        //   element: (
+        //     <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+        //       <Cart />
+        //     </ProtectedRoute>
+        //   )
+        // },
         { path: "checkout", element: <Checkout /> },
         {
           path: "profile",
@@ -117,6 +115,7 @@ function App() {
         { path: "voucher/:id", element: <CreateVoucher /> },
         { path: "skintypes", element: <SkinType /> },
         { path: "skintype/:id", element: <CreateSkinType /> },
+        { path: "skintypes", element: <SkinType /> },
         { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
         { path: "users", element: <UserPage /> },

@@ -236,63 +236,63 @@ const SkinTestQuiz = () => {
                             <div className="section-use" key={index}>
                               {routineDetail[0].routineSteps.$values[0].category
                                 .products.$values.length > 0 && (
-                                <div className="product-item">
-                                  <img
-                                    src={
-                                      routineDetail[0].routineSteps.$values[0]
-                                        .category.products.$values[0]
-                                        .productImages.$values[0].url
-                                    }
-                                    alt=""
-                                  />
-                                  <p className="product-name">
-                                    {
-                                      routineDetail[0].routineSteps.$values[0]
-                                        .category.products.$values[0]
-                                        .productName
-                                    }
-                                  </p>
-                                  <p className="product-price">
-                                    $
-                                    {
-                                      routineDetail[0].routineSteps.$values[0]
-                                        .category.products.$values[0].price
-                                    }
-                                  </p>
-                                  <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const product = {
-                                        productId:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productId,
-                                        productName:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productName,
-                                        productImage:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productImages.$values[0]
-                                            .url,
-                                        price:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].price,
-                                      };
-                                      addItem(product);
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
-                                </div>
-                              )}
+                                  <div className="product-item">
+                                    <img
+                                      src={
+                                        routineDetail[0].routineSteps.$values[0]
+                                          .category.products.$values[0]
+                                          .productImages.$values[0].url
+                                      }
+                                      alt=""
+                                    />
+                                    <p className="product-name">
+                                      {
+                                        routineDetail[0].routineSteps.$values[0]
+                                          .category.products.$values[0]
+                                          .productName
+                                      }
+                                    </p>
+                                    <p className="product-price">
+                                      $
+                                      {
+                                        routineDetail[0].routineSteps.$values[0]
+                                          .category.products.$values[0].price
+                                      }
+                                    </p>
+                                    <Button
+                                      fullWidth
+                                      variant="contained"
+                                      style={{
+                                        color: "#fff",
+                                        width: "fit-content",
+                                      }}
+                                      onClick={() => {
+                                        const product = {
+                                          productId:
+                                            routineDetail[0].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productId,
+                                          productName:
+                                            routineDetail[0].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productName,
+                                          productImage:
+                                            routineDetail[0].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productImages.$values[0]
+                                              .url,
+                                          price:
+                                            routineDetail[0].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].price,
+                                        };
+                                        addItem(product);
+                                      }}
+                                    >
+                                      Add to Cart
+                                    </Button>
+                                  </div>
+                                )}
 
                               <div>
                                 <div className="how-to-use">
@@ -316,7 +316,7 @@ const SkinTestQuiz = () => {
                                       routineDetail[0].routineSteps.$values[0].category.products.$values
                                         .slice(1)
                                         .map((product) => (
-                                          <div className="other-product-item"  onClick={() => navigate(`/product/${product.productId}`)}>
+                                          <div className="other-product-item" onClick={() => navigate(`/product/${product.productId}`)}>
                                             <img
                                               src={
                                                 product.productImages.$values[0]
@@ -355,63 +355,63 @@ const SkinTestQuiz = () => {
                             <div className="section-use" key={index}>
                               {routineDetail[0].routineSteps.$values[0].category
                                 .products.$values.length > 0 && (
-                                <div className="product-item">
-                                  <img
-                                    src={
-                                      routineDetail[1].routineSteps.$values[0]
-                                        .category.products.$values[0]
-                                        .productImages.$values[0].url
-                                    }
-                                    alt=""
-                                  />
-                                  <p className="product-name">
-                                    {
-                                      routineDetail[1].routineSteps.$values[0]
-                                        .category.products.$values[0]
-                                        .productName
-                                    }
-                                  </p>
-                                  <p className="product-price">
-                                    $
-                                    {
-                                      routineDetail[1].routineSteps.$values[0]
-                                        .category.products.$values[0].price
-                                    }
-                                  </p>
-                                  <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const product = {
-                                        productId:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productId,
-                                        productName:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productName,
-                                        productImage:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].productImages.$values[0]
-                                            .url,
-                                        price:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
-                                            .$values[0].price,
-                                      };
-                                      addItem(product);
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
-                                </div>
-                              )}
+                                  <div className="product-item">
+                                    <img
+                                      src={
+                                        routineDetail[1].routineSteps.$values[0]
+                                          .category.products.$values[0]
+                                          .productImages.$values[0].url
+                                      }
+                                      alt=""
+                                    />
+                                    <p className="product-name">
+                                      {
+                                        routineDetail[1].routineSteps.$values[0]
+                                          .category.products.$values[0]
+                                          .productName
+                                      }
+                                    </p>
+                                    <p className="product-price">
+                                      $
+                                      {
+                                        routineDetail[1].routineSteps.$values[0]
+                                          .category.products.$values[0].price
+                                      }
+                                    </p>
+                                    <Button
+                                      fullWidth
+                                      variant="contained"
+                                      style={{
+                                        color: "#fff",
+                                        width: "fit-content",
+                                      }}
+                                      onClick={() => {
+                                        const product = {
+                                          productId:
+                                            routineDetail[1].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productId,
+                                          productName:
+                                            routineDetail[1].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productName,
+                                          productImage:
+                                            routineDetail[1].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].productImages.$values[0]
+                                              .url,
+                                          price:
+                                            routineDetail[1].routineSteps
+                                              .$values[0].category.products
+                                              .$values[0].price,
+                                        };
+                                        addItem(product);
+                                      }}
+                                    >
+                                      Add to Cart
+                                    </Button>
+                                  </div>
+                                )}
 
                               <div>
                                 <div className="how-to-use">

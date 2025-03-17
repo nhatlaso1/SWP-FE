@@ -22,11 +22,11 @@ const Voucher = () => {
   const [vouchers, setVouchers] = useState([]);
   const token = useStore((state) => state.profile.user?.token);
   const navigate = useNavigate();
-  
+
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   const handleCreateNewVoucher = () => {
     navigate("/admin/createvoucher");
   };
@@ -39,8 +39,8 @@ const Voucher = () => {
           response?.$values && Array.isArray(response.$values)
             ? response.$values
             : Array.isArray(response)
-            ? response
-            : [];
+              ? response
+              : [];
         setVouchers(voucherArray);
       } catch (error) {
         console.error("Error fetching vouchers:", error);
@@ -60,7 +60,7 @@ const Voucher = () => {
     setCurrentPage(value);
   };
 
-  // Định dạng ngày
+  // Hàm định dạng ngày
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "short", day: "numeric" };
     return new Date(dateString).toLocaleDateString(undefined, options);

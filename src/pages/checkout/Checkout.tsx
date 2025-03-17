@@ -191,7 +191,7 @@ const Checkout: React.FC = () => {
       }
       const provinceName =
         provinces.find((p) => p.code === selectedProvince)?.name || "";
-      const inRegion = provinceName === "Ho Chi Minh City"; // Use English name for the city
+      const inRegion = provinceName === "Thành phố Hồ Chí Minh";
       const orderDetails = cart.map((item: any) => ({
         productId: item.productId || item.id,
         quantity: item.quantity,
@@ -326,7 +326,7 @@ const Checkout: React.FC = () => {
       districts.find((d) => d.code === selectedDistrict)?.name || "";
     const wardName = wards.find((w) => w.code === selectedWard)?.name || "";
     const fullAddress = `${streetAddress}, ${wardName}, ${districtName}, ${provinceName}`;
-    const inRegion = provinceName === "Ho Chi Minh City";
+    const inRegion = provinceName === "Thành phố Hồ Chí Minh";
 
     const requestPayload = {
       paymentMethodId,

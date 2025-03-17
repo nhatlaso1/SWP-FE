@@ -25,7 +25,7 @@ const SkinType = () => {
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  
+
   const handleCreateNewVoucher = () => {
     navigate("/admin/createskintype");
   };
@@ -39,8 +39,8 @@ const SkinType = () => {
           response?.$values && Array.isArray(response.$values)
             ? response.$values
             : Array.isArray(response)
-            ? response
-            : [];
+              ? response
+              : [];
         setSkinTypes(skinTypeArray);
       } catch (error) {
         console.error("Error fetching skin types:", error);
@@ -63,7 +63,7 @@ const SkinType = () => {
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
-  
+
   const handleRowClick = (skinTypeId) => {
     navigate(`/admin/skintype/${skinTypeId}`);
   };
@@ -96,7 +96,7 @@ const SkinType = () => {
             {currentData.length > 0 ? (
               currentData.map((skinType) => (
                 <TableRow key={skinType.skinTypeId} hover className="skin-type-row"
-                onClick={() => handleRowClick(skinType.skinTypeId)}>
+                  onClick={() => handleRowClick(skinType.skinTypeId)}>
                   <TableCell className="skin-type-cell">{skinType.skinTypeId}</TableCell>
                   <TableCell className="skin-type-cell">{skinType.skinTypeName}</TableCell>
                   <TableCell className="skin-type-cell">{skinType.priority}</TableCell>

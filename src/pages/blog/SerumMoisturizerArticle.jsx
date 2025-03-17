@@ -14,7 +14,7 @@ export default function SerumMoisturizerArticle() {
       {/* Article Header */}
       <header className="article-header">
         <h1 className="article-title">Do I Need a Serum and a Moisturizer?</h1>
-        
+
       </header>
 
       {/* Article Introduction */}

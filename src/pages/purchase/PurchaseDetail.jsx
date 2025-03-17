@@ -233,7 +233,6 @@ export default function PurchaseDetail() {
                 <p style={{ margin: 0, fontSize: "14px" }}>
                   <strong>Quantity:</strong> {item.quantity}
                 </p>
-
               </div>
             </div>
 
