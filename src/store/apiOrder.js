@@ -86,7 +86,7 @@ export const getOrderStatuses = () => {
 
 export const completeOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/complete-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/complete-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -98,7 +98,7 @@ export const completeOrder = async (orderId) => {
 
 export const cancelOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/cancel-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/cancel-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -110,7 +110,7 @@ export const cancelOrder = async (orderId) => {
 
 export const denyOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/deny-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/deny-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -122,7 +122,7 @@ export const denyOrder = async (orderId) => {
 
 export const confirmOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/confirm-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/confirm-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -134,7 +134,7 @@ export const confirmOrder = async (orderId) => {
 
 export const shippingOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/shipping-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/shipping-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -146,7 +146,7 @@ export const shippingOrder = async (orderId) => {
 
 export const returnOrder = async (orderId) => {
   try {
-    const response = await axios.patch(`https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Order/return-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/return-order`, null, {
       params: { orderId }
     });
     return response.status === 200;
@@ -181,7 +181,7 @@ export const getOrderById = async (orderId) => {
     const response = await axios.get(`${API_URL}/Order/get_order_by_id`, {
       params: { orderId }
     });
-    
+
     if (!response.data) {
       throw new Error('No data received from the API');
     }

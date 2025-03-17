@@ -12,7 +12,11 @@ export interface CartActions {
   removeItem: (id: any) => void;
   clearCart: () => void;
   createOrder: (body: any, voucher: number, token: string) => Promise<void>;
-  getShippingPrice: (body: any, inRegion: boolean, token: string) => Promise<any>;
+  getShippingPrice: (
+    body: any,
+    inRegion: boolean,
+    token: string
+  ) => Promise<any>;
 }
 
 export const initialCart: CartState = {

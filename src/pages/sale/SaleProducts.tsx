@@ -47,6 +47,7 @@ export interface Product {
   discount: number; // Discount as a decimal (e.g., 0.2 equals 20%)
   rating: number;
   productImage: string;
+  status: boolean; // true for active, false for inactive
   brand: Brand;
   category: Category;
   skinTypes: {
@@ -96,9 +97,9 @@ const SaleProducts: React.FC = () => {
         });
 
         if (response && response.products) {
-          // Filter products with discount > 0
+          // Filter products with discount > 0 and active status
           const discountedProducts = response.products.filter(
-            (product: Product) => product.discount > 0
+            (product: Product) => product.discount > 0 && product.status === true
           );
           allFetchedProducts = [...allFetchedProducts, ...discountedProducts];
 
@@ -193,10 +194,14 @@ const SaleProducts: React.FC = () => {
                 </Box>
                 <CardMedia
                   component="img"
-                  height="200"
                   image={product.productImage}
                   alt={product.productName}
-                  sx={{ objectFit: 'cover', cursor: 'pointer' }}
+                  sx={{
+                    width: '100%',
+                    aspectRatio: '1/1',
+                    objectFit: 'cover',
+                    cursor: 'pointer'
+                  }}
                   onClick={() => navigate(`/product/${product.productId}`)}
                 />
                 <CardContent sx={{ flexGrow: 1 }}>

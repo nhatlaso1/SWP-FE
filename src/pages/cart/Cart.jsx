@@ -98,7 +98,12 @@ const Cart = () => {
             >
               <CardMedia
                 component="img"
-                sx={{ width: 150, borderRadius: "12px 0 0 12px" }}
+                sx={{
+                  width: 150,
+                  height: 150,
+                  objectFit: "cover",
+                  borderRadius: "12px 0 0 12px",
+                }}
                 image={product.productImage}
                 alt={product.productName}
               />
@@ -108,10 +113,22 @@ const Cart = () => {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 1,
                 }}
               >
                 <Box>
-                  <Typography variant="body1" fontWeight="bold" mb={2}>
+                  <Typography
+                    sx={{
+                      display: "-webkit-box",
+                      "-webkit-box-orient": "vertical",
+                      "-webkit-line-clamp": "3",
+                      whiteSpace: "pre-line",
+                      overflow: "hidden",
+                    }}
+                    variant="body1"
+                    fontWeight="bold"
+                    mb={2}
+                  >
                     {product.productName}
                   </Typography>
                   <Typography variant="body2" mb={2}>
@@ -174,7 +191,7 @@ const Cart = () => {
           <img
             style={{ objectFit: "cover", height: 160 }}
             width={"100%"}
-            src="cart-bg.avif.jpg"
+            src="/cart-bg.avif.jpg"
             alt=""
           />
 

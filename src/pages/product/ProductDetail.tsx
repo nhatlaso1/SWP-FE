@@ -70,15 +70,12 @@ interface Feedback {
   rating: number;
   comment: string;
   createdDate: string;
-  customer: Customer;
-
+  status: boolean;
+  customer: {
+    fullName: string;
+  };
 }
-interface Customer {
-  $id: string;
-  customerId: number;
-  fullName: string
 
-}
 interface ProductDetail {
   $id: string;
   productId: number;
@@ -145,9 +142,8 @@ const ProductDetail: React.FC = () => {
         }
 
         setProduct(data);
-        if (data.productImages.$values.length > 0) {
-          setSelectedImage(data.productImages.$values[0].productImage);
-        }
+        const defaultImage = 'path/to/default/image.jpg'; // Provide a path to a default image
+        setSelectedImage(data.productImages.$values.length > 0 ? data.productImages.$values[0].productImage : defaultImage);
       } catch (error) {
         console.error('Error fetching product detail:', error);
         setError('Failed to load product details. Please try again later.');
@@ -208,23 +204,29 @@ const ProductDetail: React.FC = () => {
                 sx={{ objectFit: 'contain' }}
               />
             </Card>
-            <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
-              {product.productImages.$values.map((image) => (
-                <ImageListItem
-                  key={image.productImageId}
-                  className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''
-                    }`}
-                  onClick={() => setSelectedImage(image.productImage)}
-                >
-                  <img
-                    src={image.productImage}
-                    alt={`${product.productName}-${image.productImageId}`}
-                    loading="lazy"
-                    style={{ height: '100%', objectFit: 'cover' }}
-                  />
-                </ImageListItem>
-              ))}
-            </ImageList>
+            {product.productImages.$values.length > 0 ? (
+              <ImageList className={styles.thumbnailList} cols={4} rowHeight={100}>
+                {product.productImages.$values.map((image) => (
+                  <ImageListItem
+                    key={image.productImageId}
+                    className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''
+                      }`}
+                    onClick={() => setSelectedImage(image.productImage)}
+                  >
+                    <img
+                      src={image.productImage}
+                      alt={`${product.productName}-${image.productImageId}`}
+                      loading="lazy"
+                      style={{ height: '100%', objectFit: 'cover' }}
+                    />
+                  </ImageListItem>
+                ))}
+              </ImageList>
+            ) : (
+              <Typography variant="body2" color="text.secondary">
+                No images available
+              </Typography>
+            )}
           </Grid>
 
           <Grid item xs={12} md={6}>
@@ -263,16 +265,13 @@ const ProductDetail: React.FC = () => {
 
             <List>
               <ListItem>
-                <ListItemText primary="Size" secondary={product.size} />
+                <ListItemText primary={<Typography variant="subtitle1">Size</Typography>} secondary={<Typography variant="body1">{product.size}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary="Brand" secondary={product.brand.brandName} />
+                <ListItemText primary={<Typography variant="subtitle1">Brand</Typography>} secondary={<Typography variant="body1">{product.brand.brandName}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary="Category" secondary={product.category.categoryName} />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary="Available Quantity" secondary={product.quantity} />
+                <ListItemText primary={<Typography variant="subtitle1">Category</Typography>} secondary={<Typography variant="body1">{product.category.categoryName}</Typography>} />
               </ListItem>
             </List>
 
@@ -308,7 +307,7 @@ const ProductDetail: React.FC = () => {
                   productImage: selectedImage || product.productImages.$values[0].productImage,
                   category: product.category.categoryName,
                   skintype: product.skinTypes.$values,
-                  quantity: quantity, 
+                  quantity: quantity,
                 });
               }}
             >
@@ -368,12 +367,12 @@ const ProductDetail: React.FC = () => {
               <Typography variant="h6" className={styles.sectionTitle}>
                 Customer Feedback & Ratings
               </Typography>
-              {product.feedbacks.$values.length > 0 ? (
+              {product.feedbacks.$values.filter(feedback => feedback.status).length > 0 ? (
                 <List>
-                  {product.feedbacks.$values.map((feedback) => (
+                  {product.feedbacks.$values.filter(feedback => feedback.status).map((feedback) => (
                     <ListItem key={feedback.feedbackId} className={styles.reviewItem}>
                       <Box sx={{ width: '100%' }}>
-                      <Typography variant="body1" fontWeight="bold" className={styles.reviewText}>
+                        <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 'bold' }}>
                           {feedback.customer.fullName}
                         </Typography>
                         <Box sx={{ display: 'flex', alignItems: 'center' }}>

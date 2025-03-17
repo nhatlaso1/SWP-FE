@@ -9,12 +9,6 @@ import {
   ProfileState,
 } from "./store/profile";
 import {
-  initialUsers,
-  usersActions,
-  UsersActions,
-  UsersState,
-} from "./store/users";
-import {
   initialNotification,
   NotificationActions,
   notificationActions,
@@ -39,13 +33,11 @@ export interface State {
   notification: NotificationState;
   profile: ProfileState;
   products: ProductsState;
-  users: UsersState;
   cart: CartState;
   routine: RoutineState;
 }
 
 export type Actions = ProfileActions &
-  UsersActions &
   NotificationActions &
   ProductsActions &
   CartActions &
@@ -59,8 +51,6 @@ export const useStore = create<Store, [["zustand/immer", never]]>(
   immer((set, get) => ({
     profile: initialProfile,
     ...profileActions(set, get),
-    users: initialUsers,
-    ...usersActions(set, get),
     products: initialProducts,
     ...productsActions(set, get),
     notification: initialNotification,
