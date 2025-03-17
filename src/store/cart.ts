@@ -1,6 +1,6 @@
-import CartItem from "../pages/checkout/CartItems";
+
 import type { StoreGet, StoreSet } from "../store";
-import axios from "../utils/axiosConfig";
+import { apiClient, apiEndpoints } from "./utils.api";
 
 export interface CartState {
   cart: any;
@@ -21,8 +21,6 @@ export const initialCart: CartState = {
     : [],
 };
 
-const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api";
-
 export function cartActions(set: StoreSet, get: StoreGet): CartActions {
   return {
     addItem: (item) => {
@@ -41,7 +39,6 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         } else {
           updatedCart = [...state.cart.cart, { ...item }];
         }
-
 
         localStorage.setItem("cart", JSON.stringify(updatedCart));
         state.cart.cart = updatedCart;
@@ -73,7 +70,7 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         state.cart.cart = updatedCart;
         state.notification.data.push({
           status: "SUCCESS",
-          content: "Remote to cart successfully!",
+          content: "Remove from cart successfully!",
         });
       });
     },
@@ -84,24 +81,20 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         state.cart.cart = [];
       });
     },
+
     createOrder: async (body, voucher, token) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        const url =
-          voucher && voucher > 0
-            ? `${BASE_URL}/Order/create-order?voucherId=${voucher}`
-            : `${BASE_URL}/Order/create-order`;
-        const response = await axios.post(
-          url,
-          body,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const url = voucher && voucher > 0
+          ? `/${apiEndpoints.Order}/create-order?voucherId=${voucher}`
+          : `/${apiEndpoints.Order}/create-order`;
+
+        const response = await apiClient.post(url, body, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         return response.data;
       } catch (error: any) {
         set((state) => {
@@ -118,25 +111,19 @@ export function cartActions(set: StoreSet, get: StoreGet): CartActions {
         });
       }
     },
+
     getShippingPrice: async (body, inRegion, token) => {
       try {
-        const url = `${BASE_URL}/Order/get_shipping_price?inRegion=${inRegion}`;
-        // Giả sử API sử dụng phương thức POST với body là danh sách orderDetailRequests
-        const response = await axios.post(
-          url,
-          body,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const url = `/${apiEndpoints.Order}/get_shipping_price?inRegion=${inRegion}`;
+        const response = await apiClient.post(url, body, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         return response.data;
       } catch (error: any) {
         console.error("Error fetching shipping price:", error);
         throw error;
       }
     },
-
   };
 }

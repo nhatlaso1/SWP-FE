@@ -127,7 +127,7 @@ const SkinTest = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  No Data
+                  No skin tests available
                 </TableCell>
               </TableRow>
             )}

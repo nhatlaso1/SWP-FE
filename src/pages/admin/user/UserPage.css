@@ -6,5 +6,69 @@
     margin-top: 1rem;
   }
   
-  /* Nếu cần tùy chỉnh thêm, bạn có thể định nghĩa các style bổ sung ở đây */
+  .userpage-container {
+    padding: 24px;
+    background-color: #f8f9fa; /* Nền nhạt */
+    border-radius: 8px;
+  }
+  
+  .userpage-table-container {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .MuiTable-root {
+    border-collapse: separate;
+    border-spacing: 0 8px;
+  }
+  
+  .MuiTableCell-root {
+    background-color: white;
+    padding: 12px;
+    font-size: 14px;
+  }
+  
+  .MuiTableHead-root {
+    background-color: #1976d2; /* Màu xanh chủ đạo */
+  }
+  
+  .MuiTableHead-root .MuiTableCell-root {
+    color: rgb(31, 29, 29);
+    font-weight: bold;
+    text-transform: capitalize;
+    background-color: #fce1e6;
+  }
+  
+  .MuiTableBody-root .MuiTableRow-root {
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .MuiTableBody-root .MuiTableRow-root:hover {
+    background-color: #e3f2fd; /* Highlight khi hover */
+    cursor: pointer;
+  }
+  
+  .MuiTableFooter-root {
+    background-color: white;
+  }
+  
+  .MuiTablePagination-root {
+    border-top: 1px solid #ddd;
+  }
+  
+  .MuiTableCell-root:first-child {
+    border-radius: 8px 0 0 8px;
+  }
+  
+  .MuiTableCell-root:last-child {
+    border-radius: 0 8px 8px 0;
+  }
+  
+  @media (max-width: 768px) {
+    .MuiTableCell-root {
+      font-size: 12px;
+      padding: 8px;
+    }
+  }
   

@@ -286,7 +286,7 @@ const SkinTestQuiz = () => {
                                             .$values[0].category.products
                                             .$values[0].price,
                                       };
-                                      addItem(product);
+                                      addItem(product.productName);
                                     }}
                                   >
                                     Add to Cart
@@ -316,7 +316,14 @@ const SkinTestQuiz = () => {
                                       routineDetail[0].routineSteps.$values[0].category.products.$values
                                         .slice(1)
                                         .map((product) => (
-                                          <div className="other-product-item"  onClick={() => navigate(`/product/${product.productId}`)}>
+                                          <div
+                                            className="other-product-item"
+                                            onClick={() =>
+                                              navigate(
+                                                `/product/${product.productId}`
+                                              )
+                                            }
+                                          >
                                             <img
                                               src={
                                                 product.productImages.$values[0]
@@ -435,7 +442,14 @@ const SkinTestQuiz = () => {
                                       routineDetail[1].routineSteps.$values[0].category.products.$values
                                         .slice(1)
                                         .map((product) => (
-                                          <div className="other-product-item" onClick={() => navigate(`/product/${product.productId}`)}>
+                                          <div
+                                            className="other-product-item"
+                                            onClick={() =>
+                                              navigate(
+                                                `/product/${product.productId}`
+                                              )
+                                            }
+                                          >
                                             <img
                                               src={
                                                 product.productImages.$values[0]
