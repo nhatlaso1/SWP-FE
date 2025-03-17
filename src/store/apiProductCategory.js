@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://localhost:7130/api'; // Sử dụng URL trực tiếp
+const BASE_URL = 'https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api'; // Sử dụng URL trực tiếp
 
 const api = axios.create({
   baseURL: BASE_URL,

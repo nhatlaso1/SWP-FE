@@ -186,6 +186,7 @@ export default function PurchaseDetail() {
               />
               <div className="product-info" style={{ flexGrow: 1 }}>
                 {/* Dòng 1: Tên sản phẩm */}
+                
                 <h4
                   style={{
                     margin: 0,
@@ -227,7 +228,7 @@ export default function PurchaseDetail() {
                         .join(", ")
                     : "N/A"}
                 </p>
-
+                  
                 {/* Dòng 4: Quantity */}
                 <p style={{ margin: 0, fontSize: "14px" }}>
                   <strong>Quantity:</strong> {item.quantity}

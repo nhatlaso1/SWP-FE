@@ -82,7 +82,7 @@ const Cart = () => {
           sx={{
             py: 2,
             overflowY: "auto",
-            height: "calc(100vh - 390px)",
+            height: "calc(100vh - 348px)",
           }}
         >
           {formik.values.products.map((product, index) => (
@@ -98,7 +98,12 @@ const Cart = () => {
             >
               <CardMedia
                 component="img"
-                sx={{ width: 150, borderRadius: "12px 0 0 12px" }}
+                sx={{
+                  width: 150,
+                  height: 150,
+                  objectFit: "cover",
+                  borderRadius: "12px 0 0 12px",
+                }}
                 image={product.productImage}
                 alt={product.productName}
               />
@@ -108,10 +113,22 @@ const Cart = () => {
                   display: "flex",
                   justifyContent: "space-between",
                   alignItems: "center",
+                  gap: 1,
                 }}
               >
                 <Box>
-                  <Typography variant="body1" fontWeight="bold" mb={2}>
+                  <Typography
+                    sx={{
+                      display: "-webkit-box",
+                      "-webkit-box-orient": "vertical",
+                      "-webkit-line-clamp": "3",
+                      whiteSpace: "pre-line",
+                      overflow: "hidden",
+                    }}
+                    variant="body1"
+                    fontWeight="bold"
+                    mb={2}
+                  >
                     {product.productName}
                   </Typography>
                   <Typography variant="body2" mb={2}>
@@ -172,9 +189,9 @@ const Cart = () => {
 
         <Box sx={{ m: 0, background: "#1a1a1a" }}>
           <img
-            style={{ objectFit: "cover", height: 180 }}
+            style={{ objectFit: "cover", height: 160 }}
             width={"100%"}
-            src="cart-bg.avif.jpg"
+            src="/cart-bg.avif.jpg"
             alt=""
           />
 
@@ -186,8 +203,9 @@ const Cart = () => {
             justifyContent="space-between"
             alignItems={"center"}
             m={0}
-            mb={2}
-            p={2}
+            mb={1}
+            py={1}
+            px={2}
           >
             Total:{" "}
             <span style={{ fontSize: "1.5rem", color: "#f44336" }}>
@@ -205,7 +223,7 @@ const Cart = () => {
               mb: 2,
               fontSize: "1.1rem",
             }}
-             onClick={() => navigate("/checkout")}
+            onClick={() => navigate("/checkout")}
           >
             Payment
           </Button>

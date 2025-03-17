@@ -11,30 +11,36 @@ import {
   TableRow,
   Typography,
   Pagination,
+  Button,
 } from "@mui/material";
 import { useStore } from "../../../store";
 import { getAllVoucher } from "../../../store/voucher.api";
+import { useNavigate } from "react-router-dom";
 import "./Voucher.css";
 
 const Voucher = () => {
   const [vouchers, setVouchers] = useState([]);
   const token = useStore((state) => state.profile.user?.token);
+  const navigate = useNavigate();
 
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const handleCreateNewVoucher = () => {
+    navigate("/admin/createvoucher");
+  };
+
   useEffect(() => {
     const fetchVouchers = async () => {
       try {
         const response = await getAllVoucher(token);
-        // Nếu API trả về dữ liệu dạng { "$values": [...] }
         const voucherArray =
           response?.$values && Array.isArray(response.$values)
             ? response.$values
             : Array.isArray(response)
-            ? response
-            : [];
+              ? response
+              : [];
         setVouchers(voucherArray);
       } catch (error) {
         console.error("Error fetching vouchers:", error);
@@ -44,12 +50,8 @@ const Voucher = () => {
     fetchVouchers();
   }, [token]);
 
-  // Sắp xếp voucher theo voucherId tăng dần
-  const sortedVouchers = [...vouchers].sort(
-    (a, b) => Number(a.voucherId) - Number(b.voucherId)
-  );
+  const sortedVouchers = [...vouchers].sort((a, b) => Number(a.voucherId) - Number(b.voucherId));
 
-  // Tính toán phân trang
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentData = sortedVouchers.slice(startIndex, startIndex + itemsPerPage);
   const totalPages = Math.ceil(sortedVouchers.length / itemsPerPage);
@@ -64,10 +66,18 @@ const Voucher = () => {
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
 
+  // Điều hướng đến trang chi tiết voucher
+  const handleRowClick = (voucherId) => {
+    navigate(`/admin/voucher/${voucherId}`);
+  };
+
   return (
     <Container maxWidth="lg" className="voucher-container">
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
         <Typography variant="h4">Voucher List</Typography>
+        <Button variant="contained" color="primary" onClick={handleCreateNewVoucher}>
+          Create New Voucher
+        </Button>
       </Box>
 
       <TableContainer component={Paper} className="voucher-table-container">
@@ -88,7 +98,13 @@ const Voucher = () => {
           <TableBody>
             {currentData.length > 0 ? (
               currentData.map((voucher) => (
-                <TableRow key={voucher.voucherId} hover className="voucher-row">
+                <TableRow
+                  key={voucher.voucherId}
+                  hover
+                  className="voucher-row"
+                  onClick={() => handleRowClick(voucher.voucherId)} // ⬅️ Thêm sự kiện click
+                  style={{ cursor: "pointer" }} // 👀 Biến con trỏ thành bàn tay khi hover
+                >
                   <TableCell className="voucher-table-cell">{voucher.voucherId}</TableCell>
                   <TableCell className="voucher-table-cell">{voucher.voucherName}</TableCell>
                   <TableCell className="voucher-table-cell">{voucher.voucherCode}</TableCell>

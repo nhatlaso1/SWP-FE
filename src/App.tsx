@@ -2,7 +2,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { ThemeProvider } from "@mui/material";
 import theme from "./theme";
 import Home from "./pages/home/Home";
-import Login from "./pages/login/Login";
 import ProtectedRoute from "./utils/ProtectedRoute";
 import Loading from "./components/loading/Loading";
 import { useStore } from "./store";
@@ -13,7 +12,6 @@ import ProductManagement from "./pages/staff/product/ProductManagement";
 import CategoryManagement from "./pages/staff/category/CategoryManagement";
 import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
 import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
-import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import CustomerLayout from "./layouts/CustomerLayout";
 import Cart from "./pages/cart/Cart";
 import Register from "./pages/register/Register";
@@ -40,6 +38,9 @@ import CheckoutSuccess from "./pages/checkout/CheckoutCOD";
 import ProductList from "./pages/product/ProductList";
 import ProductDetail from "./pages/product/ProductDetail";
 import SaleProducts from "./pages/sale/SaleProducts";
+import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
+import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
+import Login from "./pages/login/Login";
 
 
 function App() {
@@ -62,7 +63,7 @@ function App() {
       element: <CustomerLayout />,
       children: [
         { path: "/", element: <Home /> },
-        { path: "take-quiz", element: <SkinTestQuiz /> },
+        // { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
@@ -112,11 +113,16 @@ function App() {
         { path: "skintests", element: <SkinTest /> },
         { path: "routines", element: <Routine /> },
         { path: "vouchers", element: <Voucher /> },
+        { path: "voucher/:id", element: <CreateVoucher /> },
+        { path: "skintypes", element: <SkinType /> },
+        { path: "skintype/:id", element: <CreateSkinType /> },
         { path: "skintypes", element: <SkinType /> },
         { path: "routine/:id", element: <RoutineDetail /> },
         { path: "skintest/:id", element: <SkinTestDetail /> },
         { path: "users", element: <UserPage /> },
         { path: "user/:id", element: <UserInfo /> },
+        { path: "createvoucher", element: <CreateVoucher /> },
+        { path: "createskintype", element: <CreateSkinType /> },
       ],
     }, {
       path: "staff",

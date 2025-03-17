@@ -2,7 +2,7 @@ import axios from 'axios';
 
 
 
-const BASE_URL = 'https://localhost:7130/api';
+const BASE_URL = 'https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api';
 
 
 
@@ -115,7 +115,7 @@ export const ProductAPI = {
     try {
 
       console.log('Calling getAll products with params:', payload);
-      
+
 
       // Gọi API với POST method và parameters để lấy tất cả sản phẩm
 
@@ -254,7 +254,7 @@ export const ProductAPI = {
     try {
 
       console.log('Creating new product with data:', productData);
-      
+
 
       const requestBody = {
 
@@ -295,7 +295,7 @@ export const ProductAPI = {
 
 
       const response = await api.post('/Product/create-product', requestBody);
-      
+
 
       if (!response.data) {
 
@@ -310,14 +310,14 @@ export const ProductAPI = {
       console.log('Response status:', response.status);
 
       console.log('Response data:', response.data);
-      
+
 
       return response.data;
 
     } catch (error) {
 
       console.error('Error creating product. Full error:', error);
-      
+
 
       if (error.response) {
 
@@ -334,16 +334,16 @@ export const ProductAPI = {
           headers: error.response.headers
 
         });
-        
 
-        const errorMessage = error.response.data?.detail 
 
-          || error.response.data?.message 
+        const errorMessage = error.response.data?.detail
+
+          || error.response.data?.message
 
           || error.response.data?.title
 
           || 'Lỗi từ server khi tạo sản phẩm';
-          
+
 
         throw new Error(errorMessage);
 
@@ -369,7 +369,7 @@ export const ProductAPI = {
 
   },
 
- 
+
 
   // Cập nhật sản phẩm
 
@@ -380,7 +380,7 @@ export const ProductAPI = {
       console.log('Updating product with ID:', productId);
 
       console.log('Update data:', productData);
-      
+
 
       // Đảm bảo productId là số nguyên
 
@@ -428,7 +428,7 @@ export const ProductAPI = {
 
       });
 
-      
+
 
       console.log('Update response:', response.data);
 
@@ -613,53 +613,4 @@ export const ProductAPI = {
 };
 
 
-
-
-export const activateProduct = async (productId) => {
-
-  try {
-
-    const response = await api.patch(`/Product/active-product`, null, {
-
-      params: { productId }
-
-    });
-
-    return response.data;
-
-  } catch (error) {
-
-    console.error('Error activating product:', error);
-
-    throw new Error('Không thể kích hoạt sản phẩm');
-
-  }
-
-};
-
-
-
-// Ngừng kích hoạt sản phẩm
-
-export const deactivateProduct = async (productId) => {
-
-  try {
-
-    const response = await api.patch(`/Product/inactive-product`, null, {
-
-      params: { productId }
-
-    });
-
-    return response.data;
-
-  } catch (error) {
-
-    console.error('Error deactivating product:', error);
-
-    throw new Error('Không thể ngừng kích hoạt sản phẩm');
-
-  }
-
-};
 

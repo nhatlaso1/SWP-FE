@@ -1,23 +1,30 @@
 import axios, { AxiosInstance } from "axios";
 
-const apiBaseUrl: string = "https://localhost:7130/api";
+const apiBaseUrl: string =
+  "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api";
 
 export const apiEndpoints = {
   SkinTest: "SkinTest",
   Customer: "Customer",
   Order: "Order",
-  Payment:"Payment",
+  Payment: "Payment",
   SkinType: "SkinType",
   Routine: "Routine",
-  Category:"Category",
-  Voucher:"Voucher",
-  Feedback:"Feedback",
+  Category: "Category",
+  Voucher: "Voucher",
+  Feedback: "Feedback",
+  Product: "Product",
+  Authentication: "Authentication",
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
+    Authorization: `${localStorage.getItem("token")
+        ? `Bearer ${localStorage.getItem("token")}`
+        : ""
+      }`,
   },
 });
 

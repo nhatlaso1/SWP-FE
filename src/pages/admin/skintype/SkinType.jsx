@@ -11,18 +11,24 @@ import {
   TableRow,
   Typography,
   Pagination,
+  Button,
 } from "@mui/material";
 import { useStore } from "../../../store";
 import { getAllSkinType } from "../../../store/skintype.api";
 import "./SkinType.css";
+import { useNavigate } from "react-router-dom";
 
 const SkinType = () => {
   const [skinTypes, setSkinTypes] = useState([]);
   const token = useStore((state) => state.profile.user?.token);
-
+  const navigate = useNavigate();
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  const handleCreateNewVoucher = () => {
+    navigate("/admin/createskintype");
+  };
 
   useEffect(() => {
     const fetchSkinTypes = async () => {
@@ -33,8 +39,8 @@ const SkinType = () => {
           response?.$values && Array.isArray(response.$values)
             ? response.$values
             : Array.isArray(response)
-            ? response
-            : [];
+              ? response
+              : [];
         setSkinTypes(skinTypeArray);
       } catch (error) {
         console.error("Error fetching skin types:", error);
@@ -58,10 +64,17 @@ const SkinType = () => {
     setCurrentPage(value);
   };
 
+  const handleRowClick = (skinTypeId) => {
+    navigate(`/admin/skintype/${skinTypeId}`);
+  };
+
   return (
     <Container maxWidth="lg" className="skin-type-container">
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
         <Typography variant="h4">Skin Type List</Typography>
+        <Button variant="contained" color="primary" onClick={handleCreateNewVoucher}>
+          Create New Skin type
+        </Button>
       </Box>
 
       <TableContainer component={Paper} className="skin-type-table-container">
@@ -74,14 +87,19 @@ const SkinType = () => {
               <TableCell className="skin-type-cell header-cell">
                 Skin Type Name
               </TableCell>
+              <TableCell className="skin-type-cell header-cell">
+                Skin Type Priority
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {currentData.length > 0 ? (
               currentData.map((skinType) => (
-                <TableRow key={skinType.skinTypeId} hover className="skin-type-row">
+                <TableRow key={skinType.skinTypeId} hover className="skin-type-row"
+                  onClick={() => handleRowClick(skinType.skinTypeId)}>
                   <TableCell className="skin-type-cell">{skinType.skinTypeId}</TableCell>
                   <TableCell className="skin-type-cell">{skinType.skinTypeName}</TableCell>
+                  <TableCell className="skin-type-cell">{skinType.priority}</TableCell>
                 </TableRow>
               ))
             ) : (

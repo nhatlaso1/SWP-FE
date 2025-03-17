@@ -108,7 +108,7 @@ const OrderManagement = () => {
 
       const allOrders = await getAllOrders();
 
-      
+
 
       setOrders(allOrders);
 
@@ -116,13 +116,13 @@ const OrderManagement = () => {
 
       console.error('Error fetching orders:', error);
 
-      setNotification({ 
+      setNotification({
 
-        open: true, 
+        open: true,
 
-        message: 'Cannot load order list. Please try again later.', 
+        message: 'Cannot load order list. Please try again later.',
 
-        severity: 'error' 
+        severity: 'error'
 
       });
 
@@ -256,7 +256,7 @@ const OrderManagement = () => {
 
     const targetOrderId = orderId || (selectedOrder ? selectedOrder.orderId : null);
 
-    
+
 
     if (!targetOrderId) {
 
@@ -266,31 +266,31 @@ const OrderManagement = () => {
 
     }
 
-    
+
 
     let updatedStatus;
 
-    let targetOrder = orderId 
+    let targetOrder = orderId
 
-      ? orders.find(order => order.orderId === orderId) 
+      ? orders.find(order => order.orderId === orderId)
 
       : selectedOrder;
 
-    
+
 
     const currentStatus = targetOrder.status;
 
-    
+
 
     if (currentStatus === 'Pending') {
 
       // Get payment method ID from the order
 
-      const paymentMethodId = targetOrder.paymentMethodId || 
+      const paymentMethodId = targetOrder.paymentMethodId ||
 
-                             (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod') ? 1 : 2);
+        (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod') ? 1 : 2);
 
-      
+
 
       if (newStatus === 'Confirmed') {
 
@@ -304,9 +304,9 @@ const OrderManagement = () => {
 
           // If payment method is card/VNPay, mark as paid
 
-          if (paymentMethodId === 2 || 
+          if (paymentMethodId === 2 ||
 
-             (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+            (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
 
             targetOrder = { ...targetOrder, isPaid: true };
 
@@ -318,9 +318,9 @@ const OrderManagement = () => {
 
         // For COD (paymentMethodId = 1), use denyOrder
 
-        if (paymentMethodId === 1 || 
+        if (paymentMethodId === 1 ||
 
-           (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+          (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
 
           const success = await denyOrder(targetOrderId);
 
@@ -336,9 +336,9 @@ const OrderManagement = () => {
 
         // For VNPay/Card (paymentMethodId = 2), use cancelOrder
 
-        if (paymentMethodId === 2 || 
+        if (paymentMethodId === 2 ||
 
-           (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+          (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
 
           const success = await cancelOrder(targetOrderId);
 
@@ -410,15 +410,15 @@ const OrderManagement = () => {
 
       }
 
-      
 
-      setOrders(prevOrders => 
 
-        prevOrders.map(order => 
+      setOrders(prevOrders =>
 
-          order.orderId === targetOrderId 
+        prevOrders.map(order =>
 
-            ? { ...order, status: updatedStatus } 
+          order.orderId === targetOrderId
+
+            ? { ...order, status: updatedStatus }
 
             : order
 
@@ -426,19 +426,19 @@ const OrderManagement = () => {
 
       );
 
-      
 
-      setNotification({ 
 
-        open: true, 
+      setNotification({
 
-        message: `Order status has been updated to ${updatedStatus}!`, 
+        open: true,
 
-        severity: 'success' 
+        message: `Order status has been updated to ${updatedStatus}!`,
+
+        severity: 'success'
 
       });
 
-      
+
 
       await fetchOrders();
 
@@ -538,7 +538,7 @@ const OrderManagement = () => {
 
     const isCOD = paymentMethodId === 1 || paymentMethodId === undefined;
 
-    
+
 
     switch (currentStatus) {
 
@@ -589,10 +589,15 @@ const OrderManagement = () => {
 
 
   const totalAmount = selectedOrder?.details.reduce((total, detail) => {
-
-    return total + (detail.price * detail.quantity);
-
+    // Calculate price after discount for each item
+    const priceAfterDiscount = detail.price * (1 - detail.discount);
+    return total + (priceAfterDiscount * detail.quantity);
   }, 0) || 0;
+
+
+
+  // Add shipping fee to total
+  const finalTotalAmount = totalAmount + (selectedOrder?.shippingPrice || 0);
 
 
 
@@ -616,7 +621,7 @@ const OrderManagement = () => {
 
           { label: 'Shipping Fee', value: selectedOrder.shippingPrice.toLocaleString() + 'đ' },
 
-          { label: 'Total Amount', value: selectedOrder.totalAmount.toLocaleString() + 'đ' }
+          { label: 'Total Amount', value: finalTotalAmount.toLocaleString() + 'đ' }
 
         ].map((item, index) => (
 
@@ -770,7 +775,7 @@ const OrderManagement = () => {
 
                     {/* Get payment method ID from the order */}
 
-                    {(selectedOrder.paymentMethodId === 1 || 
+                    {(selectedOrder.paymentMethodId === 1 ||
 
                       (selectedOrder.paymentMethodName && selectedOrder.paymentMethodName.toLowerCase().includes('cod'))) ? (
 
@@ -778,13 +783,13 @@ const OrderManagement = () => {
 
                       <>
 
-                    <Button onClick={() => handleStatusChange('Denied', selectedOrder.orderId)} variant="contained" color="error" sx={{ mr: 1 }}>
+                        <Button onClick={() => handleStatusChange('Denied', selectedOrder.orderId)} variant="contained" color="error" sx={{ mr: 1 }}>
 
                           Reject
 
-                    </Button>
+                        </Button>
 
-                    <Button onClick={() => handleStatusChange('Confirmed', selectedOrder.orderId)} variant="contained" color="primary">
+                        <Button onClick={() => handleStatusChange('Confirmed', selectedOrder.orderId)} variant="contained" color="primary">
 
                           Approve
 
@@ -800,7 +805,7 @@ const OrderManagement = () => {
 
                         Cancel
 
-                    </Button>
+                      </Button>
 
                     )}
 
@@ -961,21 +966,15 @@ const OrderManagement = () => {
                         <TableCell colSpan={4} />
 
                         <TableCell align="right">
-
+                          <Typography variant="subtitle1">Subtotal:</Typography>
                           <Typography variant="subtitle1">Shipping Fee:</Typography>
-
                           <Typography variant="subtitle1"><strong>Total Amount:</strong></Typography>
-
                         </TableCell>
-
                         <TableCell align="right">
-
+                          <Typography variant="subtitle1">{totalAmount.toLocaleString()}đ</Typography>
                           <Typography variant="subtitle1">{selectedOrder.shippingPrice.toLocaleString()}đ</Typography>
-
-                          <Typography variant="subtitle1"><strong>{selectedOrder.totalAmount.toLocaleString()}đ</strong></Typography>
-
+                          <Typography variant="subtitle1"><strong>{finalTotalAmount.toLocaleString()}đ</strong></Typography>
                         </TableCell>
-
                       </TableRow>
 
                     </TableBody>
@@ -1052,13 +1051,13 @@ const OrderManagement = () => {
 
 
 
-          <Snackbar 
+          <Snackbar
 
-            open={notification.open} 
+            open={notification.open}
 
-            autoHideDuration={6000} 
+            autoHideDuration={6000}
 
-            onClose={handleCloseNotification} 
+            onClose={handleCloseNotification}
 
             anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
 

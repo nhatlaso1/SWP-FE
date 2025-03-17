@@ -142,10 +142,8 @@ const ProductDetail: React.FC = () => {
         }
 
         setProduct(data);
-
         const defaultImage = 'path/to/default/image.jpg'; // Provide a path to a default image
         setSelectedImage(data.productImages.$values.length > 0 ? data.productImages.$values[0].productImage : defaultImage);
-
       } catch (error) {
         console.error('Error fetching product detail:', error);
         setError('Failed to load product details. Please try again later.');
@@ -185,7 +183,7 @@ const ProductDetail: React.FC = () => {
   const averageRating =
     product.feedbacks.$values.length > 0
       ? product.feedbacks.$values.reduce((acc, feedback) => acc + feedback.rating, 0) /
-        product.feedbacks.$values.length
+      product.feedbacks.$values.length
       : 0;
 
   // Tính giá sau discount: nếu có discount, finalPrice = price * (1 - discount)
@@ -211,9 +209,8 @@ const ProductDetail: React.FC = () => {
                 {product.productImages.$values.map((image) => (
                   <ImageListItem
                     key={image.productImageId}
-                    className={`${styles.thumbnailItem} ${
-                      selectedImage === image.productImage ? styles.thumbnailSelected : ''
-                    }`}
+                    className={`${styles.thumbnailItem} ${selectedImage === image.productImage ? styles.thumbnailSelected : ''
+                      }`}
                     onClick={() => setSelectedImage(image.productImage)}
                   >
                     <img
@@ -230,7 +227,6 @@ const ProductDetail: React.FC = () => {
                 No images available
               </Typography>
             )}
-
           </Grid>
 
           <Grid item xs={12} md={6}>
@@ -269,17 +265,13 @@ const ProductDetail: React.FC = () => {
 
             <List>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Size</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.size}</Typography>} />
+                <ListItemText primary={<Typography variant="subtitle1">Size</Typography>} secondary={<Typography variant="body1">{product.size}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Brand</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.brand.brandName}</Typography>} />
+                <ListItemText primary={<Typography variant="subtitle1">Brand</Typography>} secondary={<Typography variant="body1">{product.brand.brandName}</Typography>} />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Category</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.category.categoryName}</Typography>} />
-              </ListItem>
-              <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>Available Quantity</Typography>} secondary={<Typography variant="body1" sx={{ fontWeight: 'bold' }}>{product.quantity}</Typography>} />
-
+                <ListItemText primary={<Typography variant="subtitle1">Category</Typography>} secondary={<Typography variant="body1">{product.category.categoryName}</Typography>} />
               </ListItem>
             </List>
 
@@ -313,6 +305,9 @@ const ProductDetail: React.FC = () => {
                   productName: product.productName,
                   price: product.price,
                   productImage: selectedImage || product.productImages.$values[0].productImage,
+                  category: product.category.categoryName,
+                  skintype: product.skinTypes.$values,
+                  quantity: quantity,
                 });
               }}
             >
@@ -372,7 +367,6 @@ const ProductDetail: React.FC = () => {
               <Typography variant="h6" className={styles.sectionTitle}>
                 Customer Feedback & Ratings
               </Typography>
-
               {product.feedbacks.$values.filter(feedback => feedback.status).length > 0 ? (
                 <List>
                   {product.feedbacks.$values.filter(feedback => feedback.status).map((feedback) => (

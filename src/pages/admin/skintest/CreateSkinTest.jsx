@@ -74,16 +74,16 @@ const CreateSkinTest = () => {
       skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
         q.skinTypeQuestionId === questionId
           ? {
-              ...q,
-              skinTypeAnswers: [
-                ...q.skinTypeAnswers,
-                {
-                  skinTypeAnswerId: Date.now(),
-                  description: "",
-                  skinTypeId: "",
-                },
-              ],
-            }
+            ...q,
+            skinTypeAnswers: [
+              ...q.skinTypeAnswers,
+              {
+                skinTypeAnswerId: Date.now(),
+                description: "",
+                skinTypeId: "",
+              },
+            ],
+          }
           : q
       ),
     }));
@@ -95,11 +95,11 @@ const CreateSkinTest = () => {
       skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
         q.skinTypeQuestionId === questionId
           ? {
-              ...q,
-              skinTypeAnswers: q.skinTypeAnswers.filter(
-                (a) => a.skinTypeAnswerId !== answerId
-              ),
-            }
+            ...q,
+            skinTypeAnswers: q.skinTypeAnswers.filter(
+              (a) => a.skinTypeAnswerId !== answerId
+            ),
+          }
           : q
       ),
     }));
@@ -124,11 +124,11 @@ const CreateSkinTest = () => {
       skinTypeQuestions: prev.skinTypeQuestions.map((q) =>
         q.skinTypeQuestionId === questionId
           ? {
-              ...q,
-              skinTypeAnswers: q.skinTypeAnswers.map((a) =>
-                a.skinTypeAnswerId === answerId ? { ...a, [field]: value } : a
-              ),
-            }
+            ...q,
+            skinTypeAnswers: q.skinTypeAnswers.map((a) =>
+              a.skinTypeAnswerId === answerId ? { ...a, [field]: value } : a
+            ),
+          }
           : q
       ),
     }));

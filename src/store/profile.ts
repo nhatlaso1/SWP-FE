@@ -1,6 +1,6 @@
 import type { StoreGet, StoreSet } from "../store";
-import axios from "../utils/axiosConfig";
 import { NavigateFunction } from "react-router-dom";
+import { apiClient, apiEndpoints } from "./utils.api";
 
 export interface UserProfile {
   $id: string;
@@ -28,7 +28,7 @@ export interface ProfileState {
 
 export interface ProfileActions {
   fetchProfile: () => Promise<void>;
-  updateProfile: (values: Record<string, unknown>) => Promise<void>;
+  updateProfile: (values: any) => Promise<void>;
   register: (userBody: Record<string, unknown>) => Promise<void>;
   login: (
     email: string,
@@ -47,7 +47,7 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
-const BASE_URL = "https://localhost:7130/api/Authentication";
+const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
 
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {
@@ -79,17 +79,20 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/login`, {
-          email,
-          password,
-        });
+        const response = await apiClient.post(
+          `${apiEndpoints.Authentication}/login`,
+          {
+            email,
+            password,
+          }
+        );
         const { token } = response.data || {};
 
         if (token) {
           const payload = JSON.parse(atob(token.split(".")[1]));
           const role =
             payload[
-              "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
             ];
 
           set((state) => {
@@ -117,7 +120,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.delete(`${BASE_URL}/logout`);
+        await apiClient.delete(`${apiEndpoints.Authentication}/logout`);
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         set((state) => {
@@ -140,7 +143,9 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.get(`${BASE_URL}/profile`);
+        const response = await apiClient.get(
+          `${apiEndpoints.Authentication}/profile`
+        );
         //Dummy data
         // const response = {
         //   data: {
@@ -149,6 +154,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         //     fullName: "Customer 1",
         //     birthday: "1992-03-12",
         //     confirmedEmail: false,
+        //     phoneNumber: "0123123213",
         //     skinType: {
         //       $id: "2",
         //       skinTypeId: 5,
@@ -170,12 +176,25 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
       }
     },
 
-    updateProfile: async (values) => {
+    updateProfile: async (values: any) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
-        await axios.put(`${BASE_URL}/profile`, values);
+        const formData = new FormData();
+        formData.append("FullName", values.fullName);
+        formData.append("PhoneNumber", values.phoneNumber);
+        formData.append("Birthday", values.birthday);
+        formData.append("Image", "");
+        await apiClient.patch(
+          `${apiEndpoints.Customer}/update-profile`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         handleSuccess("Profile updated successfully");
       } catch (error) {
         handleError(error);
@@ -191,7 +210,10 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        const response = await axios.post(`${BASE_URL}/register`, body);
+        const response = await apiClient.post(
+          `${apiEndpoints.Authentication}/register`,
+          body
+        );
         const status = response?.data?.status;
         const message = response?.data?.detail || "Register successfully!";
         set((state) => {
@@ -232,7 +254,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.put(`${BASE_URL}/refresh`);
+        await apiClient.put(`${apiEndpoints.Authentication}/refresh`);
         handleSuccess("Token refreshed successfully");
       } catch (error) {
         handleError(error);
@@ -248,7 +270,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await axios.put(`${BASE_URL}/change-password`, {
+        await apiClient.put(`${apiEndpoints.Customer}/change-password`, {
           oldPassword,
           newPassword,
         });
@@ -267,5 +289,6 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.profile.error = error;
       });
     },
+
   };
 }
