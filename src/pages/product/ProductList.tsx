@@ -476,17 +476,17 @@ const ProductList: React.FC = () => {
                         addItem({
                           productId: product.productId,
                           productName: product.productName,
-                          summary: product.summary,
+                          // summary: product.summary,
                           price: product.price * (1 - product.discount),
-                          discount: product.discount,
-                          rating: product.rating,
+                          // discount: product.discount,
+                          // rating: product.rating,
                           productImage: product.productImage,
-                          brand: product.brand?.brandName,
+                          // brand: product.brand?.brandName,
                           category: product.category?.categoryName,
                           // Pass skinTypes as an array: if product.skinTypes exists, extract $values, otherwise an empty array
                           skintype: product.skinTypes?.$values || [],
-                          functions: product.functions?.$values || [],
-                          ingredients: product.ingredients?.$values || [],
+                          // functions: product.functions?.$values || [],
+                          // ingredients: product.ingredients?.$values || [],
                           quantity: 1, // default quantity when adding to cart
                         });
                       }}

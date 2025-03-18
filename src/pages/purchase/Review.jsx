@@ -10,10 +10,10 @@ export default function Review({ isOpen, onClose, detail }) {
   const [comment, setComment] = useState(
     "Suitable Skin Types:\n\nFunctions:\n\nFeedback:"
   );
-  const token = useStore(
-    (state) => state.profile.user && state.profile.user.token
-  );
-
+  // const token = useStore(
+  //   (state) => state.profile.user && state.profile.user.token
+  // );
+  const token = localStorage.getItem("token");
   const handleStarClick = (value) => {
     setRating(value);
   };

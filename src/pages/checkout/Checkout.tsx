@@ -380,7 +380,7 @@ const Checkout: React.FC = () => {
       const paymentUrl = await createPayment(orderIdRef.current, token);
       console.log("Received payment URL:", paymentUrl);
       if (paymentUrl && paymentUrl.startsWith("http")) {
-        window.location.href = paymentUrl; // Redirect to payment gateway
+        window.open(paymentUrl, "_blank");// Redirect to payment gateway
       } else {
         console.error("Invalid payment URL:", paymentUrl);
         alert("Unable to retrieve payment link. Please try again.");

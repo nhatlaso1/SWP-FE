@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
-
 import {
 
   Box,
@@ -77,7 +76,8 @@ const OrderManagement = () => {
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
   const [isDetailDialogOpen, setDetailDialogOpen] = useState(false);
-
+  
+  const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
 
@@ -103,10 +103,10 @@ const OrderManagement = () => {
   const fetchOrders = async () => {
 
     try {
-
+      
       console.log('Fetching all orders');
 
-      const allOrders = await getAllOrders();
+      const allOrders = await getAllOrders(token);
 
 
 
@@ -136,7 +136,7 @@ const OrderManagement = () => {
 
     try {
 
-      const success = await confirmOrder(orderId);
+      const success = await confirmOrder(orderId,token);
 
       if (success) {
 
@@ -166,7 +166,7 @@ const OrderManagement = () => {
 
     try {
 
-      const success = await cancelOrder(orderId);
+      const success = await cancelOrder(orderId,token);
 
       if (success) {
 
@@ -196,7 +196,7 @@ const OrderManagement = () => {
 
     try {
 
-      const detailedOrder = await getOrderById(order.orderId);
+      const detailedOrder = await getOrderById(order.orderId,token);
 
       setSelectedOrder(detailedOrder);
 
@@ -296,7 +296,7 @@ const OrderManagement = () => {
 
         // For both payment methods, use confirmOrder
 
-        const success = await confirmOrder(targetOrderId);
+        const success = await confirmOrder(targetOrderId,token);
 
         if (success) {
 
@@ -322,7 +322,7 @@ const OrderManagement = () => {
 
           (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
 
-          const success = await denyOrder(targetOrderId);
+          const success = await denyOrder(targetOrderId,token);
 
           if (success) {
 
@@ -340,7 +340,7 @@ const OrderManagement = () => {
 
           (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
 
-          const success = await cancelOrder(targetOrderId);
+          const success = await cancelOrder(targetOrderId,token);
 
           if (success) {
 
@@ -356,7 +356,7 @@ const OrderManagement = () => {
 
       if (newStatus === 'Shipping') {
 
-        const success = await shippingOrder(targetOrderId);
+        const success = await shippingOrder(targetOrderId,token);
 
         if (success) {
 
@@ -366,7 +366,7 @@ const OrderManagement = () => {
 
       } else if (newStatus === 'Cancel') {
 
-        const success = await cancelOrder(targetOrderId);
+        const success = await cancelOrder(targetOrderId,token);
 
         if (success) {
 
@@ -380,7 +380,7 @@ const OrderManagement = () => {
 
       if (newStatus === 'Returned') {
 
-        const success = await returnOrder(targetOrderId);
+        const success = await returnOrder(targetOrderId,token);
 
         if (success) {
 
@@ -390,7 +390,7 @@ const OrderManagement = () => {
 
       } else if (newStatus === 'Complete') {
 
-        const success = await completeOrder(targetOrderId);
+        const success = await completeOrder(targetOrderId,token);
 
         if (success) {
 

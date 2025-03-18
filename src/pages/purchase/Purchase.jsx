@@ -10,7 +10,8 @@ import "./Purchase.css";
 export default function Purchase() {
   const navigate = useNavigate();
   const location = useLocation();
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const [orders, setOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -31,6 +32,9 @@ export default function Purchase() {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      
+      console.log("token:", token);
+      console.log("selectedStatus:", selectedStatus);
       if (!token) return;
       try {
         const data = await getAllUserOrders(selectedStatus, token);

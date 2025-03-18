@@ -285,18 +285,18 @@ const ProductManagement = () => {
 
       if (response && response.products) {
         setProducts(response.products);
-        setTotalItems(response.pagination.totalItems);
+        // setTotalItems(response.pagination.totalItems);
         setTotalPages(response.pagination.totalPages);
         setCurrentPage(response.pagination.currentPage);
 
         console.log('Total products loaded:', response.products.length);
         console.log('Total pages:', response.pagination.totalPages);
         console.log('Current page:', response.pagination.currentPage);
-        console.log('Total items:', response.pagination.totalItems);
+        //console.log('Total items:', response.pagination.totalItems);
       } else {
         console.error('Invalid response format:', response);
         setProducts([]);
-        setTotalItems(0);
+        //setTotalItems(0);
         setTotalPages(0);
         setCurrentPage(1);
       }

@@ -2,12 +2,16 @@ import axios from 'axios';
 
 const API_URL = 'https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api';
 
-export const getAllOrders = async (status) => {
+export const getAllOrders = async (token) => {
+// export const getAllOrders = async (status,token) => {
   try {
-    const apiStatus = status === 'Cancelled' ? 'Cancel' : status;
-    console.log(`Fetching orders with status: ${apiStatus}`);
+    console.log("token",token);
+    //const apiStatus = status === 'Cancelled' ? 'Cancel' : status;
+    //console.log(`Fetching orders with status: ${apiStatus}`);
     const response = await axios.get(`${API_URL}/Order/get_all_order`, {
-      params: apiStatus ? { status: apiStatus } : {}
+    //  params: apiStatus ? { status: apiStatus } : {}
+ //   },{
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     console.log('API Response:', response.data);
@@ -33,7 +37,7 @@ export const getAllOrders = async (status) => {
       }))
     }));
 
-    console.log(`Found ${orders.length} orders with status:`, apiStatus);
+    //console.log(`Found ${orders.length} orders with status:`, apiStatus);
     return orders;
   } catch (error) {
     console.error('Error fetching orders:', error);
@@ -84,10 +88,12 @@ export const getOrderStatuses = () => {
   return ['Pending', 'Shipping', 'Complete', 'Cancelled'];
 };
 
-export const completeOrder = async (orderId) => {
+export const completeOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/complete-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/complete-order`, {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -96,10 +102,12 @@ export const completeOrder = async (orderId) => {
   }
 };
 
-export const cancelOrder = async (orderId) => {
+export const cancelOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/cancel-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/cancel-order`, {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -108,10 +116,12 @@ export const cancelOrder = async (orderId) => {
   }
 };
 
-export const denyOrder = async (orderId) => {
+export const denyOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/deny-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/deny-order` , {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -120,10 +130,12 @@ export const denyOrder = async (orderId) => {
   }
 };
 
-export const confirmOrder = async (orderId) => {
+export const confirmOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/confirm-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/confirm-order` , {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -132,10 +144,12 @@ export const confirmOrder = async (orderId) => {
   }
 };
 
-export const shippingOrder = async (orderId) => {
+export const shippingOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/shipping-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/shipping-order` , {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -144,10 +158,12 @@ export const shippingOrder = async (orderId) => {
   }
 };
 
-export const returnOrder = async (orderId) => {
+export const returnOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/return-order`, null, {
+    const response = await axios.patch(`${API_URL}/Order/return-order` , {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
     return response.status === 200;
   } catch (error) {
@@ -156,9 +172,11 @@ export const returnOrder = async (orderId) => {
   }
 };
 
-export const approveOrder = async (orderId) => {
+export const approveOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/approve/${orderId}`);
+    const response = await axios.patch(`${API_URL}/Order/approve/${orderId}`,{
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.status === 200;
   } catch (error) {
     console.error('Error approving order:', error);
@@ -166,9 +184,11 @@ export const approveOrder = async (orderId) => {
   }
 };
 
-export const rejectOrder = async (orderId) => {
+export const rejectOrder = async (orderId,token) => {
   try {
-    const response = await axios.patch(`${API_URL}/Order/reject/${orderId}`);
+    const response = await axios.patch(`${API_URL}/Order/reject/${orderId}`,{
+      headers: { Authorization: `Bearer ${token}` },
+    });
     return response.status === 200;
   } catch (error) {
     console.error('Error rejecting order:', error);
@@ -176,10 +196,12 @@ export const rejectOrder = async (orderId) => {
   }
 };
 
-export const getOrderById = async (orderId) => {
+export const getOrderById = async (orderId,token) => {
   try {
     const response = await axios.get(`${API_URL}/Order/get_order_by_id`, {
       params: { orderId }
+    },{
+      headers: { Authorization: `Bearer ${token}` },
     });
 
     if (!response.data) {
