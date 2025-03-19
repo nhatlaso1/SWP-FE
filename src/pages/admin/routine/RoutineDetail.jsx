@@ -26,13 +26,16 @@ import { getAllSkinType } from "../../../store/skintype.api";
 const RoutineDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const [skinTypes, setSkinTypes] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
+  
   const [routine, setRoutine] = useState({
     routineId: 0,
     routineName: "",
     skinTypeId: 0,
+    status: true,
     routineDetails: [],
   });
   const [categories, setCategories] = useState([]);
@@ -65,6 +68,7 @@ const RoutineDetail = () => {
           routineName: data.routineName || "",
           skinTypeId: data.skinTypeId || 0,
           skinTypeName: data.skinTypeName || "",
+          status: data.status,
           routineDetails: data.routineDetails || [],
         });
       }
@@ -202,7 +206,7 @@ const RoutineDetail = () => {
       </Button>
 
       <Grid container spacing={2} sx={{ mb: 2 }}>
-        <Grid item xs={8}>
+        <Grid item xs={6}>
           <TextField
             label="Routine Name"
             fullWidth
@@ -211,7 +215,7 @@ const RoutineDetail = () => {
             disabled={!isEditing}
           />
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={3}>
           <FormControl fullWidth>
             <InputLabel>Skin Type</InputLabel>
             <Select
@@ -227,7 +231,26 @@ const RoutineDetail = () => {
               ))}
             </Select>
           </FormControl>
+          
         </Grid>
+        <Grid item xs={3}>
+            {isEditing ? (
+              <Select
+                value={routine.status ? "Active" : "Inactive"}
+                onChange={(e) =>
+                  handleChange("status", e.target.value)
+                }
+                fullWidth
+              >
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+            ) : (
+              <Typography>
+                Status: {routine.status ? "Active" : "Inactive"}
+              </Typography>
+            )}
+          </Grid>
       </Grid>
 
       {routine.routineDetails.map((detail, dIdx) => (

@@ -12,6 +12,7 @@ const Profile = () => {
   const fetchProfile = useStore((store) => store.fetchProfile);
   const updateProfile = useStore((store) => store.updateProfile);
   const profile = useStore((store) => store.profile.userProfile);
+  
 
   const formik = useFormik({
     initialValues: {
@@ -34,7 +35,9 @@ const Profile = () => {
 
   useEffect(() => {
     if (profile) {
+      console.log("B Profile:", profile);
       formik.setValues(profile);
+      console.log(" A Profile:", profile);
     }
   }, [profile]);
 

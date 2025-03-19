@@ -179,7 +179,7 @@ const Cart = () => {
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="caption" fontWeight={"bold"}>
-                    {product.price.toLocaleString()} đ
+                    {product.price} đ
                   </Typography>
                 </Box>
               </CardContent>

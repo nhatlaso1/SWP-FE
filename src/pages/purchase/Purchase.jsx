@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Box, Pagination, TextField, MenuItem } from "@mui/material";
-import { useStore } from "../../store";
+
 import { getAllUserOrders } from "../../store/purchase.api";
 import { rePayment } from "../../store/payment.api"; // Your rePayment API
 import Review from "./Review";
 import "./Purchase.css";
+import { useStore } from "../../store";
 
 export default function Purchase() {
   const navigate = useNavigate();
   const location = useLocation();
-  //const token = useStore((state) => state.profile.user?.token);
-  const token = localStorage.getItem("token");
+  const fprofile = useStore((store) => store.profile.userProfile);
+  // const token = useStore((state) => state.profile.user?.token);
+
+   const token = localStorage.getItem("token");
   const [orders, setOrders] = useState([]);
   const [selectedStatus, setSelectedStatus] = useState("");
   const [isPopupOpen, setPopupOpen] = useState(false);
@@ -31,7 +34,9 @@ export default function Purchase() {
   ];
 
   useEffect(() => {
+    console.log("fProfile:", fprofile);
     const fetchOrders = async () => {
+      
       
       console.log("token:", token);
       console.log("selectedStatus:", selectedStatus);

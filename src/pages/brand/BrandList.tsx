@@ -354,11 +354,14 @@ const BrandList: React.FC = () => {
                             productImage: product.productImage,
                             category: product.category?.categoryName || "",
                             skintype: product.skinTypes?.$values || [],
-                            price: product.price * (1 - product.discount),
+                            price: Math.round(product.price * (1 - product.discount))
+                              .toString()
+                              .padStart(3, "0"), // Định dạng số nguyên 3 chữ số
                             quantity: 1,
-                            //    note: product.summary,
+                            // note: product.summary,
                           });
                         }}
+                        
                       >
                         Add to Cart
                       </Button>

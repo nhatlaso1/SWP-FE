@@ -303,7 +303,7 @@ const ProductDetail: React.FC = () => {
                 addItem({
                   productId: product.productId,
                   productName: product.productName,
-                  price: product.price,
+                  price: finalPrice,
                   productImage: selectedImage || product.productImages.$values[0].productImage,
                   category: product.category.categoryName,
                   skintype: product.skinTypes.$values,

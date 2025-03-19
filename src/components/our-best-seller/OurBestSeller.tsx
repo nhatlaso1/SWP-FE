@@ -98,7 +98,7 @@ const OurBestSeller: React.FC = () => {
                 <div className="product-info">
                   <p className="name">{product.productName}</p>
                   <p className="desc">{product.summary}</p>
-                  <p className="price">${product.price}</p>
+                  <p className="price">{product.price.toLocaleString()}VND</p>
                 </div>
               </div>
             ))}

@@ -42,6 +42,7 @@ export const createRoutine = async (routine: Routine): Promise<any> => {
     const payload = {
       routineName: routine.routineName,
       skinTypeId: routine.skinTypeId, // nếu API cần, bạn có thể truyền skinTypeName thay thế
+      status: routine.status,
       routineDetails: routine.routineDetails.map((detail) => ({
         routineDetailName: detail.routineDetailName,
         routineSteps: detail.routineSteps.map((step) => ({
@@ -66,6 +67,7 @@ export const updateRoutine = async (routine: Routine): Promise<any> => {
       routineId: routine.routineId,
       routineName: routine.routineName,
       skinTypeId: routine.skinTypeId,
+      status: routine.status,
       routineDetails: routine.routineDetails.map((detail) => ({
         routineDetailId:detail.routineDetailId,
         routineDetailName: detail.routineDetailName,

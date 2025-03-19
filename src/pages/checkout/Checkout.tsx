@@ -67,7 +67,8 @@ const Checkout: React.FC = () => {
   const queryParams = new URLSearchParams(location.search);
   const paymentStatus = queryParams.get("status");
 
-  const token = useStore((state) => state.profile.user?.token);
+ //const token = useStore((state) => state.profile.user?.token);
+  const token =localStorage.getItem("token");
   const cart = useStore((state) => state.cart.cart);
   const getShippingPrice = useStore((state) => state.getShippingPrice);
   const createOrder = useStore((state) => state.createOrder);
@@ -380,7 +381,8 @@ const Checkout: React.FC = () => {
       const paymentUrl = await createPayment(orderIdRef.current, token);
       console.log("Received payment URL:", paymentUrl);
       if (paymentUrl && paymentUrl.startsWith("http")) {
-        window.open(paymentUrl, "_blank");// Redirect to payment gateway
+        //window.open(paymentUrl, "_blank");// Redirect to payment gateway
+        window.location.href = paymentUrl;
       } else {
         console.error("Invalid payment URL:", paymentUrl);
         alert("Unable to retrieve payment link. Please try again.");

@@ -98,6 +98,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           });
 
           localStorage.setItem("token", token);
+          localStorage.setItem("email", email);
           localStorage.setItem("role", role);
 
           handleSuccess("Login successful");

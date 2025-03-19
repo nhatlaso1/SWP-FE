@@ -20,7 +20,8 @@ import "./Routine.css";
 
 const Routine = () => {
   const [routines, setRoutines] = useState([]);
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   // Phân trang

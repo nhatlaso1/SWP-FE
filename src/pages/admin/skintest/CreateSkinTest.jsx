@@ -17,7 +17,8 @@ import { createSkinTest, getAllSkinTypes } from "../../../store/skinTest.api";
 
 const CreateSkinTest = () => {
   const navigate = useNavigate();
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
 
   // Ở trang Create luôn ở chế độ nhập liệu
   const [skinTypes, setSkinTypes] = useState([]);

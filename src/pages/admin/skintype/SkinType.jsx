@@ -20,7 +20,8 @@ import { useNavigate } from "react-router-dom";
 
 const SkinType = () => {
   const [skinTypes, setSkinTypes] = useState([]);
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);

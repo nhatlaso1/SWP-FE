@@ -34,6 +34,7 @@ export const mapApiToOrder = (apiOrder: any): Order => {
     fullName: apiOrder.fullName || "Unknown",
     address: apiOrder.address,
     shippingPrice: apiOrder.shippingPrice,
+    voucher: apiOrder.voucher ||  "None",
     phoneNumber: apiOrder.phoneNumber,
     totalAmount: apiOrder.totalAmount,
     paymentMethodName: apiOrder.paymentMethodName || "N/A",

@@ -20,8 +20,8 @@ import "./SkinTest.css";
 
 const SkinTest = () => {
   const navigate = useNavigate();
-  const token = useStore((store) => store.profile.user?.token);
-  console.log("Token from store:", token);
+  // const token = useStore((store) => store.profile.user?.token);
+  // console.log("Token from store:", token);
 
   const [skinTests, setSkinTests] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -29,13 +29,13 @@ const SkinTest = () => {
 
   useEffect(() => {
     const fetchSkinTests = async () => {
-      if (!token) {
-        console.error("Token does not exist!");
-        return;
-      }
+      // if (!token) {
+      //   console.error("Token does not exist!");
+      //   return;
+      // }
 
       try {
-        const skinTestsData = await getAllSkinTests(token);
+        const skinTestsData = await getAllSkinTests();
         console.log("API response data:", skinTestsData);
 
         // Giả sử API trả về dữ liệu dạng { "$values": [...] }
@@ -54,7 +54,7 @@ const SkinTest = () => {
     };
 
     fetchSkinTests();
-  }, [token]);
+  }, []);
 
   const handleRowClick = (test) => {
     navigate(`/admin/skintest/${test.skinTestId}`);

@@ -46,11 +46,9 @@ interface ApiResponse {
 }
 
 // Lấy danh sách SkinTest
-export const getAllSkinTests = async (token: string): Promise<ApiResponse> => {
+export const getAllSkinTests = async (): Promise<ApiResponse> => {
   try {
-    const response = await apiClient.get(`${apiEndpoints.SkinTest}/get-all-skin-test`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const response = await apiClient.get(`${apiEndpoints.SkinTest}/get-all-skin-test`);
     return response.data;
   } catch (error) {
     console.error("Error fetching all skin tests:", error);

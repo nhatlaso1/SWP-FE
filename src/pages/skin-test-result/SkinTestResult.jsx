@@ -90,11 +90,10 @@ const SkinTestResult = () => {
                                     }
                                   </p>
                                   <p className="product-price">
-                                    $
                                     {
                                       routineDetail[0].routineSteps.$values[0]
-                                        .category.products.$values[0].price
-                                    }
+                                        .category.products.$values[0].price.toLocaleString()
+                                    }VND
                                   </p>
                                   <Button
                                     fullWidth
@@ -122,8 +121,18 @@ const SkinTestResult = () => {
                                           routineDetail[0].routineSteps
                                             .$values[0].category.products
                                             .$values[0].price,
+                                        category:
+                                          routineDetail[0].routineSteps.$values[0].category.categoryName
                                       };
-                                      addItem(product.productName);
+                                      addItem({
+                                        productId : product.productId,
+                                        productName : product.productName,
+                                        productImage : product.productImage,
+                                        price : product.price,
+                                        category: product.category,
+                                        skinType: skinType.skinTypeName,
+                                        quantity: 1
+                                      });
                                     }}
                                   >
                                     Add to Cart
@@ -174,7 +183,7 @@ const SkinTestResult = () => {
                                                 {product.productName}
                                               </p>
                                               <p className="price">
-                                                ${product.price}
+                                                {product.price.toLocaleString()}VND
                                               </p>
                                             </div>
                                           </div>

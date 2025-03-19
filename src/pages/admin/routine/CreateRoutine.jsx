@@ -22,12 +22,13 @@ import { getAllSkinType } from "../../../store/skintype.api";
 
 const CreateRoutine = () => {
   const navigate = useNavigate();
-  const token = useStore((state) => state.profile.user?.token);
-
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const [isEditing, setIsEditing] = useState(true);
   const [routine, setRoutine] = useState({
     routineName: "",
     skinTypeId: 0,
+    status:true,
     routineDetails: [],
   });
   const [categories, setCategories] = useState([]);

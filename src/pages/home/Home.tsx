@@ -27,7 +27,7 @@ const Home: React.FC = () => {
         <NewIn />
         <div className="section-container">
           {/* <SpecialOffer /> */}
-          <OurBranch />
+          {/* <OurBranch /> */}
           <OurBlog />
         </div>
       </div>

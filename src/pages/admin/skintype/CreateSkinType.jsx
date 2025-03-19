@@ -11,7 +11,8 @@ import { useStore } from "../../../store";
 export default function CreateSkinType() {
   const navigate = useNavigate();
   const { id } = useParams(); // Lấy id nếu là chế độ update/view
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const isEditMode = Boolean(id);
 
   const [skinType, setSkinType] = useState({

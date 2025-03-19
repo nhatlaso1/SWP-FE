@@ -52,7 +52,8 @@ const CreateSkinTests: React.FC = () => {
     severity: "success",
   });
 
-  const token = useStore((store) => store.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const userRole = useStore((store) => store.profile.user?.role);
 
   const formatPayload = () => ({

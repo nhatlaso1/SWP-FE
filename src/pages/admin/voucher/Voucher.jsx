@@ -20,7 +20,8 @@ import "./Voucher.css";
 
 const Voucher = () => {
   const [vouchers, setVouchers] = useState([]);
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
   // Phân trang

@@ -22,7 +22,8 @@ import {
 const SkinTestDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const token = useStore((state) => state.profile.user?.token);
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
 
   // Nếu không có id => chế độ tạo mới (Create)
   const isCreating = !id;

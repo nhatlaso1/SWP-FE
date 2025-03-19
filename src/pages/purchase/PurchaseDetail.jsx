@@ -36,8 +36,8 @@ function getDoneSteps(status) {
 
 export default function PurchaseDetail() {
   const { id } = useParams();
-  const token = useStore((state) => state.profile.user?.token);
-
+  //const token = useStore((state) => state.profile.user?.token);
+  const token = localStorage.getItem("token");
   const [order, setOrder] = useState(null);
 
   useEffect(() => {

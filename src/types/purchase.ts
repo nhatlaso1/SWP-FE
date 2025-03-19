@@ -43,6 +43,7 @@ export interface Order {
   fullName: string;
   address: string;
   phoneNumber: string;
+  voucher: Voucher | null;
   shippingPrice: number;
   totalAmount: number;
   paymentMethodName: string;
