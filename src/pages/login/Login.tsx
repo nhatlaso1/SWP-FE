@@ -47,6 +47,7 @@ const Login: React.FC = () => {
         role === "Staff" ? "/staff/dashboard" : "/");
 
       navigate(redirectPath); // Điều hướng về trang trước đó hoặc theo vai trò
+      window.location.reload();
     }
   }, [user, navigate, location.state]);
 

@@ -43,6 +43,7 @@ import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
 import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
+import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
 
 
 function App() {
@@ -67,6 +68,7 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
+        { path: "quiz-result", element: <SkinTestResult /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
         { path: "blogs", element: <OurBlog /> },
