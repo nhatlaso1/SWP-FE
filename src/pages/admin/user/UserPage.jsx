@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import PropTypes from "prop-types";
 import { useTheme, styled } from "@mui/material/styles";
 import {
@@ -14,8 +14,9 @@ import {
   TableRow,
   Typography,
   IconButton,
-  Button,
   TablePagination,
+  TableCell as MuiTableCell,
+  TableRow as MuiTableRow,
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import FirstPageIcon from "@mui/icons-material/FirstPage";
@@ -23,6 +24,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import "./UserPage.css";
+import { getAllCustomer } from "../../../store/user.api";
 
 // Styled components cho TableCell và TableRow
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -42,7 +44,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
   "&:hover": {
     backgroundColor: theme.palette.action.selected,
-    cursor: "pointer",
   },
 }));
 
@@ -116,77 +117,25 @@ TablePaginationActions.propTypes = {
   rowsPerPage: PropTypes.number.isRequired,
 };
 
-// Hàm tạo dữ liệu mẫu cho 60 người dùng với các trường: IdUser, Name, PhoneNumber, DateOfJoining, confirmed_email, skinType
-const skinTypeMap = {
-  1: "Oily skin",
-  2: "Combination skin",
-  3: "Sensitive skin",
-  4: "Normal skin",
-  5: "Dry skin",
-};
-
-const generateUsers = () => {
-  const firstNames = [
-    "Alice",
-    "Bob",
-    "Charlie",
-    "David",
-    "Eva",
-    "Frank",
-    "Grace",
-    "Helen",
-    "Ian",
-    "Julia",
-  ];
-  const lastNames = [
-    "Nguyen",
-    "Tran",
-    "Le",
-    "Pham",
-    "Hoang",
-    "Duong",
-    "Phan",
-    "Vu",
-    "Bui",
-    "Dang",
-  ];
-  const users = [];
-  for (let i = 1; i <= 60; i++) {
-    const firstName = firstNames[i % firstNames.length];
-    const lastName = lastNames[i % lastNames.length];
-    const fullName = `${firstName} ${lastName} ${i}`;
-    const phoneNumber = "0" + (380000000 + i);
-    const dateOfJoining = new Date(
-      2023,
-      i % 12,
-      (i % 28) + 1
-    ).toLocaleDateString();
-    // Xét confirmed_email: "Yes" nếu i chẵn, "No" nếu lẻ
-    const confirmed_email = i % 2 === 0 ? "Yes" : "No";
-    // Skin type: dùng (i % 5) + 1
-    const skinTypeId = (i % 5) + 1;
-    users.push({
-      IdUser: i,
-      Name: fullName,
-      PhoneNumber: phoneNumber,
-      DateOfJoining: dateOfJoining,
-      confirmed_email: confirmed_email,
-      skinType: skinTypeMap[skinTypeId],
-    });
-  }
-  return users;
-};
-
-const rows = generateUsers();
-
 export default function UserPage() {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const navigate = useNavigate();
+  const [customers, setCustomers] = React.useState([]);
+ 
+  const token = localStorage.getItem("token");
+
+  // Gọi API lấy danh sách khách hàng khi component mount
+  React.useEffect(() => {
+    getAllCustomer(token)
+      .then((data) => setCustomers(data))
+      .catch((error) =>
+        console.error("Error fetching customers from API:", error)
+      );
+  }, []);
 
   // Tính số dòng trống (nếu có) để tránh layout jump
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - customers.length) : 0;
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -197,9 +146,7 @@ export default function UserPage() {
     setPage(0);
   };
 
-  const handleDetail = (id) => {
-    navigate(`/admin/user/${id}`);
-  };
+
 
   return (
     <Container maxWidth="lg" className="userpage-container">
@@ -210,50 +157,61 @@ export default function UserPage() {
         <Table sx={{ minWidth: 500 }} aria-label="custom pagination table">
           <TableHead>
             <TableRow>
-              <StyledTableCell sx={{ width: "8%" }}>Id User</StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }}>Name</StyledTableCell>
+              <StyledTableCell sx={{ width: "8%" }}>
+                Customer Id
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: "20%" }}>
+                Full Name
+              </StyledTableCell>
               <StyledTableCell sx={{ width: "20%" }} align="right">
                 Phone Number
               </StyledTableCell>
               <StyledTableCell sx={{ width: "20%" }} align="right">
-                Date Of Joining
+                Email
               </StyledTableCell>
               <StyledTableCell sx={{ width: "12%" }} align="right">
-                Confirmed Email
+                Birthday
               </StyledTableCell>
               <StyledTableCell sx={{ width: "20%" }} align="center">
                 Skin Type
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: "20%" }} align="center">
+                Status
               </StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {(rowsPerPage > 0
-              ? rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              : rows
+              ? customers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              : customers
             ).map((row) => (
               <StyledTableRow
-                key={row.IdUser}
-                onClick={() => handleDetail(row.IdUser)}
+                key={row.customerId}  
               >
                 <StyledTableCell component="th" scope="row">
-                  {row.IdUser}
+                  {row.customerId}
                 </StyledTableCell>
-                <StyledTableCell>{row.Name}</StyledTableCell>
+                <StyledTableCell>{row.fullName}</StyledTableCell>
                 <StyledTableCell align="right">
-                  {row.PhoneNumber}
-                </StyledTableCell>
-                <StyledTableCell align="right">
-                  {row.DateOfJoining}
+                  {row.phoneNumber}
                 </StyledTableCell>
                 <StyledTableCell align="right">
-                  {row.confirmed_email}
+                  {row.email}
                 </StyledTableCell>
-                <StyledTableCell align="center">{row.skinType}</StyledTableCell>
+                <StyledTableCell align="right">
+                  {row.birthday}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row.skinType ? row.skinType.skinTypeName : "-"}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                  {row.status ? "Active" : "Inactive"}
+                </StyledTableCell>
               </StyledTableRow>
             ))}
             {emptyRows > 0 && (
               <TableRow style={{ height: 53 * emptyRows }}>
-                <TableCell colSpan={6} />
+                <MuiTableCell colSpan={7} />
               </TableRow>
             )}
           </TableBody>
@@ -261,8 +219,8 @@ export default function UserPage() {
             <TableRow>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                colSpan={6}
-                count={rows.length}
+                colSpan={7}
+                count={customers.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 SelectProps={{

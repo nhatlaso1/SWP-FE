@@ -6,6 +6,7 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import RouteIcon from "@mui/icons-material/Route";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
+import ChromeReaderModeIcon from '@mui/icons-material/ChromeReaderMode';
 import "./SideBarAdmin.css";
 
 const NAVIGATION = [
@@ -49,6 +50,12 @@ const NAVIGATION = [
     title: "SkinTests",
     icon: <QuizIcon />,
     navigate: "/admin/skintests",
+  },
+  {
+    segment: "Blog",
+    title: "Blog",
+    icon: <ChromeReaderModeIcon />,
+    navigate: "/admin/blog",
   },
 ];
 

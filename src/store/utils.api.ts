@@ -15,6 +15,7 @@ export const apiEndpoints = {
   Feedback: "Feedback",
   Product: "Product",
   Authentication: "Authentication",
+  blogs: "blogs",
 } as const;
 
 export const apiClient: AxiosInstance = axios.create({
