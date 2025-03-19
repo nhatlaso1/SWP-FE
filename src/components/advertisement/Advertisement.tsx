@@ -2,8 +2,14 @@ import React from "react";
 
 import "./Advertisement.scss";
 import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Advertisement: React.FC = () => {
+  const navigate = useNavigate();
+    
+      const handleClick = () => {
+        navigate("/take-quiz");
+      };
   return (
     <div className="advertisement-container">
       <div className="advertisement-info">
@@ -28,6 +34,7 @@ const Advertisement: React.FC = () => {
                 color: "white",
                 borderColor: "white",
               }}
+              onClick={handleClick}
             >
               Answer a few questions
             </Button>
