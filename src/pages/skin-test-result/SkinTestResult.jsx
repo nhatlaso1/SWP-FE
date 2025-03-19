@@ -13,8 +13,10 @@ const SkinTestResult = () => {
   const fetchRoutine = useStore((state) => state.fetchRoutine);
   const skinType = useStore((state) => state.routine.skinType);
   const routineDetail = useStore((state) => state.routine.routineDetail);
+  console.log('skinType', skinType);
+  console.log('routineDetail', routineDetail);
   const userProfile = useStore((state) => state.profile.userProfile);
-
+  
   const scrollToTop = () => {
     if (skinRef.current) {
       skinRef.current.scrollIntoView({ behavior: "smooth" });
@@ -71,12 +73,13 @@ const SkinTestResult = () => {
                         routineDetail[0].routineSteps.$values.map(
                           (step, index) => (
                             <div className="section-use" key={index}>
-                              {routineDetail[0].routineSteps.$values[0].category
+                              {/* sản phẩm chính */}
+                              {step.category
                                 .products.$values.length > 0 && (
                                 <div className="product-item">
                                   <img
                                     src={
-                                      routineDetail[0].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0]
                                         .productImages.$values[0].url
                                     }
@@ -84,14 +87,14 @@ const SkinTestResult = () => {
                                   />
                                   <p className="product-name">
                                     {
-                                      routineDetail[0].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0]
                                         .productName
                                     }
                                   </p>
                                   <p className="product-price">
                                     {
-                                      routineDetail[0].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0].price.toLocaleString()
                                     }VND
                                   </p>
@@ -105,24 +108,24 @@ const SkinTestResult = () => {
                                     onClick={() => {
                                       const product = {
                                         productId:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productId,
                                         productName:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productName,
                                         productImage:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productImages.$values[0]
                                             .url,
                                         price:
-                                          routineDetail[0].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].price,
                                         category:
-                                          routineDetail[0].routineSteps.$values[0].category.categoryName
+                                          step.category.categoryName
                                       };
                                       addItem({
                                         productId : product.productId,
@@ -157,9 +160,9 @@ const SkinTestResult = () => {
                                   <div className="other-products-list">
                                     {routineDetail[0].routineSteps.$values
                                       .length > 0 &&
-                                      routineDetail[0].routineSteps.$values[0]
+                                      step
                                         .category.products.$values.length > 0 &&
-                                      routineDetail[0].routineSteps.$values[0].category.products.$values
+                                      step.category.products.$values
                                         .slice(1)
                                         .map((product) => (
                                           <div
@@ -207,12 +210,12 @@ const SkinTestResult = () => {
                         routineDetail[1].routineSteps.$values.map(
                           (step, index) => (
                             <div className="section-use" key={index}>
-                              {routineDetail[0].routineSteps.$values[0].category
+                              {step.category
                                 .products.$values.length > 0 && (
                                 <div className="product-item">
                                   <img
                                     src={
-                                      routineDetail[1].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0]
                                         .productImages.$values[0].url
                                     }
@@ -220,7 +223,7 @@ const SkinTestResult = () => {
                                   />
                                   <p className="product-name">
                                     {
-                                      routineDetail[1].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0]
                                         .productName
                                     }
@@ -228,7 +231,7 @@ const SkinTestResult = () => {
                                   <p className="product-price">
                                     $
                                     {
-                                      routineDetail[1].routineSteps.$values[0]
+                                      step
                                         .category.products.$values[0].price
                                     }
                                   </p>
@@ -242,22 +245,27 @@ const SkinTestResult = () => {
                                     onClick={() => {
                                       const product = {
                                         productId:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productId,
                                         productName:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productName,
                                         productImage:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].productImages.$values[0]
                                             .url,
                                         price:
-                                          routineDetail[1].routineSteps
-                                            .$values[0].category.products
+                                          step
+                                            .category.products
                                             .$values[0].price,
+                                        category:
+                                          step.
+                                            category.categoryName,
+                                        skinType: skinType.skinTypeName,
+                                        quantity: 1
                                       };
                                       addItem(product);
                                     }}
@@ -284,9 +292,10 @@ const SkinTestResult = () => {
                                   <div className="other-products-list">
                                     {routineDetail[1].routineSteps.$values
                                       .length > 0 &&
-                                      routineDetail[1].routineSteps.$values[0]
+                                      step
                                         .category.products.$values.length > 0 &&
-                                      routineDetail[1].routineSteps.$values[0].category.products.$values
+                                      step
+                                        .category.products.$values
                                         .slice(1)
                                         .map((product) => (
                                           <div

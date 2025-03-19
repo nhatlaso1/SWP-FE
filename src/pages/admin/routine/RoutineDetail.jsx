@@ -238,7 +238,7 @@ const RoutineDetail = () => {
               <Select
                 value={routine.status ? "Active" : "Inactive"}
                 onChange={(e) =>
-                  handleChange("status", e.target.value)
+                  handleChange("status", e.target.value == "Active")
                 }
                 fullWidth
               >

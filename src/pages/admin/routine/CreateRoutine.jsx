@@ -168,7 +168,7 @@ const CreateRoutine = () => {
 
       <Box sx={{ mb: 2 }}>
         <Grid container spacing={2}>
-          <Grid item xs={8}>
+          <Grid item xs={6}>
             <TextField
               label="Routine Name"
               fullWidth
@@ -177,7 +177,7 @@ const CreateRoutine = () => {
               disabled={!isEditing}
             />
           </Grid>
-          <Grid item xs={4}>
+          <Grid item xs={3}>
             <FormControl fullWidth disabled={!isEditing}>
               <InputLabel id="skin-type-label">Skin Type</InputLabel>
               <Select
@@ -195,6 +195,24 @@ const CreateRoutine = () => {
                 ))}
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item xs={3}>
+            {isEditing ? (
+              <Select
+                value={routine.status ? "Active" : "Inactive"}
+                onChange={(e) =>
+                  handleChange("status", e.target.value == "Active")
+                }
+                fullWidth
+              >
+                <MenuItem value="Active">Active</MenuItem>
+                <MenuItem value="Inactive">Inactive</MenuItem>
+              </Select>
+            ) : (
+              <Typography>
+                Status: {routine.status ? "Active" : "Inactive"}
+              </Typography>
+            )}
           </Grid>
         </Grid>
       </Box>

@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from "axios";
 
-const apiBaseUrl: string =
+ const apiBaseUrl: string =
   "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api";
 
 export const apiEndpoints = {
