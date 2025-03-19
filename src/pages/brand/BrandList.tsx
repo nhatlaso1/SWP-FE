@@ -15,6 +15,7 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { ProductAPI } from '../../store/apiProduct';
+import { BrandAPI } from '../../store/apiBrand';
 import { useStore } from '../../store';
 
 // Define interfaces for Brand, Category, and SkinType
@@ -22,6 +23,7 @@ interface Brand {
   $id: string;
   brandId: number;
   brandName: string;
+  brandImage: string;
 }
 
 interface Category {
@@ -51,7 +53,6 @@ interface Product {
   brand: Brand;
   category: Category;
   skinTypes: {
-
     $id: string;
     $values: SkinType[];
   };
@@ -64,17 +65,35 @@ interface PaginationData {
   totalPages: number;
 }
 
+// Default brand logo URL with fallback
+const DEFAULT_BRAND_LOGO = 'https://placehold.co/200x200/f5f5f5/969696?text=No+Logo';
+const FALLBACK_LOGO = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgZmlsbD0iI2Y1ZjVmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMTYiIGZpbGw9IiM5Njk2OTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5ObyBMb2dvPC90ZXh0Pjwvc3ZnPg==';
+
 const BrandList: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [brands, setBrands] = useState<string[]>([]);
-  // Initially, no brand is selected
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [selectedBrand, setSelectedBrand] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const addItem = useStore((store) => store.addItem);
   const navigate = useNavigate();
 
-  const fetchAllProducts = async () => {
+  const fetchBrands = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const brandsData = await BrandAPI.getAll();
+      console.log('Fetched brands:', brandsData); // For debugging
+      setBrands(brandsData);
+    } catch (err) {
+      console.error('Error fetching brands:', err);
+      setError('Failed to load brands. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProducts = async () => {
     try {
       setLoading(true);
       setError(null);
@@ -86,7 +105,7 @@ const BrandList: React.FC = () => {
         console.log('Fetching products for page:', currentPage);
         const response = await ProductAPI.getAll({
           pageIndex: currentPage,
-          pageSize: 100, // Fetch 100 products per page
+          pageSize: 100,
           SortTypes: [""],
           CategoryIds: [],
           SizeTypes: [""],
@@ -99,7 +118,6 @@ const BrandList: React.FC = () => {
         });
 
         if (response && response.products) {
-          // Filter out inactive products
           const activeProducts = response.products.filter(product => product.status === true);
           allFetchedProducts = [...allFetchedProducts, ...activeProducts];
           if (!response.pagination || currentPage >= response.pagination.totalPages) {
@@ -113,34 +131,24 @@ const BrandList: React.FC = () => {
       }
 
       setProducts(allFetchedProducts);
-
-      // Extract unique brand names from the products
-      const brandSet = new Set<string>();
-      allFetchedProducts.forEach(product => {
-        if (product.brand && product.brand.brandName) {
-          brandSet.add(product.brand.brandName);
-        }
-      });
-      setBrands(Array.from(brandSet));
     } catch (err) {
       console.error('Error fetching products:', err);
       setError('Failed to load products. Please try again later.');
       setProducts([]);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchAllProducts();
+    fetchBrands();
+    fetchProducts();
   }, []);
 
   // Toggle select/deselect brand
-  const handleBrandClick = (brand: string) => {
-    if (selectedBrand === brand) {
+  const handleBrandClick = (brandName: string) => {
+    if (selectedBrand === brandName) {
       setSelectedBrand(null);
     } else {
-      setSelectedBrand(brand);
+      setSelectedBrand(brandName);
     }
   };
 
@@ -184,18 +192,62 @@ const BrandList: React.FC = () => {
       </Typography>
 
       {/* Display brand list as Cards */}
-      <Grid container spacing={2} justifyContent="center">
+      <Grid container spacing={2} justifyContent="center" sx={{ mb: 4 }}>
         {brands.map((brand) => (
-          <Grid item key={brand} xs={12} sm={6} md={4} lg={3}>
+          <Grid item key={brand.brandId} xs={6} sm={4} md={3} lg={2}>
             <Card
               sx={{
-                border: selectedBrand === brand ? '2px solid #1976d2' : '1px solid #ccc',
+                border: selectedBrand === brand.brandName ? '2px solid #1976d2' : '1px solid #ccc',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                '&:hover': {
+                  transform: 'scale(1.02)',
+                  transition: 'transform 0.2s ease-in-out',
+                  boxShadow: 3
+                }
               }}
             >
-              <CardActionArea onClick={() => handleBrandClick(brand)}>
-                <CardContent>
-                  <Typography variant="h5" align="center">
-                    {brand}
+              <CardActionArea
+                onClick={() => handleBrandClick(brand.brandName)}
+                sx={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}
+              >
+                <CardMedia
+                  component="img"
+                  image={brand.brandImage || DEFAULT_BRAND_LOGO}
+                  alt={brand.brandName}
+                  sx={{
+                    height: 120,
+                    objectFit: 'contain',
+                    padding: 1,
+                    backgroundColor: '#f5f5f5'
+                  }}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    if (target.src !== FALLBACK_LOGO) {
+                      target.src = FALLBACK_LOGO;
+                    }
+                  }}
+                />
+                <CardContent sx={{
+                  flexGrow: 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '8px',
+                  '&:last-child': { paddingBottom: '8px' }
+                }}>
+                  <Typography
+                    variant="body1"
+                    align="center"
+                    sx={{
+                      fontWeight: 'medium',
+                      fontSize: '0.9rem',
+                      lineHeight: 1.2
+                    }}
+                  >
+                    {brand.brandName}
                   </Typography>
                 </CardContent>
               </CardActionArea>
@@ -270,7 +322,7 @@ const BrandList: React.FC = () => {
                       </Box>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                         <Typography variant="h6" color="primary.main">
-                          ${(product.price * (1 - product.discount)).toLocaleString()}
+                          {(product.price * (1 - product.discount)).toLocaleString()} VND
                         </Typography>
                         {product.discount > 0 && (
                           <Typography
@@ -280,7 +332,7 @@ const BrandList: React.FC = () => {
                               textDecoration: 'line-through'
                             }}
                           >
-                            ${product.price.toLocaleString()}
+                            {product.price.toLocaleString()} VND
                           </Typography>
                         )}
                       </Box>
@@ -300,16 +352,11 @@ const BrandList: React.FC = () => {
                             productId: product.productId,
                             productName: product.productName,
                             productImage: product.productImage,
-                            // Use the category name from the product.category object
                             category: product.category?.categoryName || "",
-                            // Extract skin types as an array from the product.skinTypes object
                             skintype: product.skinTypes?.$values || [],
-                            // Calculate final price using discount (if any)
                             price: product.price * (1 - product.discount),
-                            // Default quantity is 1 when adding to cart
                             quantity: 1,
-                            // Use the product summary as an optional note
-                            note: product.summary,
+                            //    note: product.summary,
                           });
                         }}
                       >

@@ -4,6 +4,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CategoryIcon from "@mui/icons-material/Category";
 import LayersIcon from "@mui/icons-material/Layers";
+import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
 import "./SideBarStaff.css";
 
 const NAVIGATION = [
@@ -34,6 +35,12 @@ const NAVIGATION = [
     title: "Products",
     icon: <LayersIcon />,
     navigate: "/staff/products",
+  },
+  {
+    segment: "brands",
+    title: "Brands",
+    icon: <BrandingWatermarkIcon />,
+    navigate: "/staff/brands",
   },
 ];
 

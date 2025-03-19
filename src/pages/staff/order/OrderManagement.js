@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 
+
 import {
 
   Box,
@@ -76,8 +77,7 @@ const OrderManagement = () => {
   const [notification, setNotification] = useState({ open: false, message: '', severity: 'success' });
 
   const [isDetailDialogOpen, setDetailDialogOpen] = useState(false);
-  
-  const token = localStorage.getItem('token');
+
   const navigate = useNavigate();
 
 
@@ -103,10 +103,10 @@ const OrderManagement = () => {
   const fetchOrders = async () => {
 
     try {
-      
+
       console.log('Fetching all orders');
 
-      const allOrders = await getAllOrders(token);
+      const allOrders = await getAllOrders();
 
 
 
@@ -136,7 +136,7 @@ const OrderManagement = () => {
 
     try {
 
-      const success = await confirmOrder(orderId,token);
+      const success = await confirmOrder(orderId);
 
       if (success) {
 
@@ -166,7 +166,7 @@ const OrderManagement = () => {
 
     try {
 
-      const success = await cancelOrder(orderId,token);
+      const success = await cancelOrder(orderId);
 
       if (success) {
 
@@ -196,7 +196,7 @@ const OrderManagement = () => {
 
     try {
 
-      const detailedOrder = await getOrderById(order.orderId,token);
+      const detailedOrder = await getOrderById(order.orderId);
 
       setSelectedOrder(detailedOrder);
 
@@ -254,75 +254,85 @@ const OrderManagement = () => {
 
   const handleStatusChange = async (newStatus, orderId = null) => {
 
-    const targetOrderId = orderId || (selectedOrder ? selectedOrder.orderId : null);
+    try {
+
+      const targetOrderId = orderId || (selectedOrder ? selectedOrder.orderId : null);
+
+      if (!targetOrderId) {
+
+        setNotification({
+
+          open: true,
+
+          message: 'No order selected',
+
+          severity: 'error'
+
+        });
+
+        return;
+
+      }
 
 
 
-    if (!targetOrderId) {
+      let updatedStatus;
 
-      setNotification({ open: true, message: 'No order selected', severity: 'error' });
+      let targetOrder = orderId
 
-      return;
+        ? orders.find(order => order.orderId === orderId)
 
-    }
-
-
-
-    let updatedStatus;
-
-    let targetOrder = orderId
-
-      ? orders.find(order => order.orderId === orderId)
-
-      : selectedOrder;
+        : selectedOrder;
 
 
 
-    const currentStatus = targetOrder.status;
+      const currentStatus = targetOrder.status;
+
+      console.log('Current status:', currentStatus);
+
+      console.log('New status:', newStatus);
+
+      console.log('Target order:', targetOrder);
 
 
 
-    if (currentStatus === 'Pending') {
+      if (currentStatus === 'Pending') {
 
-      // Get payment method ID from the order
+        const paymentMethodId = targetOrder.paymentMethodId ||
 
-      const paymentMethodId = targetOrder.paymentMethodId ||
-
-        (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod') ? 1 : 2);
+          (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod') ? 1 : 2);
 
 
 
-      if (newStatus === 'Confirmed') {
+        console.log('Payment method:', paymentMethodId);
 
-        // For both payment methods, use confirmOrder
 
-        const success = await confirmOrder(targetOrderId,token);
 
-        if (success) {
+        if (newStatus === 'Confirmed') {
 
-          updatedStatus = 'Confirmed';
+          const success = await confirmOrder(targetOrderId);
 
-          // If payment method is card/VNPay, mark as paid
+          if (success) {
 
-          if (paymentMethodId === 2 ||
+            updatedStatus = 'Confirmed';
 
-            (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+            if (paymentMethodId === 2 ||
 
-            targetOrder = { ...targetOrder, isPaid: true };
+              (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
+
+              targetOrder = { ...targetOrder, isPaid: true };
+
+            }
 
           }
 
-        }
+        } else if (newStatus === 'Denied') {
 
-      } else if (newStatus === 'Denied') {
+          console.log('Attempting to deny order:', targetOrderId);
 
-        // For COD (paymentMethodId = 1), use denyOrder
+          const success = await denyOrder(targetOrderId);
 
-        if (paymentMethodId === 1 ||
-
-          (targetOrder.paymentMethodName && targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
-
-          const success = await denyOrder(targetOrderId,token);
+          console.log('Deny order result:', success);
 
           if (success) {
 
@@ -330,17 +340,9 @@ const OrderManagement = () => {
 
           }
 
-        }
+        } else if (newStatus === 'Cancel') {
 
-      } else if (newStatus === 'Cancel') {
-
-        // For VNPay/Card (paymentMethodId = 2), use cancelOrder
-
-        if (paymentMethodId === 2 ||
-
-          (targetOrder.paymentMethodName && !targetOrder.paymentMethodName.toLowerCase().includes('cod'))) {
-
-          const success = await cancelOrder(targetOrderId,token);
+          const success = await cancelOrder(targetOrderId);
 
           if (success) {
 
@@ -350,97 +352,117 @@ const OrderManagement = () => {
 
         }
 
-      }
+      } else if (currentStatus === 'Confirmed') {
 
-    } else if (currentStatus === 'Confirmed') {
+        if (newStatus === 'Shipping') {
 
-      if (newStatus === 'Shipping') {
+          const success = await shippingOrder(targetOrderId);
 
-        const success = await shippingOrder(targetOrderId,token);
+          if (success) {
 
-        if (success) {
+            updatedStatus = 'Shipping';
 
-          updatedStatus = 'Shipping';
+          }
 
-        }
+        } else if (newStatus === 'Cancel') {
 
-      } else if (newStatus === 'Cancel') {
+          const success = await cancelOrder(targetOrderId);
 
-        const success = await cancelOrder(targetOrderId,token);
+          if (success) {
 
-        if (success) {
+            updatedStatus = 'Cancel';
 
-          updatedStatus = 'Cancel';
-
-        }
-
-      }
-
-    } else if (currentStatus === 'Shipping') {
-
-      if (newStatus === 'Returned') {
-
-        const success = await returnOrder(targetOrderId,token);
-
-        if (success) {
-
-          updatedStatus = 'Returned';
+          }
 
         }
 
-      } else if (newStatus === 'Complete') {
+      } else if (currentStatus === 'Shipping') {
 
-        const success = await completeOrder(targetOrderId,token);
+        if (newStatus === 'Returned') {
 
-        if (success) {
+          const success = await returnOrder(targetOrderId);
 
-          updatedStatus = 'Complete';
+          if (success) {
+
+            updatedStatus = 'Returned';
+
+          }
+
+        } else if (newStatus === 'Complete') {
+
+          const success = await completeOrder(targetOrderId);
+
+          if (success) {
+
+            updatedStatus = 'Complete';
+
+          }
 
         }
-
-      }
-
-    }
-
-    if (updatedStatus) {
-
-      if (selectedOrder && selectedOrder.orderId === targetOrderId) {
-
-        setSelectedOrder(prev => ({ ...prev, status: updatedStatus }));
 
       }
 
 
 
-      setOrders(prevOrders =>
+      if (updatedStatus) {
 
-        prevOrders.map(order =>
+        if (selectedOrder && selectedOrder.orderId === targetOrderId) {
 
-          order.orderId === targetOrderId
+          setSelectedOrder(prev => ({ ...prev, status: updatedStatus }));
 
-            ? { ...order, status: updatedStatus }
-
-            : order
-
-        )
-
-      );
+        }
 
 
+
+        setOrders(prevOrders =>
+
+          prevOrders.map(order =>
+
+            order.orderId === targetOrderId
+
+              ? { ...order, status: updatedStatus }
+
+              : order
+
+          )
+
+        );
+
+
+
+        setNotification({
+
+          open: true,
+
+          message: `Order status has been updated to ${getDisplayStatus(updatedStatus)}!`,
+
+          severity: 'success'
+
+        });
+
+
+
+        await fetchOrders();
+
+      } else {
+
+        throw new Error('Status update was not successful');
+
+      }
+
+    } catch (error) {
+
+      console.error('Error in handleStatusChange:', error);
 
       setNotification({
 
         open: true,
 
-        message: `Order status has been updated to ${updatedStatus}!`,
+        message: `Failed to update order status: ${error.message}`,
 
-        severity: 'success'
+        severity: 'error'
 
       });
-
-
-
-      await fetchOrders();
 
     }
 
@@ -458,7 +480,7 @@ const OrderManagement = () => {
 
       case 'Shipping':
 
-        return 'Shipping (Đang giao hàng)';
+        return 'Delivery (Đang giao hàng)';
 
       case 'Complete':
 
@@ -470,15 +492,41 @@ const OrderManagement = () => {
 
       case 'Denied':
 
-        return 'Denied (Từ chối đơn hàng)';
+        return 'Reject (Từ chối đơn hàng)';
 
       case 'Confirmed':
 
-        return 'Confirmed (Đã xác nhận)';
+        return 'Approve (Đã xác nhận)';
 
       case 'Returned':
 
-        return 'Returned (Trả hàng)';
+        return 'Return (Trả hàng)';
+
+      default:
+
+        return status;
+
+    }
+
+  };
+
+
+
+  const getDisplayStatus = (status) => {
+
+    switch (status) {
+
+      case 'Shipping':
+
+        return 'Delivery';
+
+      case 'Denied':
+
+        return 'Reject';
+
+      case 'Confirmed':
+
+        return 'Approve';
 
       default:
 
@@ -773,13 +821,9 @@ const OrderManagement = () => {
 
                   <Box>
 
-                    {/* Get payment method ID from the order */}
-
                     {(selectedOrder.paymentMethodId === 1 ||
 
                       (selectedOrder.paymentMethodName && selectedOrder.paymentMethodName.toLowerCase().includes('cod'))) ? (
-
-                      // For COD (paymentMethodId = 1), show Reject and Approve buttons
 
                       <>
 
@@ -798,8 +842,6 @@ const OrderManagement = () => {
                       </>
 
                     ) : (
-
-                      // For VNPay/Card (paymentMethodId = 2), show Cancel button
 
                       <Button onClick={() => handleStatusChange('Cancel', selectedOrder.orderId)} variant="contained" color="error">
 

@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { BrandAPI } from '../../../store/apiBrand';
 import { ProductAPI } from '../../../store/apiProduct';
+//import { useNavigate } from 'react-router-dom';
 import './BrandManagement.css';
 
 const BrandManagement = () => {
+  // const navigate = useNavigate();
   const [brands, setBrands] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,13 +13,17 @@ const BrandManagement = () => {
   const [showBrandForm, setShowBrandForm] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
   const [brandForm, setBrandForm] = useState({
-    brandName: '',
-    description: ''
+    brandName: ''
   });
-  const [productCounts, setProductCounts] = useState({});
+  const [allProducts, setAllProducts] = useState([]);
+  const [loadingProducts, setLoadingProducts] = useState(false);
+  const [showProductsModal, setShowProductsModal] = useState(false);
+  const [showProductDetailModal, setShowProductDetailModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
 
   useEffect(() => {
     fetchBrands();
+    fetchAllProducts();
   }, []);
 
   const fetchBrands = async () => {
@@ -31,51 +37,81 @@ const BrandManagement = () => {
         brandsData = response.$values;
       }
       setBrands(brandsData);
-
-      // Lấy số lượng sản phẩm cho mỗi nhãn hiệu
-      const counts = {};
-      for (const brand of brandsData) {
-        const count = await ProductAPI.getCountByBrand(brand.brandId);
-        counts[brand.brandId] = count;
-      }
-      setProductCounts(counts);
     } catch (err) {
-      setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
+      setError('Cannot connect to the server. Please try again later.');
     } finally {
       setLoading(false);
     }
   };
+
+  const fetchAllProducts = async () => {
+    setLoadingProducts(true);
+    try {
+      let currentPage = 1;
+      let allFetchedProducts = [];
+      let hasMorePages = true;
+
+      while (hasMorePages) {
+        const response = await ProductAPI.getAll({
+          pageIndex: currentPage,
+          pageSize: 100,
+          SortTypes: [""],
+          CategoryIds: [],
+          SizeTypes: [""],
+          Ingredients: [],
+          BrandIds: [],
+          FunctionIds: [],
+          MinPrice: 0,
+          MaxPrice: 999999999,
+          Status: true
+        });
+
+        if (response && response.products) {
+          const activeProducts = response.products.filter(product => product.status === true);
+          allFetchedProducts = [...allFetchedProducts, ...activeProducts];
+
+          if (!response.pagination || currentPage >= response.pagination.totalPages) {
+            hasMorePages = false;
+          } else {
+            currentPage++;
+          }
+        } else {
+          hasMorePages = false;
+        }
+      }
+
+      setAllProducts(allFetchedProducts);
+    } catch (err) {
+      setError('Cannot load products. Please try again later.');
+    } finally {
+      setLoadingProducts(false);
+    }
+  };
+
+  const handleBrandClick = (brand) => {
+    setSelectedBrand(brand);
+    setShowProductsModal(true);
+  };
+
+  const handleProductClick = (product) => {
+    setSelectedProduct(product);
+    setShowProductDetailModal(true);
+  };
+
+  // Lọc sản phẩm theo brand được chọn
+  const filteredProducts = selectedBrand
+    ? allProducts.filter(product => product.brand && product.brand.brandId === selectedBrand.brandId)
+    : [];
 
   const showNotificationMessage = (message) => {
     setNotification(message);
     setTimeout(() => setNotification(null), 3000);
   };
 
-  const handleEditBrand = (brand) => {
-    setSelectedBrand(brand);
-    setBrandForm({
-      brandName: brand.brandName,
-      description: brand.description
-    });
-    setShowBrandForm(true);
-  };
-
-  const handleDeleteBrand = async (brandId) => {
-    if (window.confirm('Bạn có chắc chắn muốn xóa nhãn hiệu này?')) {
-      try {
-        await BrandAPI.delete(brandId);
-        showNotificationMessage('Xóa nhãn hiệu thành công!');
-        fetchBrands();
-      } catch (err) {
-        setError('Không thể xóa nhãn hiệu');
-      }
-    }
-  };
-
   const handleSubmitBrand = async (e) => {
     e.preventDefault();
     if (!brandForm.brandName.trim()) {
-      setError('Tên nhãn hiệu không được để trống');
+      setError('Brand name cannot be empty');
       return;
     }
 
@@ -83,17 +119,18 @@ const BrandManagement = () => {
       setLoading(true);
       if (selectedBrand) {
         await BrandAPI.update(selectedBrand.brandId, brandForm);
-        showNotificationMessage('Cập nhật nhãn hiệu thành công!');
+        showNotificationMessage('Brand updated successfully!');
       } else {
         await BrandAPI.create(brandForm);
-        showNotificationMessage('Thêm nhãn hiệu thành công!');
+        showNotificationMessage('Brand added successfully!');
       }
       setShowBrandForm(false);
-      setBrandForm({ brandName: '', description: '' });
+      setBrandForm({ brandName: '' });
       setSelectedBrand(null);
       fetchBrands();
+      fetchAllProducts(); // Refresh products after brand changes
     } catch (err) {
-      setError(selectedBrand ? 'Không thể cập nhật nhãn hiệu' : 'Không thể thêm nhãn hiệu');
+      setError(selectedBrand ? 'Cannot update brand' : 'Cannot add brand');
     } finally {
       setLoading(false);
     }
@@ -109,10 +146,10 @@ const BrandManagement = () => {
       )}
 
       <div className="management-header">
-        <h1>Quản lý Nhãn hiệu</h1>
+        <h1>Brand Management</h1>
         <div className="header-actions">
           <button onClick={() => { setShowBrandForm(true); setSelectedBrand(null); }}>
-            Thêm nhãn hiệu
+            Add Brand
           </button>
         </div>
       </div>
@@ -120,10 +157,10 @@ const BrandManagement = () => {
       {showBrandForm && (
         <div className="modal">
           <div className="modal-content">
-            <h2>{selectedBrand ? 'Sửa nhãn hiệu' : 'Thêm nhãn hiệu mới'}</h2>
+            <h2>{selectedBrand ? 'Edit Brand' : 'Add New Brand'}</h2>
             <form onSubmit={handleSubmitBrand}>
               <div className="form-group">
-                <label>Tên nhãn hiệu: <span className="required">*</span></label>
+                <label>Brand Name: <span className="required">*</span></label>
                 <input
                   type="text"
                   value={brandForm.brandName}
@@ -134,30 +171,20 @@ const BrandManagement = () => {
                   required
                 />
               </div>
-              <div className="form-group">
-                <label>Mô tả:</label>
-                <textarea
-                  value={brandForm.description}
-                  onChange={(e) => setBrandForm({
-                    ...brandForm,
-                    description: e.target.value
-                  })}
-                />
-              </div>
               <div className="modal-actions">
                 <button type="submit">
-                  {selectedBrand ? 'Cập nhật' : 'Thêm mới'}
+                  {selectedBrand ? 'Update' : 'Add New'}
                 </button>
                 <button
                   type="button"
                   onClick={() => {
                     setShowBrandForm(false);
-                    setBrandForm({ brandName: '', description: '' });
+                    setBrandForm({ brandName: '' });
                     setSelectedBrand(null);
                   }}
                   className="cancel-button"
                 >
-                  Hủy
+                  Cancel
                 </button>
               </div>
             </form>
@@ -166,41 +193,141 @@ const BrandManagement = () => {
       )}
 
       {loading ? (
-        <div className="loading-spinner">Đang tải dữ liệu...</div>
+        <div className="loading-spinner">Loading data...</div>
       ) : (
-        <div className="brands-table">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Tên nhãn hiệu</th>
-                <th>Mô tả</th>
-                <th>Số lượng sản phẩm</th>
-                <th>Thao tác</th>
-              </tr>
-            </thead>
-            <tbody>
-              {brands.map((brand) => (
-                <tr key={brand.brandId}>
-                  <td>{brand.brandId}</td>
-                  <td>{brand.brandName}</td>
-                  <td>{brand.description}</td>
-                  <td>{productCounts[brand.brandId] || 0} sản phẩm</td>
-                  <td>
-                    <div className="action-buttons">
-                      <button onClick={() => handleEditBrand(brand)}>Sửa</button>
-                      <button 
-                        onClick={() => handleDeleteBrand(brand.brandId)}
-                        className="delete-button"
-                      >
-                        Xóa
-                      </button>
-                    </div>
-                  </td>
+        <div className="brands-container">
+          <div className="brands-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Brand Name</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {brands.map((brand) => (
+                  <tr
+                    key={brand.brandId}
+                    onClick={() => handleBrandClick(brand)}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <td>{brand.brandId}</td>
+                    <td>{brand.brandName}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* Modal hiển thị danh sách sản phẩm của brand */}
+      {showProductsModal && selectedBrand && (
+        <div className="modal">
+          <div className="modal-content product-list-modal">
+            <div className="modal-header">
+              <h2>Products of {selectedBrand.brandName}</h2>
+              <button
+                onClick={() => {
+                  setShowProductsModal(false);
+                  setSelectedBrand(null);
+                }}
+                className="close-button"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="products-content">
+              {loadingProducts ? (
+                <div className="loading-spinner">Loading products...</div>
+              ) : filteredProducts.length === 0 ? (
+                <div className="no-products">No products for this brand.</div>
+              ) : (
+                <div className="products-grid">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.productId}
+                      className="product-card"
+                      onClick={() => handleProductClick(product)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <img src={product.productImage} alt={product.productName} />
+                      <div className="product-info">
+                        <h3>{product.productName}</h3>
+                        <p className="price">
+                          {product.discount > 0 ? (
+                            <>
+                              <span className="original-price">{product.price.toLocaleString()}đ</span>
+                              <span className="discounted-price">
+                                {(product.price * (1 - product.discount)).toLocaleString()}đ
+                              </span>
+                            </>
+                          ) : (
+                            <span>{product.price.toLocaleString()}đ</span>
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal hiển thị chi tiết sản phẩm */}
+      {showProductDetailModal && selectedProduct && (
+        <div className="modal">
+          <div className="modal-content product-detail-modal">
+            <div className="modal-header">
+              <h2>Product Details</h2>
+              <button
+                onClick={() => {
+                  setShowProductDetailModal(false);
+                  setSelectedProduct(null);
+                }}
+                className="close-button"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="product-detail-content">
+              <div className="product-image-section">
+                <img
+                  src={selectedProduct.productImage}
+                  alt={selectedProduct.productName}
+                  className="product-detail-image"
+                />
+              </div>
+              <div className="product-info-section">
+                <h3>{selectedProduct.productName}</h3>
+                <p className="product-summary">{selectedProduct.summary}</p>
+                <div className="product-details">
+                  <p><strong>Brand:</strong> {selectedProduct.brand.brandName}</p>
+                  <p><strong>Category:</strong> {selectedProduct.category?.categoryName}</p>
+                  <p><strong>Price:</strong> {selectedProduct.price.toLocaleString()}đ</p>
+                  {selectedProduct.discount > 0 && (
+                    <p>
+                      <strong>Discounted Price:</strong> {(selectedProduct.price * (1 - selectedProduct.discount)).toLocaleString()}đ
+                      <span className="discount-tag">-{(selectedProduct.discount * 100).toFixed(0)}%</span>
+                    </p>
+                  )}
+                  <p><strong>Stock Quantity:</strong> {selectedProduct.quantity}</p>
+                  {selectedProduct.skinTypes?.$values && (
+                    <div className="skin-types">
+                      <strong>Suitable Skin Types:</strong>
+                      <div className="tags">
+                        {selectedProduct.skinTypes.$values.map(type => (
+                          <span key={type.skinTypeId} className="tag">{type.skinTypeName}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 

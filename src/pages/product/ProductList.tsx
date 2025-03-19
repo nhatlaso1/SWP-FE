@@ -23,7 +23,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useStore } from '../../store';
 import { FilterAPI, callApi } from '../../store/apiFilter';
-import styles from './ProductList.module.css';
+//import styles from './ProductList.module.css';
 
 // Interfaces for filter options
 interface Category {
@@ -98,24 +98,26 @@ function applyLocalFilter(products: Product[], filters: ProductFilterParams): Pr
     if (filters.brandIds && prod.brand.brandId !== filters.brandIds) return false;
     if (
       filters.functionIds &&
-      (!prod.functions?.$values ||
-        !prod.functions.$values.some((func) => func.functionId === filters.functionIds))
+      (!prod.functions?.$values || !prod.functions.$values.some((func) => func.functionId === filters.functionIds))
     )
       return false;
     if (
       filters.ingredients &&
-      (!prod.ingredients?.$values ||
-        !prod.ingredients.$values.some((ing) => ing.ingredientId === filters.ingredients))
+      (!prod.ingredients?.$values || !prod.ingredients.$values.some((ing) => ing.ingredientId === filters.ingredients))
     )
       return false;
     if (
       filters.skinTypeIds &&
-      (!prod.skinTypes?.$values ||
-        !prod.skinTypes.$values.some((skin) => skin.skinTypeId === filters.skinTypeIds))
+      (!prod.skinTypes?.$values || !prod.skinTypes.$values.some((skin) => skin.skinTypeId === filters.skinTypeIds))
     )
       return false;
-    if (prod.price < filters.minPrice) return false;
-    if (filters.maxPrice !== null && prod.price > filters.maxPrice) return false;
+
+    // Calculate the discounted price
+    const discountedPrice = prod.price * (1 - prod.discount);
+
+    // Use discounted price for filtering
+    if (discountedPrice < filters.minPrice) return false;
+    if (filters.maxPrice !== null && discountedPrice > filters.maxPrice) return false;
     return true;
   });
 }
@@ -454,15 +456,15 @@ const ProductList: React.FC = () => {
                       {hasDiscount ? (
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                           <Typography variant="h6" color="error">
-                            ${finalPrice.toLocaleString()}
+                            {finalPrice.toLocaleString()} VND
                           </Typography>
                           <Typography variant="body2" sx={{ textDecoration: 'line-through', color: 'gray' }}>
-                            ${product.price.toLocaleString()}
+                            {product.price.toLocaleString()} VND
                           </Typography>
                         </Box>
                       ) : (
                         <Typography variant="h6">
-                          ${product.price.toLocaleString()}
+                          {product.price.toLocaleString()} VND
                         </Typography>
                       )}
                     </Box>
