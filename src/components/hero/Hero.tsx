@@ -3,8 +3,14 @@ import Carousel from "react-multi-carousel";
 
 import "./Hero.scss";
 import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
+  const navigate = useNavigate();
+  
+    const handleClick = () => {
+      navigate("/take-quiz");
+    };
   return (
     <div className="hero-container">
       <Carousel
@@ -62,7 +68,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Doing Quiz</Button>
+            <Button variant="outlined" onClick={handleClick}>Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -70,7 +76,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Doing Quiz</Button>
+            <Button variant="outlined" onClick={handleClick}>Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -78,7 +84,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Doing Quiz</Button>
+            <Button variant="outlined" onClick={handleClick}>Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -86,7 +92,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Doing Quiz</Button>
+            <Button variant="outlined" onClick={handleClick}>Doing Quiz</Button>
           </div>
         </div>
       </Carousel>

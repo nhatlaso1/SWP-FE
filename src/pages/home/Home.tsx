@@ -4,7 +4,7 @@ import Hero from "../../components/hero/Hero";
 import ProductCategories from "../../components/categories/product-categories/ProductCategories";
 import Advertisement from "../../components/advertisement/Advertisement";
 import OurBestSeller from "../../components/our-best-seller/OurBestSeller";
-import SpecialOffer from "../../components/special-offer/SpecialOffer";
+// import SpecialOffer from "../../components/special-offer/SpecialOffer";
 import OurBranch from "../../components/our-branch/OurBranch";
 import OurBlog from "../../components/our-blog/OurBlog";
 import NewIn from "../../components/new-in/NewIn";
@@ -26,7 +26,7 @@ const Home: React.FC = () => {
         </div>
         <NewIn />
         <div className="section-container">
-          <SpecialOffer />
+          {/* <SpecialOffer /> */}
           <OurBranch />
           <OurBlog />
         </div>

@@ -5,7 +5,7 @@ import "./ProductCategories.scss";
 const ProductCategories: React.FC = () => {
   return (
     <div className="product-categories-container">
-      <h2 className="title">Products’ Categories</h2>
+      <h2 className="title">Products’ Brands</h2>
 
       <div className="categories-list">
         <div className="category-item">
