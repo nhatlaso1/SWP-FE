@@ -61,6 +61,14 @@
           transform: translateY(-2px);
         }
       }
+
+      .skin-test-wrap {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr max-content;
+        gap: 16px;
+        align-items: baseline;
+      }
     }
 
     .gallery-photo {

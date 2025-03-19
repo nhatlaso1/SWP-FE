@@ -161,7 +161,6 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         //   },
         // };
         set((state) => {
-          console.log(response);
           state.profile.userProfile = response.data || undefined;
         });
         handleSuccess("Profile fetched successfully");
@@ -212,12 +211,13 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           `${apiEndpoints.Authentication}/register`,
           body
         );
-        set((state) => {         
+        set((state) => {
           state.profile.error = undefined;
-            state.notification.data.push({
-              status: "SUCCESS",
-              content: "Register successfully!. Please check your email to confirm your account",
-            });
+          state.notification.data.push({
+            status: "SUCCESS",
+            content:
+              "Register successfully!. Please check your email to confirm your account",
+          });
         });
       } catch (error: any) {
         const message =

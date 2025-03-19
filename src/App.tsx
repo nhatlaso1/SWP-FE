@@ -42,6 +42,7 @@ import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
 import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
+import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
 
 
 function App() {
@@ -65,6 +66,7 @@ function App() {
       children: [
         { path: "/", element: <Home /> },
          { path: "take-quiz", element: <SkinTestQuiz/> },
+         { path: "quiz-result", element: <SkinTestResult/> },
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },

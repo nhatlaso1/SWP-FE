@@ -21,7 +21,7 @@ export const apiClient: AxiosInstance = axios.create({
   baseURL: apiBaseUrl,
   headers: {
     "Content-Type": "application/json",
-    Authorization: `${localStorage.getItem("token")
+    Authorization: `${!!localStorage.getItem("token")
         ? `Bearer ${localStorage.getItem("token")}`
         : ""
       }`,

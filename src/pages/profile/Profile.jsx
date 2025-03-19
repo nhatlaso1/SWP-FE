@@ -5,8 +5,10 @@ import { useFormik } from "formik";
 import { useStore } from "../../store";
 
 import "./Profile.scss";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const fetchProfile = useStore((store) => store.fetchProfile);
   const updateProfile = useStore((store) => store.updateProfile);
   const profile = useStore((store) => store.profile.userProfile);
@@ -95,25 +97,39 @@ const Profile = () => {
               style={{ marginBottom: "16px" }}
             />
 
-            <TextField
-              fullWidth
-              id="skinTypeName"
-              name="skinTypeName"
-              label="Skin Type Name"
-              value={formik.values.skinType?.skinTypeName}
-              disabled={true}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.skinType?.skinTypeName &&
-                Boolean(formik.errors.skinType?.skinTypeName)
-              }
-              helperText={
-                formik.touched.skinType?.skinTypeName &&
-                formik.errors.skinType?.skinTypeName
-              }
-              style={{ marginBottom: "16px" }}
-            />
+            <div className="skin-test-wrap">
+              <TextField
+                id="skinTypeName"
+                name="skinTypeName"
+                label="Skin Type Name"
+                value={formik.values.skinType?.skinTypeName}
+                disabled={true}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
+                error={
+                  formik.touched.skinType?.skinTypeName &&
+                  Boolean(formik.errors.skinType?.skinTypeName)
+                }
+                helperText={
+                  formik.touched.skinType?.skinTypeName &&
+                  formik.errors.skinType?.skinTypeName
+                }
+                style={{ marginBottom: "16px" }}
+              />
+
+              <Button
+                disabled={!formik.values.skinType?.skinTypeName}
+                color="primary"
+                variant="contained"
+                type="submit"
+                style={{ color: "white" }}
+                onClick={() => {
+                  navigate("/quiz-result");
+                }}
+              >
+                Skin Result
+              </Button>
+            </div>
 
             <Button
               color="primary"
