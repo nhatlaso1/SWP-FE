@@ -43,6 +43,7 @@ import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
+import ListAllBlog from "./pages/blog/ListAllBlog";
 
 
 function App() {
@@ -126,6 +127,7 @@ function App() {
         { path: "user/:id", element: <UserInfo /> },
         { path: "createvoucher", element: <CreateVoucher /> },
         { path: "createskintype", element: <CreateSkinType /> },
+        { path: "blog", element: <ListAllBlog /> },
       ],
     }, {
       path: "staff",
