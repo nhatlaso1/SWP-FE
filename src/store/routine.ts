@@ -5,18 +5,21 @@ export interface RoutineState {
   skinTypeQuestions: any;
   skinType: any;
   routineDetail: any;
+  step: any;
 }
 
 export interface RoutineActions {
   determineSkinType: (item: any) => void;
-  fetchQuestionsSkinTest: (id: any, quantity: any) => void;
+  fetchQuestionsSkinTest: (id: any) => void;
   fetchRoutine: (skinTypeId: number) => void;
+  setStep: (step: number) => void;
 }
 
 export const initialRoutine: RoutineState = {
   skinTypeQuestions: undefined,
   skinType: undefined,
   routineDetail: undefined,
+  step: 1,
 };
 
 export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
@@ -56,13 +59,13 @@ export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
         });
       }
     },
-    fetchQuestionsSkinTest: async () => {
+    fetchQuestionsSkinTest: async (id: number) => {
       set((state) => {
         state.loading.isLoading = true;
       });
       try {
         const response = await apiClient.get(
-          `${apiEndpoints.SkinTest}/get-skin-test?skinTestId=1`
+          `${apiEndpoints.SkinTest}/get-skin-test?skinTestId=${id}`
         );
         // Dummy data
         // const response = {
@@ -1464,6 +1467,11 @@ export function routineActions(set: StoreSet, get: StoreGet): RoutineActions {
           state.loading.isLoading = false;
         });
       }
+    },
+    setStep: (step: number) => {
+      set((state) => {
+        state.routine.step = step;
+      });
     },
   };
 }

@@ -62,7 +62,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Know More</Button>
+            <Button variant="outlined">Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -70,7 +70,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Know More</Button>
+            <Button variant="outlined">Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -78,7 +78,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Know More</Button>
+            <Button variant="outlined">Doing Quiz</Button>
           </div>
         </div>
         <div className="hero-item">
@@ -86,7 +86,7 @@ const Hero: React.FC = () => {
 
           <div className="hero-content">
             <p className="title">Unlock Your True Beauty</p>
-            <Button variant="outlined">Know More</Button>
+            <Button variant="outlined">Doing Quiz</Button>
           </div>
         </div>
       </Carousel>

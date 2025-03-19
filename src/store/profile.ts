@@ -47,8 +47,6 @@ export const initialProfile: ProfileState = {
   error: undefined,
 };
 
-const BASE_URL = "https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Authentication";
-
 export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
   const handleError = (error: any) => {
     const message =
@@ -92,7 +90,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           const payload = JSON.parse(atob(token.split(".")[1]));
           const role =
             payload[
-            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+              "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
             ];
 
           set((state) => {
@@ -214,26 +212,16 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           `${apiEndpoints.Authentication}/register`,
           body
         );
-        const status = response?.data?.status;
-        const message = response?.data?.detail || "Register successfully!";
-        set((state) => {
-          if (status === 400) {
-            state.profile.error = message; // Chắc chắn error luôn là string hoặc undefined
-            state.notification.data.push({
-              status: "ERROR",
-              content: message,
-            });
-          } else {
-            state.profile.error = undefined;
+        set((state) => {         
+          state.profile.error = undefined;
             state.notification.data.push({
               status: "SUCCESS",
-              content: "Register successfully!",
+              content: "Register successfully!. Please check your email to confirm your account",
             });
-          }
         });
       } catch (error: any) {
         const message =
-          error?.response?.data?.message ||
+          error?.response?.data?.detail ||
           error?.message ||
           "An unexpected error occurred";
         set((state) => {
@@ -289,6 +277,5 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.profile.error = error;
       });
     },
-
   };
 }

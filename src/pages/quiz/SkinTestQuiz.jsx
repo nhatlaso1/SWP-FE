@@ -19,6 +19,7 @@ import {
 import { useStore } from "../../store";
 import "./SkinTestQuiz.scss";
 import { useNavigate } from "react-router-dom";
+import { getAllSkinTests } from "../../store/skinTest.api";
 
 const SkinTestQuiz = () => {
   const navigate = useNavigate();
@@ -29,10 +30,12 @@ const SkinTestQuiz = () => {
   );
   const addItem = useStore((state) => state.addItem);
   const determineSkinType = useStore((state) => state.determineSkinType);
+  const setStep = useStore((state) => state.setStep);
   const quizQuestions = useStore((state) => state.routine.skinTypeQuestions);
   const skinType = useStore((state) => state.routine.skinType);
   const routineDetail = useStore((state) => state.routine.routineDetail);
-  const [step, setStep] = useState(1);
+  const step = useStore((state) => state.routine.step);
+  const token = localStorage.getItem("token");
 
   const scrollToTop = () => {
     if (skinRef.current) {
@@ -43,7 +46,14 @@ const SkinTestQuiz = () => {
   useEffect(() => {
     const loadQuestions = async () => {
       setLoading(true);
-      await fetchQuestionsSkinTest();
+      let skinTestIdActive = 1;
+      const skinTestsData = await getAllSkinTests(token);
+      if (skinTestsData && skinTestsData.$values.length > 0) {
+        skinTestIdActive = skinTestsData.$values.find(
+          (item) => item.status === true
+        ).skinTestId;
+      }
+      await fetchQuestionsSkinTest(skinTestIdActive);
       setLoading(false);
     };
     loadQuestions();
@@ -177,14 +187,23 @@ const SkinTestQuiz = () => {
 
               <div className="greeting-wrap">
                 <h4>
-                  Your Recommended Skincare Routine 
+                  Hello, <br /> Your Baumann Skin Type is
                 </h4>
+                <p>Dry, Sensitive, Pigmented, Tight</p>
+                <p>
+                  This dry skin type is characterized by recurrent skin
+                  inflammation and an uneven skin tone. The DSPT skincare
+                  regimen should treat the dryness and inflammation first, and
+                  then proceed to treat the pigmentation. Laser and light
+                  treatments may be used.
+                </p>
+
                 <h3>{skinType && skinType.skinTypeName}</h3>
               </div>
             </div>
 
             <div className="quiz-result-content">
-              {/* <div className="recommended-wrap">
+              <div className="recommended-wrap">
                 <p className="heading">Your Recommended Skincare Routine</p>
                 <div className="recommended-list">
                   <img src="/recomended-bg.png" alt="" />
@@ -209,10 +228,10 @@ const SkinTestQuiz = () => {
                       }}
                     >
                       Add to Cart
-                    </Button> 
+                    </Button> */}
                   </div>
                 </div>
-              </div> */}
+              </div>
 
               <div className="guide-to-use-wrap">
                 {routineDetail &&
@@ -227,7 +246,7 @@ const SkinTestQuiz = () => {
                             <div className="section-use" key={index}>
                               {routineDetail[0].routineSteps.$values[0].category
                                 .products.$values.length > 0 && (
-                                <div className="product-item">p
+                                <div className="product-item">
                                   <img
                                     src={
                                       routineDetail[0].routineSteps.$values[0]

@@ -176,6 +176,13 @@
             margin: 16px 0;
             font-size: 18px;
             font-weight: 700;
+            max-width: 186px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            white-space: pre-line;
+            text-overflow: ellipsis;
+            overflow: hidden;
           }
 
           .product-price {
@@ -210,10 +217,14 @@
 
           .other-products-list {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: repeat(5, 1fr);
             gap: 16px;
 
             .other-product-item {
+              height: 100%;
+              display: flex;
+              flex-direction: column;
+
               img {
                 width: 100%;
                 aspect-ratio: 1 / 1;
@@ -223,6 +234,8 @@
 
               .product-info {
                 padding: 16px;
+                display: flex;
+                justify-content: space-between;
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 0;
@@ -232,6 +245,12 @@
                   font-size: 16px;
                   font-weight: 600;
                   line-height: 22px;
+                  display: -webkit-box;
+                  -webkit-line-clamp: 3;
+                  -webkit-box-orient: vertical;
+                  white-space: pre-line;
+                  text-overflow: ellipsis;
+                  overflow: hidden;
                 }
 
                 .price {
