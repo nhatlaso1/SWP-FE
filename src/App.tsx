@@ -23,6 +23,7 @@ import Routine from "./pages/admin/routine/Routine";
 import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import OrderManagement from "./pages/staff/order/OrderManagement";
+import BrandManagement from "./pages/staff/brand/BrandManagement";
 import BrandList from "./pages/brand/BrandList";
 import Notification from "./components/notification/Notification";
 import Purchase from "./pages/purchase/Purchase";
@@ -42,7 +43,6 @@ import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
 import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
-import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
 
 
 function App() {
@@ -65,8 +65,7 @@ function App() {
       element: <CustomerLayout />,
       children: [
         { path: "/", element: <Home /> },
-         { path: "take-quiz", element: <SkinTestQuiz/> },
-         { path: "quiz-result", element: <SkinTestResult/> },
+        { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
@@ -139,6 +138,7 @@ function App() {
         { path: "orders", element: <OrderManagement /> },
         { path: "categories", element: <CategoryManagement /> },
         { path: "products", element: <ProductManagement /> },
+        { path: "brands", element: <BrandManagement /> },
       ],
     },
   ]);

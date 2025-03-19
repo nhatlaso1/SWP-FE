@@ -246,15 +246,15 @@ const ProductDetail: React.FC = () => {
               {hasDiscount ? (
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                   <Typography variant="h4" color="error">
-                    ${finalPrice.toLocaleString()}
+                    {finalPrice.toLocaleString()} VND
                   </Typography>
                   <Typography variant="h6" sx={{ textDecoration: 'line-through', color: 'gray' }}>
-                    ${product.price.toLocaleString()}
+                    {product.price.toLocaleString()} VND
                   </Typography>
                 </Box>
               ) : (
                 <Typography variant="h4">
-                  ${product.price.toLocaleString()}
+                  {product.price.toLocaleString()} VND
                 </Typography>
               )}
             </div>

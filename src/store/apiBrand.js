@@ -27,14 +27,19 @@ export const BrandAPI = {
   getAll: async () => {
     try {
       const response = await api.get('/Brand/get-brands');
-      
+
       if (response?.data) {
         const data = response.data;
-        if (Array.isArray(data)) return data;
-        if (data.$values) return data.$values;
-        if (data.data) return data.data;
+        let brands = [];
+
+        if (Array.isArray(data)) brands = data;
+        else if (data.$values) brands = data.$values;
+        else if (data.data) brands = data.data;
+
+        // Return brands directly without modifying the brandLogo
+        return brands;
       }
-      
+
       return [];
     } catch (error) {
       console.warn('Lỗi khi lấy danh sách nhãn hiệu:', error.message);
@@ -42,10 +47,33 @@ export const BrandAPI = {
     }
   },
 
+  // Lấy logo của brand
+  getBrandLogo: async (brandId) => {
+    try {
+      const response = await api.get(`/Brand/get-brand-image/${brandId}`, {
+        responseType: 'blob'
+      });
+      return URL.createObjectURL(response.data);
+    } catch (error) {
+      console.warn('Lỗi khi lấy logo nhãn hiệu:', error.message);
+      return null;
+    }
+  },
+
   // Tạo nhãn hiệu mới
   create: async (brandData) => {
     try {
-      const response = await api.post('/Brand/create-brand', brandData);
+      const formData = new FormData();
+      formData.append('brandName', brandData.brandName);
+      if (brandData.logo) {
+        formData.append('logo', brandData.logo);
+      }
+
+      const response = await api.post('/Brand/create-brand', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       console.warn('Lỗi khi tạo nhãn hiệu:', error.message);
@@ -56,7 +84,17 @@ export const BrandAPI = {
   // Cập nhật nhãn hiệu
   update: async (brandId, brandData) => {
     try {
-      const response = await api.put(`/Brand/update-brand/${brandId}`, brandData);
+      const formData = new FormData();
+      formData.append('brandName', brandData.brandName);
+      if (brandData.logo) {
+        formData.append('logo', brandData.logo);
+      }
+
+      const response = await api.put(`/Brand/update-brand/${brandId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       return response.data;
     } catch (error) {
       console.warn('Lỗi khi cập nhật nhãn hiệu:', error.message);

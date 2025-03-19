@@ -486,18 +486,21 @@ const ProductManagement = () => {
         throw new Error('Please select a category');
       }
 
-      const allImageUrls = editedProduct.images.map(img => img.url || img);
-
-      console.log('All image URLs to be updated:', allImageUrls);
-
+      // Format ingredients data
       const ingredientsData = editedProduct.ingredients.map(ing => ({
-        ingredientId: ing.ingredientId,
-        concentration: ing.concentration || ''
+        ingredientId: parseInt(ing.ingredientId),
+        concentration: ing.concentration ? parseFloat(ing.concentration) : 0
       }));
+
+      // Format image URLs
+      const imageUrls = editedProduct.images.map(img => {
+        if (typeof img === 'string') return img;
+        return img.url || '';
+      }).filter(url => url !== '');
 
       const updateData = {
         productName: editedProduct.productName.trim(),
-        size: editedProduct.size.trim(),
+        size: editedProduct.size?.trim() || '',
         price: price,
         weight: weight,
         quantity: quantity,
@@ -506,10 +509,10 @@ const ProductManagement = () => {
         isRecommended: Boolean(editedProduct.isRecommended),
         brandId: brandId,
         categoryId: categoryId,
-        skinTypeIds: editedProduct.skinTypes || [],
+        skinTypeIds: editedProduct.skinTypes.map(id => parseInt(id)),
         ingredientConcentrations: ingredientsData,
-        functionIds: editedProduct.functions || [],
-        imageUrls: allImageUrls,
+        functionIds: editedProduct.functions.map(id => parseInt(id)),
+        imageUrls: imageUrls,
         status: editedProduct.status
       };
 
@@ -543,6 +546,7 @@ const ProductManagement = () => {
       const price = parseFloat(newProduct.price);
       const quantity = parseInt(newProduct.quantity);
       const discount = parseFloat(newProduct.discount);
+      const weight = parseFloat(newProduct.weight);
       const brandId = parseInt(newProduct.brandId);
       const categoryId = parseInt(newProduct.categoryId);
 
@@ -555,6 +559,9 @@ const ProductManagement = () => {
       if (isNaN(discount) || discount < 0 || discount > 1) {
         throw new Error('Discount must be between 0 and 1');
       }
+      if (isNaN(weight) || weight < 0) {
+        throw new Error('Invalid weight');
+      }
       if (isNaN(brandId) || brandId <= 0) {
         throw new Error('Please select a brand');
       }
@@ -562,20 +569,31 @@ const ProductManagement = () => {
         throw new Error('Please select a category');
       }
 
+      // Format ingredients data
+      const ingredientsData = newProduct.ingredients.map(ing => ({
+        ingredientId: parseInt(ing.ingredientId),
+        concentration: ing.concentration ? parseFloat(ing.concentration) : 0
+      }));
+
+      // Format image URLs
+      const imageUrls = newProduct.images.filter(url => url && url.trim() !== '');
+
       const productToCreate = {
-        productName: newProduct.productName,
-        summary: newProduct.summary,
-        size: newProduct.size,
+        productName: newProduct.productName.trim(),
+        summary: newProduct.summary?.trim() || '',
+        size: newProduct.size?.trim() || '',
         price: price,
+        weight: weight,
         quantity: quantity,
         discount: discount,
-        isRecommended: newProduct.isRecommended,
+        isRecommended: Boolean(newProduct.isRecommended),
         brandId: brandId,
         categoryId: categoryId,
-        skinTypes: newProduct.skinTypes,
-        ingredients: newProduct.ingredients,
-        functions: newProduct.functions,
-        images: newProduct.images
+        skinTypes: newProduct.skinTypes.map(id => parseInt(id)),
+        ingredients: ingredientsData,
+        functions: newProduct.functions.map(id => parseInt(id)),
+        images: imageUrls,
+        status: true // Set default status to true for new products
       };
 
       console.log('Attempting to create product with data:', productToCreate);
@@ -616,6 +634,7 @@ const ProductManagement = () => {
     } catch (error) {
       console.error('Error in handleCreateProduct:', error);
       console.error('Error response:', error.response);
+
       const errorMessage = error.response?.data?.detail
         || error.response?.data?.message
         || error.message

@@ -216,7 +216,7 @@ const SaleProducts: React.FC = () => {
                   </Box>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
                     <Typography variant="h6" color="primary.main">
-                      ${(product.price * (1 - product.discount)).toLocaleString()}
+                      {(product.price * (1 - product.discount)).toLocaleString()} VND
                     </Typography>
                     <Typography
                       variant="body2"
@@ -225,7 +225,7 @@ const SaleProducts: React.FC = () => {
                         textDecoration: 'line-through',
                       }}
                     >
-                      ${product.price.toLocaleString()}
+                      {product.price.toLocaleString()} VND
                     </Typography>
                   </Box>
                   <Button
@@ -255,7 +255,7 @@ const SaleProducts: React.FC = () => {
                         // Default quantity is 1 when adding to cart
                         quantity: 1,
                         // Use the product summary as an optional note
-                        note: product.summary,
+                        // note: product.summary,
                       });
                     }}
                   >
