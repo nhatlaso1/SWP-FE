@@ -45,6 +45,8 @@ import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
 import ListAllBlog from "./pages/blog/ListAllBlog";
+import BlogDetail from "./components/our-blog/BlogDetail";
+import CreateBlog from "./pages/blog/CreateBlog";
 
 
 function App() {
@@ -73,10 +75,11 @@ function App() {
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
         { path: "blogs", element: <OurBlog /> },
-        { path: "blog/detail", element: <SerumMoisturizerArticle /> },
+        { path: "blogs/:id", element: <BlogDetail /> },
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
+        { path: "SerumMoisturizerArticle", element: <SerumMoisturizerArticle /> },
         {
           path: "cart",
           element: (
@@ -128,7 +131,9 @@ function App() {
         { path: "user/:id", element: <UserInfo /> },
         { path: "createvoucher", element: <CreateVoucher /> },
         { path: "createskintype", element: <CreateSkinType /> },
-        { path: "blog", element: <ListAllBlog /> },
+        { path: "blogs", element: <ListAllBlog /> },
+        { path: "createBlog", element: <CreateBlog /> },
+        { path: "blogs/:blogId", element: <CreateBlog /> },
       ],
     }, {
       path: "staff",
