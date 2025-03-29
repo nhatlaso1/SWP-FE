@@ -43,6 +43,9 @@ import CreateVoucher from "./pages/admin/voucher/CreateVoucher";
 import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
+import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
+import ListAllBlog from "./pages/blog/ListAllBlog";
+import Compare from './pages/compare/Compare';
 
 
 function App() {
@@ -67,6 +70,7 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
+        { path: "quiz-result", element: <SkinTestResult /> },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
         { path: "blogs", element: <OurBlog /> },
@@ -98,7 +102,7 @@ function App() {
             </ProtectedRoute>
           )
         },
-
+        { path: 'compare', element: <Compare /> },
       ],
     },
     {
@@ -125,6 +129,7 @@ function App() {
         { path: "user/:id", element: <UserInfo /> },
         { path: "createvoucher", element: <CreateVoucher /> },
         { path: "createskintype", element: <CreateSkinType /> },
+        { path: "blog", element: <ListAllBlog /> },
       ],
     }, {
       path: "staff",

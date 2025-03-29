@@ -5,6 +5,7 @@ import { CategoryAPI } from '../../../store/apiCategory';
 import { FunctionAPI } from '../../../store/apiFunction';
 import { IngredientAPI } from '../../../store/apiIngredient';
 import { SkinTypeAPI } from '../../../store/apiSkinType';
+import './ProductManagement.css';
 
 const ProductManagement = () => {
   const [products, setProducts] = useState([]);
@@ -39,197 +40,6 @@ const ProductManagement = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [showEditForm, setShowEditForm] = useState(false);
 
-  const containerStyle = {
-    padding: '20px',
-    minHeight: '100vh',
-    backgroundColor: '#f5f7fa',
-  };
-
-  const contentWrapperStyle = {
-    height: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  const headerStyle = {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '20px',
-    padding: '16px',
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-  };
-
-  const tableContainerStyle = {
-    flex: 1,
-    backgroundColor: 'white',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    overflow: 'auto',
-  };
-
-  const tableStyle = {
-    width: '100%',
-    borderCollapse: 'collapse',
-    backgroundColor: '#fff',
-  };
-
-  const thStyle = {
-    backgroundColor: '#f5f5f5',
-    padding: '12px',
-    textAlign: 'left',
-    borderBottom: '2px solid #ddd',
-    color: '#333',
-    fontWeight: 'bold',
-  };
-
-  const tdStyle = {
-    padding: '12px',
-    borderBottom: '1px solid #ddd',
-    color: '#666',
-  };
-
-  const buttonStyle = {
-    padding: '8px 16px',
-    borderRadius: '4px',
-    border: 'none',
-    cursor: 'pointer',
-    fontWeight: '500',
-    transition: 'background-color 0.3s',
-  };
-
-  const primaryButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#4CAF50',
-    color: 'white',
-  };
-
-  const secondaryButtonStyle = {
-    ...buttonStyle,
-    backgroundColor: '#f5f5f5',
-    color: '#333',
-    border: '1px solid #ddd',
-  };
-
-  const modalStyle = {
-    position: 'fixed',
-    top: '0',
-    left: '0',
-    right: '0',
-    bottom: '0',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 1000,
-  };
-
-  const modalContentStyle = {
-    backgroundColor: '#fff',
-    padding: '24px',
-    borderRadius: '8px',
-    width: '95%',
-    maxWidth: '1200px',
-    maxHeight: '95vh',
-    overflowY: 'auto',
-  };
-
-  const formGroupStyle = {
-    marginBottom: '16px',
-  };
-
-  const inputStyle = {
-    width: '100%',
-    padding: '8px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    fontSize: '14px',
-  };
-
-  const labelStyle = {
-    display: 'block',
-    marginBottom: '8px',
-    color: '#333',
-    fontWeight: '500',
-  };
-
-  const imagePreviewStyle = {
-    width: '100px',
-    height: '100px',
-    objectFit: 'cover',
-    borderRadius: '4px',
-    margin: '4px',
-  };
-
-  const textareaStyle = {
-    ...inputStyle,
-    minHeight: '150px',
-    resize: 'vertical',
-    fontFamily: 'inherit',
-    lineHeight: '1.5'
-  };
-
-  const dropdownStyle = {
-    position: 'relative',
-    width: '100%',
-    marginBottom: '8px'
-  };
-
-  const dropdownButtonStyle = {
-    ...inputStyle,
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    cursor: 'pointer',
-    backgroundColor: 'white',
-    minHeight: '38px'
-  };
-
-  const dropdownContentStyle = {
-    position: 'absolute',
-    top: '100%',
-    left: '0',
-    right: '0',
-    maxHeight: '250px',
-    overflowY: 'auto',
-    backgroundColor: 'white',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
-    zIndex: 1000,
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-  };
-
-  const dropdownItemStyle = {
-    padding: '8px 12px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '8px',
-    transition: 'background-color 0.2s',
-    ':hover': {
-      backgroundColor: '#f5f5f5'
-    }
-  };
-
-  const selectedItemsStyle = {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '4px',
-    padding: '4px'
-  };
-
-  const selectedItemStyle = {
-    backgroundColor: '#e3f2fd',
-    borderRadius: '16px',
-    padding: '2px 8px',
-    fontSize: '12px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '4px'
-  };
-
   const [dropdownStates, setDropdownStates] = useState({
     skinTypes: false,
     functions: false,
@@ -239,7 +49,10 @@ const ProductManagement = () => {
     editIngredients: false
   });
 
-  const toggleDropdown = (dropdown) => {
+  const toggleDropdown = (dropdown, e) => {
+    if (e) {
+      e.stopPropagation();
+    }
     setDropdownStates(prev => ({
       ...prev,
       [dropdown]: !prev[dropdown]
@@ -248,7 +61,17 @@ const ProductManagement = () => {
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      if (!e.target.closest('.dropdown-container')) {
+      const dropdownContainer = e.target.closest('.product-management-dropdown-container');
+      const isDropdownButton = e.target.closest('.product-management-dropdown-button');
+      const isDropdownContent = e.target.closest('.product-management-dropdown-content');
+      const isDropdownItem = e.target.closest('.product-management-dropdown-item');
+      const isDropdownInput = e.target.closest('.product-management-dropdown-item-input');
+
+      if (isDropdownContent || isDropdownItem || isDropdownInput) {
+        return;
+      }
+
+      if (!dropdownContainer || (dropdownContainer && !isDropdownButton)) {
         setDropdownStates({
           skinTypes: false,
           functions: false,
@@ -414,19 +237,19 @@ const ProductManagement = () => {
     setEditedProduct({
       productId: product.productId,
       productName: product.productName,
-      size: product.size,
-      price: product.price,
-      weight: product.weight || 0,
-      quantity: product.quantity,
-      discount: product.discount,
-      summary: product.summary,
+      size: product.size || '',
+      price: product.price || '',
+      weight: product.weight || '',
+      quantity: product.quantity || '',
+      discount: product.discount || '',
+      summary: product.summary || '',
       isRecommended: product.isRecommended || false,
-      brandId: product.brand?.brandId,
-      categoryId: product.category?.categoryId,
+      brandId: product.brand?.brandId || '',
+      categoryId: product.category?.categoryId || '',
       skinTypes: product.skinTypes?.$values?.map(skin => skin.skinTypeId) || [],
       ingredients: product.ingredients?.$values?.map(ing => ({
         ingredientId: ing.ingredientId,
-        concentration: ing.concentration
+        concentration: ing.concentration || ''
       })) || [],
       functions: product.functions?.$values?.map(func => func.functionId) || [],
       images: existingImages,
@@ -440,6 +263,28 @@ const ProductManagement = () => {
       ...prev,
       [field]: value
     }));
+  };
+
+  const handleIngredientConcentrationChange = (ingredientId, concentration, isEdit = false) => {
+    if (isEdit) {
+      setEditedProduct(prev => ({
+        ...prev,
+        ingredients: prev.ingredients.map(ing =>
+          ing.ingredientId === ingredientId
+            ? { ...ing, concentration: concentration === '' ? '' : parseFloat(concentration) }
+            : ing
+        )
+      }));
+    } else {
+      setNewProduct(prev => ({
+        ...prev,
+        ingredients: prev.ingredients.map(ing =>
+          ing.ingredientId === ingredientId
+            ? { ...ing, concentration: concentration === '' ? '' : parseFloat(concentration) }
+            : ing
+        )
+      }));
+    }
   };
 
   const handleImageFile = (file) => {
@@ -670,25 +515,25 @@ const ProductManagement = () => {
   };
 
   return (
-    <div style={containerStyle}>
-      <div style={contentWrapperStyle}>
-        <div style={headerStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+    <div className="product-management-container">
+      <div className="product-management-content">
+        <div className="product-management-header">
+          <div className="product-management-header-actions">
             {selectedProduct ? (
               <>
-                <button onClick={handleBackToList} style={secondaryButtonStyle}>
+                <button onClick={handleBackToList} className="product-management-button-secondary">
                   Back to Product List
                 </button>
-                <h1 style={{ margin: 0, fontSize: '24px', color: '#333' }}>
+                <h1 className="product-management-header-title">
                   Product Details: {selectedProduct.productName}
                 </h1>
               </>
             ) : (
-              <h1 style={{ margin: 0, fontSize: '24px', color: '#333' }}>Product Management</h1>
+              <h1 className="product-management-header-title">Product Management</h1>
             )}
           </div>
           {!selectedProduct && (
-            <button onClick={() => setShowCreateForm(true)} style={primaryButtonStyle}>
+            <button onClick={() => setShowCreateForm(true)} className="product-management-button-primary">
               Add New Product
             </button>
           )}
@@ -697,26 +542,22 @@ const ProductManagement = () => {
         {!selectedProduct ? (
           <>
             {loading ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
-                Loading data...
-              </div>
+              <div className="product-management-loading">Loading data...</div>
             ) : error ? (
-              <div style={{ textAlign: 'center', padding: '20px', color: '#f44336' }}>
-                {error}
-              </div>
+              <div className="product-management-error">{error}</div>
             ) : (
               <>
-                <div style={tableContainerStyle}>
-                  <table style={tableStyle}>
+                <div className="product-management-table-container">
+                  <table className="product-management-table">
                     <thead>
                       <tr>
-                        <th style={{ ...thStyle, width: '10%' }}>Product ID</th>
-                        <th style={{ ...thStyle, width: '25%' }}>Product Name</th>
-                        <th style={{ ...thStyle, width: '15%' }}>Price</th>
-                        <th style={{ ...thStyle, width: '10%' }}>Discount</th>
-                        <th style={{ ...thStyle, width: '10%' }}>Quantity</th>
-                        <th style={{ ...thStyle, width: '15%' }}>Image</th>
-                        <th style={{ ...thStyle, width: '15%' }}>Status</th>
+                        <th className="product-management-th" style={{ width: '10%' }}>Product ID</th>
+                        <th className="product-management-th" style={{ width: '25%' }}>Product Name</th>
+                        <th className="product-management-th" style={{ width: '15%' }}>Price</th>
+                        <th className="product-management-th" style={{ width: '10%' }}>Discount</th>
+                        <th className="product-management-th" style={{ width: '10%' }}>Quantity</th>
+                        <th className="product-management-th" style={{ width: '15%' }}>Image</th>
+                        <th className="product-management-th" style={{ width: '15%' }}>Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -724,41 +565,29 @@ const ProductManagement = () => {
                         <tr
                           key={product.productId}
                           onClick={() => handleViewDetails(product)}
-                          style={{
-                            cursor: 'pointer',
-                            transition: 'background-color 0.2s',
-                            ':hover': { backgroundColor: '#f5f5f5' }
-                          }}
+                          className="product-management-table-row"
                         >
-                          <td style={tdStyle}>{product.productId}</td>
-                          <td style={tdStyle}>{product.productName}</td>
-                          <td style={tdStyle}>
+                          <td className="product-management-td">{product.productId}</td>
+                          <td className="product-management-td">{product.productName}</td>
+                          <td className="product-management-td">
                             {new Intl.NumberFormat('vi-VN', {
                               style: 'currency',
                               currency: 'VND'
                             }).format(product.price)}
                           </td>
-                          <td style={tdStyle}>{(product.discount * 100).toFixed(0)}%</td>
-                          <td style={tdStyle}>{product.quantity}</td>
-                          <td style={tdStyle}>
+                          <td className="product-management-td">{(product.discount * 100).toFixed(0)}%</td>
+                          <td className="product-management-td">{product.quantity}</td>
+                          <td className="product-management-td">
                             {product.productImage && (
                               <img
                                 src={product.productImage}
                                 alt={product.productName}
-                                style={imagePreviewStyle}
+                                className="product-management-image-preview"
                               />
                             )}
                           </td>
-                          <td style={tdStyle}>
-                            <span style={{
-                              padding: '4px 8px',
-                              borderRadius: '12px',
-                              fontSize: '12px',
-                              fontWeight: '500',
-
-                              backgroundColor: product.status ? '#e8f5e9' : '#ffebee',
-                              color: product.status ? '#2e7d32' : '#c62828',
-                            }}>
+                          <td className="product-management-td">
+                            <span className={`product-management-status-badge ${product.status ? 'product-management-status-active' : 'product-management-status-inactive'}`}>
                               {product.status ? 'Active' : 'Inactive'}
                             </span>
                           </td>
@@ -769,24 +598,11 @@ const ProductManagement = () => {
                 </div>
 
                 {totalPages > 1 && (
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '20px',
-                    backgroundColor: 'white',
-                    borderRadius: '8px',
-                    marginTop: '20px',
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                  }}>
+                  <div className="product-management-pagination">
                     <button
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
-                      style={{
-                        ...secondaryButtonStyle,
-                        opacity: currentPage === 1 ? 0.5 : 1,
-                      }}
+                      className={`product-management-pagination-button ${currentPage === 1 ? 'product-management-pagination-button-disabled' : ''}`}
                     >
                       &lt;
                     </button>
@@ -802,13 +618,7 @@ const ProductManagement = () => {
                           <button
                             key={pageNumber}
                             onClick={() => handlePageChange(pageNumber)}
-                            style={{
-                              ...buttonStyle,
-                              backgroundColor: currentPage === pageNumber ? '#4CAF50' : '#fff',
-                              color: currentPage === pageNumber ? '#fff' : '#333',
-                              border: '1px solid #ddd',
-                              minWidth: '40px',
-                            }}
+                            className={`product-management-pagination-button ${currentPage === pageNumber ? 'product-management-pagination-button-active' : ''}`}
                           >
                             {pageNumber}
                           </button>
@@ -820,10 +630,7 @@ const ProductManagement = () => {
                         return (
                           <span
                             key={pageNumber}
-                            style={{
-                              padding: '8px',
-                              color: '#666',
-                            }}
+                            className="product-management-pagination-ellipsis"
                           >
                             ...
                           </span>
@@ -835,10 +642,7 @@ const ProductManagement = () => {
                     <button
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
-                      style={{
-                        ...secondaryButtonStyle,
-                        opacity: currentPage === totalPages ? 0.5 : 1,
-                      }}
+                      className={`product-management-pagination-button ${currentPage === totalPages ? 'product-management-pagination-button-disabled' : ''}`}
                     >
                       &gt;
                     </button>
@@ -848,11 +652,11 @@ const ProductManagement = () => {
             )}
           </>
         ) : (
-          <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
+          <div className="product-management-detail">
+            <div className="product-management-detail-grid">
               <div>
-                <h3 style={{ marginBottom: '16px', color: '#333' }}>Product Information</h3>
-                <div style={{ display: 'grid', gap: '12px' }}>
+                <h3 className="product-management-detail-title">Product Information</h3>
+                <div className="product-management-detail-info">
                   <div>
                     <strong>Product Name:</strong> {selectedProduct.productName}
                   </div>
@@ -868,16 +672,11 @@ const ProductManagement = () => {
                   <div>
                     <strong>Size:</strong> {selectedProduct.size}
                   </div>
-                  <div>
-
-                    <strong>Status:</strong> {selectedProduct.status ? 'Active' : 'Inactive'}
-
-                  </div>
                 </div>
               </div>
               <div>
-                <h3 style={{ marginBottom: '16px', color: '#333' }}>Category & Brand</h3>
-                <div style={{ display: 'grid', gap: '12px' }}>
+                <h3 className="product-management-detail-title">Category & Brand</h3>
+                <div className="product-management-detail-info">
                   <div>
                     <strong>Brand:</strong> {selectedProduct.brand?.brandName}
                   </div>
@@ -888,209 +687,193 @@ const ProductManagement = () => {
               </div>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ marginBottom: '16px', color: '#333' }}>Product Description</h3>
-              <p style={{ whiteSpace: 'pre-wrap' }}>{selectedProduct.summary}</p>
+            <div className="product-management-detail-description">
+              <h3 className="product-management-detail-title">Product Description</h3>
+              <p>{selectedProduct.summary}</p>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ marginBottom: '16px', color: '#333' }}>Skin Types</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="product-management-detail-skin-types">
+              <h3 className="product-management-detail-title">Skin Types</h3>
+              <div className="product-management-detail-info">
                 {selectedProduct.skinTypes?.$values.map(skin => (
-                  <span key={skin.skinTypeId} style={{
-                    padding: '4px 12px',
-                    backgroundColor: '#e3f2fd',
-                    borderRadius: '16px',
-                    fontSize: '14px',
-                    color: '#1976d2'
-                  }}>
+                  <span key={skin.skinTypeId} className="product-management-skin-type">
                     {skin.skinTypeName}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ marginBottom: '16px', color: '#333' }}>Functions</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <div className="product-management-detail-functions">
+              <h3 className="product-management-detail-title">Functions</h3>
+              <div className="product-management-detail-info">
                 {selectedProduct.functions?.$values.map(func => (
-                  <span key={func.functionId} style={{
-                    padding: '4px 12px',
-                    backgroundColor: '#f3e5f5',
-                    borderRadius: '16px',
-                    fontSize: '14px',
-                    color: '#7b1fa2'
-                  }}>
+                  <span key={func.functionId} className="product-management-function">
                     {func.functionName}
                   </span>
                 ))}
               </div>
             </div>
 
-            <div style={{ marginBottom: '24px' }}>
-              <h3 style={{ marginBottom: '16px', color: '#333' }}>Ingredients</h3>
-              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <div className="product-management-detail-ingredients">
+              <h3 className="product-management-detail-title">Ingredients</h3>
+              <table className="product-management-detail-table">
                 <thead>
                   <tr>
-                    <th style={{ ...thStyle, width: '50%' }}>Ingredient Name</th>
-                    <th style={{ ...thStyle, width: '50%' }}>Concentration</th>
+                    <th className="product-management-th" style={{ width: '50%' }}>Ingredient Name</th>
+                    <th className="product-management-th" style={{ width: '50%' }}>Concentration</th>
                   </tr>
                 </thead>
                 <tbody>
                   {selectedProduct.ingredients?.$values.map(ingredient => (
                     <tr key={ingredient.ingredientId}>
-                      <td style={tdStyle}>{ingredient.ingredientName}</td>
-                      <td style={tdStyle}>{ingredient.concentration}%</td>
+                      <td className="product-management-td">{ingredient.ingredientName}</td>
+                      <td className="product-management-td">{ingredient.concentration}%</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
 
-            <div>
-              <h3 style={{ marginBottom: '16px', color: '#333' }}>Product Images</h3>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+            <div className="product-management-detail-images">
+              <h3 className="product-management-detail-title">Product Images</h3>
+              <div className="product-management-detail-image-grid">
                 {selectedProduct.productImages?.$values.map(image => (
                   <img
                     key={image.productImageId}
                     src={image.productImage}
                     alt={selectedProduct.productName}
-                    style={{
-                      width: '200px',
-                      height: '200px',
-                      objectFit: 'cover',
-                      borderRadius: '8px',
-                      boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                    }}
+                    className="product-management-detail-image"
                   />
                 ))}
               </div>
             </div>
 
-            <div style={{ marginTop: '24px', display: 'flex', gap: '12px' }}>
+            <div className="product-management-detail-actions">
               <button
                 onClick={() => handleEditProduct(selectedProduct)}
-                style={{
-                  ...primaryButtonStyle,
-                  backgroundColor: '#2196F3'
-                }}
+                className="product-management-button-primary"
               >
                 Edit Product
               </button>
               <button
                 onClick={() => handleActivateProduct(selectedProduct.productId)}
-                style={{
-                  ...primaryButtonStyle,
-                  backgroundColor: '#4CAF50'
-                }}
+                className="product-management-button-primary"
               >
                 Activate Product
               </button>
               <button
                 onClick={() => handleDeactivateProduct(selectedProduct.productId)}
-                style={{
-                  ...primaryButtonStyle,
-                  backgroundColor: '#f44336'
-                }}
+                className="product-management-button-primary"
               >
                 Deactivate Product
               </button>
-
             </div>
           </div>
         )}
 
         {showCreateForm && (
-          <div style={modalStyle}>
-            <div style={modalContentStyle}>
-              <h2 style={{ marginBottom: '20px', color: '#333' }}>Add New Product</h2>
+          <div className="product-management-modal">
+            <div className="product-management-modal-content">
+              <h2 className="product-management-modal-title">Add New Product</h2>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div className="product-management-form-grid">
                 <div>
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Product Name:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Product Name:</label>
                     <input
                       type="text"
                       value={newProduct.productName}
                       onChange={(e) => handleNewProductChange('productName', e.target.value)}
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Description:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Description:</label>
                     <textarea
                       value={newProduct.summary}
                       onChange={(e) => handleNewProductChange('summary', e.target.value)}
-                      style={textareaStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Size (ml):</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Size (ml):</label>
                     <input
                       type="number"
                       value={newProduct.size}
                       onChange={(e) => handleNewProductChange('size', e.target.value)}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Weight (g):</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Weight (g):</label>
                     <input
                       type="number"
                       value={newProduct.weight}
                       onChange={(e) => handleNewProductChange('weight', e.target.value)}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Price:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Price:</label>
                     <input
                       type="number"
                       value={newProduct.price}
                       onChange={(e) => handleNewProductChange('price', e.target.value)}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Quantity:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Quantity:</label>
                     <input
                       type="number"
                       value={newProduct.quantity}
                       onChange={(e) => handleNewProductChange('quantity', e.target.value)}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Discount:</label>
-                    <input
-                      type="number"
-                      value={newProduct.discount}
-                      onChange={(e) => handleNewProductChange('discount', e.target.value)}
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      style={inputStyle}
-                    />
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Discount:</label>
+                    <div className="product-management-input-group">
+                      <input
+                        type="number"
+                        value={newProduct.discount === '' ? '' : newProduct.discount * 100}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '') {
+                            handleNewProductChange('discount', '');
+                          } else {
+                            const percentage = Math.min(100, Math.max(0, parseFloat(value)));
+                            handleNewProductChange('discount', percentage / 100);
+                          }
+                        }}
+                        min="0"
+                        max="100"
+                        step="1"
+                        className="product-management-input"
+                        placeholder="Enter discount percentage"
+                      />
+                      <span className="product-management-input-group-addon">%</span>
+                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Brand:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Brand:</label>
                     <select
                       value={newProduct.brandId}
                       onChange={(e) => handleNewProductChange('brandId', e.target.value)}
-                      style={inputStyle}
+                      className="product-management-input"
                     >
                       <option value="">Select Brand</option>
                       {brands.map(brand => (
@@ -1101,12 +884,12 @@ const ProductManagement = () => {
                     </select>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Category:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Category:</label>
                     <select
                       value={newProduct.categoryId}
                       onChange={(e) => handleNewProductChange('categoryId', e.target.value)}
-                      style={inputStyle}
+                      className="product-management-input"
                     >
                       <option value="">Select Category</option>
                       {categories.map(category => (
@@ -1117,46 +900,47 @@ const ProductManagement = () => {
                     </select>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Skin Types:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Skin Types:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('skinTypes')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('skinTypes', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {newProduct.skinTypes.length > 0 ? (
                             skinTypes
                               .filter(skin => newProduct.skinTypes.includes(skin.skinTypeId))
                               .map(skin => (
-                                <span key={skin.skinTypeId} style={selectedItemStyle}>
-                                  {skin.skinTypeName}
-                                  <span
+                                <span key={skin.skinTypeId} className="product-management-selected-item">
+                                  <span>{skin.skinTypeName}</span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleNewProductChange('skinTypes',
                                         newProduct.skinTypes.filter(id => id !== skin.skinTypeId)
                                       );
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Skin Types</span>
+                            <span className="product-management-placeholder">Select Skin Types</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.skinTypes && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {skinTypes.map(skin => (
                             <div
                               key={skin.skinTypeId}
-                              style={dropdownItemStyle}
-                              onClick={() => {
+                              className="product-management-dropdown-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 const isSelected = newProduct.skinTypes.includes(skin.skinTypeId);
                                 handleNewProductChange('skinTypes',
                                   isSelected
@@ -1165,12 +949,15 @@ const ProductManagement = () => {
                                 );
                               }}
                             >
-                              <input
-                                type="checkbox"
-                                checked={newProduct.skinTypes.includes(skin.skinTypeId)}
-                                onChange={(e) => { }}
-                              />
-                              {skin.skinTypeName}
+                              <div className="product-management-dropdown-item-inner">
+                                <input
+                                  type="checkbox"
+                                  checked={newProduct.skinTypes.includes(skin.skinTypeId)}
+                                  onChange={() => { }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span>{skin.skinTypeName}</span>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1178,46 +965,47 @@ const ProductManagement = () => {
                     </div>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Functions:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Functions:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('functions')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('functions', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {newProduct.functions.length > 0 ? (
                             functions
                               .filter(func => newProduct.functions.includes(func.functionId))
                               .map(func => (
-                                <span key={func.functionId} style={selectedItemStyle}>
-                                  {func.functionName}
-                                  <span
+                                <span key={func.functionId} className="product-management-selected-item">
+                                  <span>{func.functionName}</span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleNewProductChange('functions',
                                         newProduct.functions.filter(id => id !== func.functionId)
                                       );
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Functions</span>
+                            <span className="product-management-placeholder">Select Functions</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.functions && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {functions.map(func => (
                             <div
                               key={func.functionId}
-                              style={dropdownItemStyle}
-                              onClick={() => {
+                              className="product-management-dropdown-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 const isSelected = newProduct.functions.includes(func.functionId);
                                 handleNewProductChange('functions',
                                   isSelected
@@ -1226,12 +1014,15 @@ const ProductManagement = () => {
                                 );
                               }}
                             >
-                              <input
-                                type="checkbox"
-                                checked={newProduct.functions.includes(func.functionId)}
-                                onChange={(e) => { }}
-                              />
-                              {func.functionName}
+                              <div className="product-management-dropdown-item-inner">
+                                <input
+                                  type="checkbox"
+                                  checked={newProduct.functions.includes(func.functionId)}
+                                  onChange={() => { }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span>{func.functionName}</span>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1239,50 +1030,55 @@ const ProductManagement = () => {
                     </div>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Ingredients:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Ingredients:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('ingredients')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('ingredients', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {newProduct.ingredients.length > 0 ? (
                             ingredients
                               .filter(ing => newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId))
                               .map(ing => (
-                                <span key={ing.ingredientId} style={selectedItemStyle}>
-                                  {ing.ingredientName}
-                                  ({newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}%)
-                                  <span
+                                <span key={ing.ingredientId} className="product-management-selected-item">
+                                  <span>
+                                    {ing.ingredientName}
+                                    {newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined &&
+                                      ` (${newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration}%)`
+                                    }
+                                  </span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       handleNewProductChange('ingredients',
                                         newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
                                       );
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Ingredients</span>
+                            <span className="product-management-placeholder">Select Ingredients</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.ingredients && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {ingredients.map(ing => (
                             <div
                               key={ing.ingredientId}
-                              style={{ ...dropdownItemStyle, flexWrap: 'wrap' }}
+                              className="product-management-dropdown-item"
                             >
                               <div
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}
-                                onClick={() => {
+                                className="product-management-dropdown-item-inner"
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   const isSelected = newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
                                   handleNewProductChange('ingredients',
                                     isSelected
@@ -1294,38 +1090,27 @@ const ProductManagement = () => {
                                 <input
                                   type="checkbox"
                                   checked={newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    const isSelected = newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
-                                    handleNewProductChange('ingredients',
-                                      isSelected
-                                        ? newProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
-                                        : [...newProduct.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
-                                    );
-                                  }}
+                                  onChange={() => { }}
+                                  onClick={(e) => e.stopPropagation()}
                                 />
                                 <span>{ing.ingredientName}</span>
                               </div>
                               {newProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
-                                <div style={{ width: '100%', paddingLeft: '24px', marginTop: '4px' }}>
+                                <div className="product-management-dropdown-item-input">
                                   <input
                                     type="number"
-                                    value={newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}
+                                    value={newProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration || ''}
                                     onChange={(e) => {
-                                      const newIngredients = newProduct.ingredients.map(i =>
-                                        i.ingredientId === ing.ingredientId
-                                          ? { ...i, concentration: e.target.value === '' ? '' : parseFloat(e.target.value) }
-                                          : i
-                                      );
-                                      handleNewProductChange('ingredients', newIngredients);
+                                      e.stopPropagation();
+                                      handleIngredientConcentrationChange(ing.ingredientId, e.target.value);
                                     }}
                                     onClick={(e) => e.stopPropagation()}
                                     min="0"
                                     max="100"
                                     step="0.1"
-                                    style={{ ...inputStyle, width: '80px' }}
+                                    placeholder="Enter %"
                                   />
-                                  <span style={{ marginLeft: '4px' }}>%</span>
+                                  <span>%</span>
                                 </div>
                               )}
                             </div>
@@ -1337,48 +1122,32 @@ const ProductManagement = () => {
                 </div>
               </div>
 
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Product Images:</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+              <div className="product-management-form-group">
+                <label className="product-management-label">Product Images:</label>
+                <div className="product-management-image-grid">
                   {newProduct.images.map((image, index) => (
-                    <div key={index} style={{ position: 'relative' }}>
+                    <div key={index} className="product-management-image-item">
                       <img
                         src={image}
                         alt={`Product ${index + 1}`}
-                        style={{
-                          width: '100px',
-                          height: '100px',
-                          objectFit: 'cover',
-                          borderRadius: '4px'
-                        }}
+                        className="product-management-image"
                       />
                       <button
                         onClick={() => {
                           const newImages = newProduct.images.filter((_, i) => i !== index);
                           handleNewProductChange('images', newImages);
                         }}
-                        style={{
-                          position: 'absolute',
-                          top: '-8px',
-                          right: '-8px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          cursor: 'pointer'
-                        }}
+                        className="product-management-remove-image"
                       >
                         ×
                       </button>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div className="product-management-image-input">
                     <input
                       type="text"
-                      placeholder="Enter image URL"
-                      style={{ ...inputStyle, width: '200px' }}
+                      placeholder="Enter your URL image"
+                      className="product-management-input"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.value.trim()) {
                           const imageUrl = e.target.value.trim();
@@ -1389,18 +1158,14 @@ const ProductManagement = () => {
                     />
                     <button
                       onClick={() => {
-                        const input = document.querySelector('input[placeholder="Enter image URL"]');
+                        const input = document.querySelector('input[placeholder="Enter your URL image"]');
                         const imageUrl = input.value.trim();
                         if (imageUrl) {
                           handleNewProductChange('images', [...newProduct.images, imageUrl]);
                           input.value = '';
                         }
                       }}
-                      style={{
-                        ...primaryButtonStyle,
-                        padding: '8px 16px',
-                        height: '36px'
-                      }}
+                      className="product-management-add-image"
                     >
                       Add
                     </button>
@@ -1408,17 +1173,17 @@ const ProductManagement = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <div className="product-management-modal-actions">
                 <button
                   onClick={handleCreateProduct}
-                  style={primaryButtonStyle}
+                  className="product-management-button-primary"
                   disabled={loading}
                 >
                   {loading ? 'Creating...' : 'Create Product'}
                 </button>
                 <button
                   onClick={() => setShowCreateForm(false)}
-                  style={secondaryButtonStyle}
+                  className="product-management-button-secondary"
                 >
                   Cancel
                 </button>
@@ -1428,96 +1193,108 @@ const ProductManagement = () => {
         )}
 
         {showEditForm && (
-          <div style={modalStyle}>
-            <div style={modalContentStyle}>
-              <h2 style={{ marginBottom: '20px', color: '#333' }}>Edit Product</h2>
+          <div className="product-management-modal">
+            <div className="product-management-modal-content">
+              <h2 className="product-management-modal-title">Edit Product</h2>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div className="product-management-form-grid">
                 <div>
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Product Name:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Product Name:</label>
                     <input
                       type="text"
                       value={editedProduct.productName}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, productName: e.target.value }))}
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Description:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Description:</label>
                     <textarea
                       value={editedProduct.summary}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, summary: e.target.value }))}
-                      style={textareaStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Size (ml):</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Size (ml):</label>
                     <input
                       type="number"
                       value={editedProduct.size}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, size: e.target.value }))}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Weight (g):</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Weight (g):</label>
                     <input
                       type="number"
                       value={editedProduct.weight}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, weight: e.target.value }))}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Price:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Price:</label>
                     <input
                       type="number"
                       value={editedProduct.price}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, price: e.target.value }))}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Quantity:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Quantity:</label>
                     <input
                       type="number"
                       value={editedProduct.quantity}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, quantity: e.target.value }))}
                       min="0"
-                      style={inputStyle}
+                      className="product-management-input"
                     />
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Discount:</label>
-                    <input
-                      type="number"
-                      value={editedProduct.discount}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, discount: e.target.value }))}
-                      min="0"
-                      max="1"
-                      step="0.01"
-                      style={inputStyle}
-                    />
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Discount:</label>
+                    <div className="product-management-input-group">
+                      <input
+                        type="number"
+                        value={editedProduct.discount === '' ? '' : editedProduct.discount * 100}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          if (value === '') {
+                            setEditedProduct(prev => ({ ...prev, discount: '' }));
+                          } else {
+                            const percentage = Math.min(100, Math.max(0, parseFloat(value)));
+                            setEditedProduct(prev => ({ ...prev, discount: percentage / 100 }));
+                          }
+                        }}
+                        min="0"
+                        max="100"
+                        step="1"
+                        className="product-management-input"
+                        placeholder="Enter discount percentage"
+                      />
+                      <span className="product-management-input-group-addon">%</span>
+                    </div>
                   </div>
                 </div>
 
                 <div>
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Brand:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Brand:</label>
                     <select
                       value={editedProduct.brandId}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, brandId: e.target.value }))}
-                      style={inputStyle}
+                      className="product-management-input"
                     >
                       <option value="">Select Brand</option>
                       {brands.map(brand => (
@@ -1528,12 +1305,12 @@ const ProductManagement = () => {
                     </select>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Category:</label>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Category:</label>
                     <select
                       value={editedProduct.categoryId}
                       onChange={(e) => setEditedProduct(prev => ({ ...prev, categoryId: e.target.value }))}
-                      style={inputStyle}
+                      className="product-management-input"
                     >
                       <option value="">Select Category</option>
                       {categories.map(category => (
@@ -1544,21 +1321,21 @@ const ProductManagement = () => {
                     </select>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Skin Types:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Skin Types:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('editSkinTypes')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('editSkinTypes', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {editedProduct.skinTypes.length > 0 ? (
                             skinTypes
                               .filter(skin => editedProduct.skinTypes.includes(skin.skinTypeId))
                               .map(skin => (
-                                <span key={skin.skinTypeId} style={selectedItemStyle}>
-                                  {skin.skinTypeName}
-                                  <span
+                                <span key={skin.skinTypeId} className="product-management-selected-item">
+                                  <span>{skin.skinTypeName}</span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEditedProduct(prev => ({
@@ -1566,25 +1343,26 @@ const ProductManagement = () => {
                                         skinTypes: prev.skinTypes.filter(id => id !== skin.skinTypeId)
                                       }));
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Skin Types</span>
+                            <span className="product-management-placeholder">Select Skin Types</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.editSkinTypes && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {skinTypes.map(skin => (
                             <div
                               key={skin.skinTypeId}
-                              style={dropdownItemStyle}
-                              onClick={() => {
+                              className="product-management-dropdown-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 const isSelected = editedProduct.skinTypes.includes(skin.skinTypeId);
                                 setEditedProduct(prev => ({
                                   ...prev,
@@ -1594,12 +1372,15 @@ const ProductManagement = () => {
                                 }));
                               }}
                             >
-                              <input
-                                type="checkbox"
-                                checked={editedProduct.skinTypes.includes(skin.skinTypeId)}
-                                onChange={(e) => { }}
-                              />
-                              {skin.skinTypeName}
+                              <div className="product-management-dropdown-item-inner">
+                                <input
+                                  type="checkbox"
+                                  checked={editedProduct.skinTypes.includes(skin.skinTypeId)}
+                                  onChange={(e) => { }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span>{skin.skinTypeName}</span>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1607,21 +1388,21 @@ const ProductManagement = () => {
                     </div>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Functions:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Functions:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('editFunctions')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('editFunctions', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {editedProduct.functions.length > 0 ? (
                             functions
                               .filter(func => editedProduct.functions.includes(func.functionId))
                               .map(func => (
-                                <span key={func.functionId} style={selectedItemStyle}>
-                                  {func.functionName}
-                                  <span
+                                <span key={func.functionId} className="product-management-selected-item">
+                                  <span>{func.functionName}</span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEditedProduct(prev => ({
@@ -1629,25 +1410,26 @@ const ProductManagement = () => {
                                         functions: prev.functions.filter(id => id !== func.functionId)
                                       }));
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Functions</span>
+                            <span className="product-management-placeholder">Select Functions</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.editFunctions && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {functions.map(func => (
                             <div
                               key={func.functionId}
-                              style={dropdownItemStyle}
-                              onClick={() => {
+                              className="product-management-dropdown-item"
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 const isSelected = editedProduct.functions.includes(func.functionId);
                                 setEditedProduct(prev => ({
                                   ...prev,
@@ -1657,12 +1439,15 @@ const ProductManagement = () => {
                                 }));
                               }}
                             >
-                              <input
-                                type="checkbox"
-                                checked={editedProduct.functions.includes(func.functionId)}
-                                onChange={(e) => { }}
-                              />
-                              {func.functionName}
+                              <div className="product-management-dropdown-item-inner">
+                                <input
+                                  type="checkbox"
+                                  checked={editedProduct.functions.includes(func.functionId)}
+                                  onChange={(e) => { }}
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <span>{func.functionName}</span>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -1670,22 +1455,26 @@ const ProductManagement = () => {
                     </div>
                   </div>
 
-                  <div style={formGroupStyle}>
-                    <label style={labelStyle}>Ingredients:</label>
-                    <div className="dropdown-container" style={dropdownStyle}>
+                  <div className="product-management-form-group">
+                    <label className="product-management-label">Ingredients:</label>
+                    <div className="product-management-dropdown-container">
                       <div
-                        style={dropdownButtonStyle}
-                        onClick={() => toggleDropdown('editIngredients')}
+                        className="product-management-dropdown-button"
+                        onClick={(e) => toggleDropdown('editIngredients', e)}
                       >
-                        <div style={selectedItemsStyle}>
+                        <div className="product-management-selected-items">
                           {editedProduct.ingredients.length > 0 ? (
                             ingredients
                               .filter(ing => editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId))
                               .map(ing => (
-                                <span key={ing.ingredientId} style={selectedItemStyle}>
-                                  {ing.ingredientName}
-                                  ({editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}%)
-                                  <span
+                                <span key={ing.ingredientId} className="product-management-selected-item">
+                                  <span>
+                                    {ing.ingredientName}
+                                    {editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined &&
+                                      ` (${editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration}%)`
+                                    }
+                                  </span>
+                                  <button
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEditedProduct(prev => ({
@@ -1693,28 +1482,29 @@ const ProductManagement = () => {
                                         ingredients: prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
                                       }));
                                     }}
-                                    style={{ cursor: 'pointer', marginLeft: '4px' }}
+                                    className="product-management-remove-item"
                                   >
                                     ×
-                                  </span>
+                                  </button>
                                 </span>
                               ))
                           ) : (
-                            <span style={{ color: '#666' }}>Select Ingredients</span>
+                            <span className="product-management-placeholder">Select Ingredients</span>
                           )}
                         </div>
                         <span>▼</span>
                       </div>
                       {dropdownStates.editIngredients && (
-                        <div style={dropdownContentStyle}>
+                        <div className="product-management-dropdown-content">
                           {ingredients.map(ing => (
                             <div
                               key={ing.ingredientId}
-                              style={{ ...dropdownItemStyle, flexWrap: 'wrap' }}
+                              className="product-management-dropdown-item"
                             >
                               <div
-                                style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}
-                                onClick={() => {
+                                className="product-management-dropdown-item-inner"
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   const isSelected = editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
                                   setEditedProduct(prev => ({
                                     ...prev,
@@ -1727,42 +1517,26 @@ const ProductManagement = () => {
                                 <input
                                   type="checkbox"
                                   checked={editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId)}
-                                  onChange={(e) => {
-                                    e.stopPropagation();
-                                    const isSelected = editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
-                                    setEditedProduct(prev => ({
-                                      ...prev,
-                                      ingredients: isSelected
-                                        ? prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
-                                        : [...prev.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
-                                    }));
-                                  }}
+                                  onChange={(e) => { }}
+                                  onClick={(e) => e.stopPropagation()}
                                 />
                                 <span>{ing.ingredientName}</span>
                               </div>
                               {editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId) && (
-                                <div style={{ width: '100%', paddingLeft: '24px', marginTop: '4px' }}>
+                                <div className="product-management-dropdown-item-input">
                                   <input
                                     type="number"
-                                    value={editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration !== undefined ? editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration : ''}
+                                    value={editedProduct.ingredients.find(i => i.ingredientId === ing.ingredientId)?.concentration || ''}
                                     onChange={(e) => {
-                                      const newIngredients = editedProduct.ingredients.map(i =>
-                                        i.ingredientId === ing.ingredientId
-                                          ? { ...i, concentration: e.target.value === '' ? '' : parseFloat(e.target.value) }
-                                          : i
-                                      );
-                                      setEditedProduct(prev => ({
-                                        ...prev,
-                                        ingredients: newIngredients
-                                      }));
+                                      e.stopPropagation();
+                                      handleIngredientConcentrationChange(ing.ingredientId, e.target.value, true);
                                     }}
                                     onClick={(e) => e.stopPropagation()}
                                     min="0"
                                     max="100"
                                     step="0.1"
-                                    style={{ ...inputStyle, width: '80px' }}
                                   />
-                                  <span style={{ marginLeft: '4px' }}>%</span>
+                                  <span>%</span>
                                 </div>
                               )}
                             </div>
@@ -1774,20 +1548,15 @@ const ProductManagement = () => {
                 </div>
               </div>
 
-              <div style={formGroupStyle}>
-                <label style={labelStyle}>Product Images:</label>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+              <div className="product-management-form-group">
+                <label className="product-management-label">Product Images:</label>
+                <div className="product-management-image-grid">
                   {editedProduct.images?.map((image, index) => (
-                    <div key={index} style={{ position: 'relative' }}>
+                    <div key={index} className="product-management-image-item">
                       <img
                         src={image.url || image}
                         alt={`Product ${index + 1}`}
-                        style={{
-                          width: '100px',
-                          height: '100px',
-                          objectFit: 'cover',
-                          borderRadius: '4px'
-                        }}
+                        className="product-management-image"
                         onError={(e) => {
                           e.target.onerror = null;
                           e.target.src = 'placeholder-image-url';
@@ -1798,28 +1567,17 @@ const ProductManagement = () => {
                           const newImages = editedProduct.images.filter((_, i) => i !== index);
                           setEditedProduct(prev => ({ ...prev, images: newImages }));
                         }}
-                        style={{
-                          position: 'absolute',
-                          top: '-8px',
-                          right: '-8px',
-                          backgroundColor: '#f44336',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '50%',
-                          width: '24px',
-                          height: '24px',
-                          cursor: 'pointer'
-                        }}
+                        className="product-management-remove-image"
                       >
                         ×
                       </button>
                     </div>
                   ))}
-                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <div className="product-management-image-input">
                     <input
                       type="text"
-                      placeholder="Enter image URL"
-                      style={{ ...inputStyle, width: '200px' }}
+                      placeholder="Enter your URL image"
+                      className="product-management-input"
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.value.trim()) {
                           const imageUrl = e.target.value.trim();
@@ -1833,7 +1591,7 @@ const ProductManagement = () => {
                     />
                     <button
                       onClick={() => {
-                        const input = document.querySelector('input[placeholder="Enter image URL"]');
+                        const input = document.querySelector('input[placeholder="Enter your URL image"]');
                         const imageUrl = input.value.trim();
                         if (imageUrl) {
                           setEditedProduct(prev => ({
@@ -1843,11 +1601,7 @@ const ProductManagement = () => {
                           input.value = '';
                         }
                       }}
-                      style={{
-                        ...primaryButtonStyle,
-                        padding: '8px 16px',
-                        height: '36px'
-                      }}
+                      className="product-management-add-image"
                     >
                       Add
                     </button>
@@ -1855,17 +1609,17 @@ const ProductManagement = () => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <div className="product-management-modal-actions">
                 <button
                   onClick={handleEditFormSubmit}
+                  className="product-management-button-primary"
                   disabled={loading}
-                  style={primaryButtonStyle}
                 >
                   {loading ? 'Saving...' : 'Save Changes'}
                 </button>
                 <button
                   onClick={() => setShowEditForm(false)}
-                  style={secondaryButtonStyle}
+                  className="product-management-button-secondary"
                 >
                   Cancel
                 </button>
@@ -1875,17 +1629,7 @@ const ProductManagement = () => {
         )}
 
         {notification.message && (
-          <div style={{
-            position: 'fixed',
-            bottom: '20px',
-            right: '20px',
-            backgroundColor: notification.type === 'success' ? '#4CAF50' : '#f44336',
-            color: 'white',
-            padding: '16px',
-            borderRadius: '4px',
-            boxShadow: '0 2px 5px rgba(0,0,0,0.2)',
-            zIndex: 1000,
-          }}>
+          <div className={`product-management-notification ${notification.type === 'success' ? 'product-management-notification-success' : 'product-management-notification-error'}`}>
             {notification.message}
           </div>
         )}
