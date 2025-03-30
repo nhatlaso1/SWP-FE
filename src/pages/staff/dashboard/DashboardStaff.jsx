@@ -11,8 +11,7 @@ import {
   Legend,
   ArcElement,
 } from "chart.js";
-import { Bar, Line, Pie, Doughnut } from "react-chartjs-2";
-import "./DashboardStaff.css";
+import { Bar } from "react-chartjs-2";
 import { getDashboardData, getRevenueByMonth, getRevenueByYearRange } from "../../../store/apiDashboard";
 
 // Đăng ký các thành phần cho Chart.js
@@ -164,47 +163,9 @@ export default function DashboardStaff() {
     };
   }
 
-  const lineData = {
-    labels: ["January", "February", "March", "April", "May", "June"],
-    datasets: [
-      {
-        label: "Monthly Orders",
-        data: dashboardData.orderHistory,
-        borderColor: "rgba(255, 99, 132, 1)",
-        fill: false,
-      },
-    ],
-  };
-
-  const pieData = {
-    labels: ["Active Customers", "New Customers"],
-    datasets: [
-      {
-        data: [
-          Math.floor(dashboardData.customers * 0.7),
-          Math.floor(dashboardData.customers * 0.3)
-        ],
-        backgroundColor: ["#36A2EB", "#FF6384"],
-      },
-    ],
-  };
-
-  const doughnutData = {
-    labels: ["Active Products", "Out of Stock", "Low Stock"],
-    datasets: [
-      {
-        data: [
-          Math.floor(dashboardData.products * 0.6),
-          Math.floor(dashboardData.products * 0.2),
-          Math.floor(dashboardData.products * 0.2)
-        ],
-        backgroundColor: ["#4caf50", "#f44336", "#ff9800"],
-      },
-    ],
-  };
-
   const barOptions = {
     responsive: true,
+    maintainAspectRatio: false, // Biểu đồ tự điều chỉnh theo container
     plugins: {
       legend: {
         position: "top",
@@ -265,34 +226,33 @@ export default function DashboardStaff() {
   };
 
   return (
-    <div className="dashboard-container">
+    <div style={{ height: "95vh", overflow: "hidden", display: "flex", flexDirection: "column", padding: "10px", boxSizing: "border-box" }}>
       {/* Highlight Cards */}
-      <div className="highlight-container">
-        <div className="highlight-card">
+      <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", marginBottom: "20px" }}>
+        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
           <h3>Total Revenue</h3>
           <p>{dashboardData.revenue?.toLocaleString() || "0"} VND</p>
         </div>
-        <div className="highlight-card">
+        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
           <h3>Orders</h3>
           <p>{dashboardData.orders?.toLocaleString() || "0"}</p>
         </div>
-        <div className="highlight-card">
+        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
           <h3>Customers</h3>
           <p>{dashboardData.customers?.toLocaleString() || "0"}</p>
         </div>
-        <div className="highlight-card">
+        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
           <h3>Products</h3>
           <p>{dashboardData.products?.toLocaleString() || "0"}</p>
         </div>
       </div>
 
       {/* Charts */}
-      <div className="chart-container" style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-        {/* Hàng trên: Revenue Trends và Order Trends */}
-        <div className="chart-row" style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
-          <div className="chart-card" style={{ flex: "1 1 300px" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", gap: "20px", flexWrap: "wrap" }}>
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-              <h2 className="chart-title">Revenue Trends</h2>
+              <h2 style={{ margin: 0 }}>Revenue Trends</h2>
               <div>
                 <button
                   onClick={() => setViewMode("monthly")}
@@ -337,20 +297,10 @@ export default function DashboardStaff() {
                 </button>
               </div>
             </div>
-            <Bar data={barData} options={barOptions} />
-          </div>
-
-          <div className="chart-card" style={{ flex: "1 1 300px" }}>
-            <h2 className="chart-title">Order Trends</h2>
-            <Line data={lineData} />
-          </div>
-        </div>
-
-        {/* Hàng dưới: Product Status - căn giữa và to hơn */}
-        <div className="chart-row" style={{ display: "flex", justifyContent: "center" }}>
-          <div className="chart-card" style={{ width: "700px" }}>
-            <h2 className="chart-title">Product Status</h2>
-            <Doughnut data={doughnutData} />
+            {/* Wrapper để biểu đồ chiếm toàn bộ không gian có sẵn */}
+            <div style={{ flex: 1, position: "relative" }}>
+              <Bar data={barData} options={barOptions} />
+            </div>
           </div>
         </div>
       </div>

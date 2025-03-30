@@ -56,6 +56,8 @@ import {
 
   Stack,
 
+  Pagination,
+
 } from '@mui/material';
 
 
@@ -85,6 +87,10 @@ const OrderManagement = () => {
   const orderRowRefs = useRef({});
 
   const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [ordersPerPage, setOrdersPerPage] = useState(10);
 
 
 
@@ -751,6 +757,10 @@ const OrderManagement = () => {
 
 
 
+  const paginatedOrders = orders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
+
+
+
   return (
 
     <Box p={3}>
@@ -797,7 +807,7 @@ const OrderManagement = () => {
 
                 <TableBody>
 
-                  {orders.map(order => (
+                  {paginatedOrders.map(order => (
 
                     <TableRow
                       key={order.orderId}
@@ -825,6 +835,17 @@ const OrderManagement = () => {
               </Table>
 
             </TableContainer>
+
+          </Grid>
+
+          <Grid item xs={12}>
+
+            <Pagination
+              count={Math.ceil(orders.length / ordersPerPage)}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              color="primary"
+            />
 
           </Grid>
 

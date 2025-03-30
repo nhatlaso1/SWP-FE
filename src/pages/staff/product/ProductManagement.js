@@ -237,9 +237,9 @@ const ProductManagement = () => {
     setEditedProduct({
       productId: product.productId,
       productName: product.productName,
-      size: product.size || '',
+      size: product.size?.toString() || '',
       price: product.price || '',
-      weight: product.weight || '',
+      weight: product.weight?.toString() || '',
       quantity: product.quantity || '',
       discount: product.discount || '',
       summary: product.summary || '',
@@ -255,6 +255,10 @@ const ProductManagement = () => {
       images: existingImages,
       productImages: product.productImages
     });
+
+    console.log('Edited product size:', product.size);
+    console.log('Edited product weight:', product.weight);
+
     setShowEditForm(true);
   };
 
@@ -295,6 +299,13 @@ const ProductManagement = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleEditedProductChange = (field, value) => {
+    setEditedProduct(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleEditFormSubmit = async () => {
@@ -345,7 +356,7 @@ const ProductManagement = () => {
 
       const updateData = {
         productName: editedProduct.productName.trim(),
-        size: editedProduct.size?.trim() || '',
+        size: editedProduct.size?.toString() || '',
         price: price,
         weight: weight,
         quantity: quantity,
@@ -354,10 +365,10 @@ const ProductManagement = () => {
         isRecommended: Boolean(editedProduct.isRecommended),
         brandId: brandId,
         categoryId: categoryId,
-        skinTypeIds: editedProduct.skinTypes.map(id => parseInt(id)),
-        ingredientConcentrations: ingredientsData,
-        functionIds: editedProduct.functions.map(id => parseInt(id)),
-        imageUrls: imageUrls,
+        skinTypes: editedProduct.skinTypes.map(id => parseInt(id)),
+        ingredients: ingredientsData,
+        functions: editedProduct.functions.map(id => parseInt(id)),
+        images: imageUrls,
         status: editedProduct.status
       };
 
@@ -671,6 +682,9 @@ const ProductManagement = () => {
                   </div>
                   <div>
                     <strong>Size:</strong> {selectedProduct.size}
+                  </div>
+                  <div>
+                    <strong>Weight:</strong> {selectedProduct.weight}g
                   </div>
                 </div>
               </div>
@@ -1204,7 +1218,7 @@ const ProductManagement = () => {
                     <input
                       type="text"
                       value={editedProduct.productName}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, productName: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('productName', e.target.value)}
                       className="product-management-input"
                     />
                   </div>
@@ -1213,7 +1227,7 @@ const ProductManagement = () => {
                     <label className="product-management-label">Description:</label>
                     <textarea
                       value={editedProduct.summary}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, summary: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('summary', e.target.value)}
                       className="product-management-input"
                     />
                   </div>
@@ -1221,10 +1235,9 @@ const ProductManagement = () => {
                   <div className="product-management-form-group">
                     <label className="product-management-label">Size (ml):</label>
                     <input
-                      type="number"
-                      value={editedProduct.size}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, size: e.target.value }))}
-                      min="0"
+                      type="text"
+                      value={editedProduct.size || ''}
+                      onChange={(e) => handleEditedProductChange('size', e.target.value)}
                       className="product-management-input"
                     />
                   </div>
@@ -1234,7 +1247,7 @@ const ProductManagement = () => {
                     <input
                       type="number"
                       value={editedProduct.weight}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, weight: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('weight', e.target.value)}
                       min="0"
                       className="product-management-input"
                     />
@@ -1245,7 +1258,7 @@ const ProductManagement = () => {
                     <input
                       type="number"
                       value={editedProduct.price}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, price: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('price', e.target.value)}
                       min="0"
                       className="product-management-input"
                     />
@@ -1256,7 +1269,7 @@ const ProductManagement = () => {
                     <input
                       type="number"
                       value={editedProduct.quantity}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, quantity: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('quantity', e.target.value)}
                       min="0"
                       className="product-management-input"
                     />
@@ -1271,10 +1284,10 @@ const ProductManagement = () => {
                         onChange={(e) => {
                           const value = e.target.value;
                           if (value === '') {
-                            setEditedProduct(prev => ({ ...prev, discount: '' }));
+                            handleEditedProductChange('discount', '');
                           } else {
                             const percentage = Math.min(100, Math.max(0, parseFloat(value)));
-                            setEditedProduct(prev => ({ ...prev, discount: percentage / 100 }));
+                            handleEditedProductChange('discount', percentage / 100);
                           }
                         }}
                         min="0"
@@ -1293,7 +1306,7 @@ const ProductManagement = () => {
                     <label className="product-management-label">Brand:</label>
                     <select
                       value={editedProduct.brandId}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, brandId: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('brandId', e.target.value)}
                       className="product-management-input"
                     >
                       <option value="">Select Brand</option>
@@ -1309,7 +1322,7 @@ const ProductManagement = () => {
                     <label className="product-management-label">Category:</label>
                     <select
                       value={editedProduct.categoryId}
-                      onChange={(e) => setEditedProduct(prev => ({ ...prev, categoryId: e.target.value }))}
+                      onChange={(e) => handleEditedProductChange('categoryId', e.target.value)}
                       className="product-management-input"
                     >
                       <option value="">Select Category</option>
@@ -1338,10 +1351,9 @@ const ProductManagement = () => {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setEditedProduct(prev => ({
-                                        ...prev,
-                                        skinTypes: prev.skinTypes.filter(id => id !== skin.skinTypeId)
-                                      }));
+                                      handleEditedProductChange('skinTypes',
+                                        editedProduct.skinTypes.filter(id => id !== skin.skinTypeId)
+                                      );
                                     }}
                                     className="product-management-remove-item"
                                   >
@@ -1364,12 +1376,11 @@ const ProductManagement = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const isSelected = editedProduct.skinTypes.includes(skin.skinTypeId);
-                                setEditedProduct(prev => ({
-                                  ...prev,
-                                  skinTypes: isSelected
-                                    ? prev.skinTypes.filter(id => id !== skin.skinTypeId)
-                                    : [...prev.skinTypes, skin.skinTypeId]
-                                }));
+                                handleEditedProductChange('skinTypes',
+                                  isSelected
+                                    ? editedProduct.skinTypes.filter(id => id !== skin.skinTypeId)
+                                    : [...editedProduct.skinTypes, skin.skinTypeId]
+                                );
                               }}
                             >
                               <div className="product-management-dropdown-item-inner">
@@ -1405,10 +1416,9 @@ const ProductManagement = () => {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setEditedProduct(prev => ({
-                                        ...prev,
-                                        functions: prev.functions.filter(id => id !== func.functionId)
-                                      }));
+                                      handleEditedProductChange('functions',
+                                        editedProduct.functions.filter(id => id !== func.functionId)
+                                      );
                                     }}
                                     className="product-management-remove-item"
                                   >
@@ -1431,12 +1441,11 @@ const ProductManagement = () => {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const isSelected = editedProduct.functions.includes(func.functionId);
-                                setEditedProduct(prev => ({
-                                  ...prev,
-                                  functions: isSelected
-                                    ? prev.functions.filter(id => id !== func.functionId)
-                                    : [...prev.functions, func.functionId]
-                                }));
+                                handleEditedProductChange('functions',
+                                  isSelected
+                                    ? editedProduct.functions.filter(id => id !== func.functionId)
+                                    : [...editedProduct.functions, func.functionId]
+                                );
                               }}
                             >
                               <div className="product-management-dropdown-item-inner">
@@ -1477,10 +1486,9 @@ const ProductManagement = () => {
                                   <button
                                     onClick={(e) => {
                                       e.stopPropagation();
-                                      setEditedProduct(prev => ({
-                                        ...prev,
-                                        ingredients: prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
-                                      }));
+                                      handleEditedProductChange('ingredients',
+                                        editedProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      );
                                     }}
                                     className="product-management-remove-item"
                                   >
@@ -1506,12 +1514,11 @@ const ProductManagement = () => {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   const isSelected = editedProduct.ingredients.some(i => i.ingredientId === ing.ingredientId);
-                                  setEditedProduct(prev => ({
-                                    ...prev,
-                                    ingredients: isSelected
-                                      ? prev.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
-                                      : [...prev.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
-                                  }));
+                                  handleEditedProductChange('ingredients',
+                                    isSelected
+                                      ? editedProduct.ingredients.filter(i => i.ingredientId !== ing.ingredientId)
+                                      : [...editedProduct.ingredients, { ingredientId: ing.ingredientId, concentration: '' }]
+                                  );
                                 }}
                               >
                                 <input
@@ -1565,7 +1572,7 @@ const ProductManagement = () => {
                       <button
                         onClick={() => {
                           const newImages = editedProduct.images.filter((_, i) => i !== index);
-                          setEditedProduct(prev => ({ ...prev, images: newImages }));
+                          handleEditedProductChange('images', newImages);
                         }}
                         className="product-management-remove-image"
                       >
@@ -1581,10 +1588,7 @@ const ProductManagement = () => {
                       onKeyDown={(e) => {
                         if (e.key === 'Enter' && e.target.value.trim()) {
                           const imageUrl = e.target.value.trim();
-                          setEditedProduct(prev => ({
-                            ...prev,
-                            images: [...prev.images, imageUrl]
-                          }));
+                          handleEditedProductChange('images', [...editedProduct.images, imageUrl]);
                           e.target.value = '';
                         }
                       }}
@@ -1594,10 +1598,7 @@ const ProductManagement = () => {
                         const input = document.querySelector('input[placeholder="Enter your URL image"]');
                         const imageUrl = input.value.trim();
                         if (imageUrl) {
-                          setEditedProduct(prev => ({
-                            ...prev,
-                            images: [...prev.images, imageUrl]
-                          }));
+                          handleEditedProductChange('images', [...editedProduct.images, imageUrl]);
                           input.value = '';
                         }
                       }}
