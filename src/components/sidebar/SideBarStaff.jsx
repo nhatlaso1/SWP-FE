@@ -2,9 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import CategoryIcon from "@mui/icons-material/Category";
-import LayersIcon from "@mui/icons-material/Layers";
-import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
+
+import ChromeReaderModeIcon from "@mui/icons-material/ChromeReaderMode";
 import "./SideBarStaff.css";
 
 const NAVIGATION = [
@@ -13,35 +12,18 @@ const NAVIGATION = [
     title: "Main items",
   },
   {
-    segment: "dashboard",
-    title: "Dashboard",
-    icon: <DashboardIcon />,
-    navigate: "/staff/dashboard",
-  },
-  {
     segment: "orders",
     title: "Orders",
     icon: <ShoppingCartIcon />,
     navigate: "/staff/orders",
   },
   {
-    segment: "categories",
-    title: "Categories",
-    icon: <CategoryIcon />,
-    navigate: "/staff/categories",
+    segment: "Blog",
+    title: "Blog",
+    icon: <ChromeReaderModeIcon />,
+    navigate: "/staff/blogs",
   },
-  {
-    segment: "products",
-    title: "Products",
-    icon: <LayersIcon />,
-    navigate: "/staff/products",
-  },
-  {
-    segment: "brands",
-    title: "Brands",
-    icon: <BrandingWatermarkIcon />,
-    navigate: "/staff/brands",
-  },
+  
 ];
 
 export default function SidebarStaff({ onPageChange }) {

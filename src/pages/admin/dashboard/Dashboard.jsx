@@ -12,7 +12,11 @@ import {
   ArcElement,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
-import { getDashboardData, getRevenueByMonth, getRevenueByYearRange } from "../../../store/apiDashboard";
+import {
+  getDashboardData,
+  getRevenueByMonth,
+  getRevenueByYearRange,
+} from "../../../store/apiDashboard";
 
 // Đăng ký các thành phần cho Chart.js
 ChartJS.register(
@@ -32,10 +36,10 @@ const yearColors = [
   "rgba(54, 162, 235, 0.5)", // Year 2
   "rgba(255, 206, 86, 0.5)", // Year 3
   "rgba(75, 192, 192, 0.5)", // Year 4
-  "rgba(153, 102, 255, 0.5)"  // Year 5
+  "rgba(153, 102, 255, 0.5)", // Year 5
 ];
 
-export default function DashboardStaff() {
+export default function Dashboard() {
   const [dashboardData, setDashboardData] = useState({
     revenue: 0,
     orders: 0,
@@ -43,31 +47,37 @@ export default function DashboardStaff() {
     products: 0,
     orderHistory: [],
     customerHistory: [],
-    productHistory: []
+    productHistory: [],
   });
 
   const [revenueData, setRevenueData] = useState({
     monthlyData: [],
     yearlyData: [],
-    multiYearData: []
+    multiYearData: [],
   });
 
-  const [viewMode, setViewMode] = useState('monthly');
+  const [viewMode, setViewMode] = useState("monthly");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         const data = await getDashboardData();
         const months = ["January", "February", "March", "April", "May", "June"];
-        const orderHistory = months.map(() => Math.floor(Math.random() * data.orders));
-        const customerHistory = months.map(() => Math.floor(Math.random() * data.customers));
-        const productHistory = months.map(() => Math.floor(Math.random() * data.products));
+        const orderHistory = months.map(() =>
+          Math.floor(Math.random() * data.orders)
+        );
+        const customerHistory = months.map(() =>
+          Math.floor(Math.random() * data.customers)
+        );
+        const productHistory = months.map(() =>
+          Math.floor(Math.random() * data.products)
+        );
 
         setDashboardData({
           ...data,
           orderHistory,
           customerHistory,
-          productHistory
+          productHistory,
         });
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -81,7 +91,10 @@ export default function DashboardStaff() {
         const currentMonth = currentDate.getMonth() + 1;
 
         const monthlyData = await getRevenueByMonth(currentMonth, currentYear);
-        const yearlyData = await getRevenueByYearRange(currentYear, currentYear);
+        const yearlyData = await getRevenueByYearRange(
+          currentYear,
+          currentYear
+        );
 
         const multiYearData = [];
         for (let year = currentYear - 4; year <= currentYear; year++) {
@@ -92,7 +105,7 @@ export default function DashboardStaff() {
         setRevenueData({
           monthlyData,
           yearlyData,
-          multiYearData
+          multiYearData,
         });
       } catch (error) {
         console.error("Error fetching revenue data:", error);
@@ -105,16 +118,26 @@ export default function DashboardStaff() {
 
   const getMonthName = (monthNumber) => {
     const months = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
     return months[monthNumber - 1];
   };
 
   let barData;
-  if (viewMode === 'multiYear') {
+  if (viewMode === "multiYear") {
     const multiYearGrouped = {};
-    revenueData.multiYearData.forEach(item => {
+    revenueData.multiYearData.forEach((item) => {
       const date = new Date(item.date);
       const year = date.getFullYear();
       const month = date.getMonth();
@@ -124,42 +147,61 @@ export default function DashboardStaff() {
       multiYearGrouped[year][month] = item.revenue;
     });
     const multiYearLabels = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
     ];
-    const multiYearDatasets = Object.keys(multiYearGrouped).sort().map((year, index) => ({
-      label: `Year ${year}`,
-      data: multiYearGrouped[year],
-      backgroundColor: yearColors[index % yearColors.length],
-    }));
+    const multiYearDatasets = Object.keys(multiYearGrouped)
+      .sort()
+      .map((year, index) => ({
+        label: `Year ${year}`,
+        data: multiYearGrouped[year],
+        backgroundColor: yearColors[index % yearColors.length],
+      }));
 
     barData = {
       labels: multiYearLabels,
-      datasets: multiYearDatasets
+      datasets: multiYearDatasets,
     };
-  } else if (viewMode === 'monthly') {
+  } else if (viewMode === "monthly") {
     barData = {
-      labels: revenueData.monthlyData.map(item => {
+      labels: revenueData.monthlyData.map((item) => {
         const date = new Date(item.date);
-        return `${date.getDate()} ${getMonthName(date.getMonth() + 1).slice(0, 3)}`;
+        return `${date.getDate()} ${getMonthName(date.getMonth() + 1).slice(
+          0,
+          3
+        )}`;
       }),
-      datasets: [{
-        label: "Daily Revenue (VND)",
-        data: revenueData.monthlyData.map(item => item.revenue),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-      }]
+      datasets: [
+        {
+          label: "Daily Revenue (VND)",
+          data: revenueData.monthlyData.map((item) => item.revenue),
+          backgroundColor: "rgba(54, 162, 235, 0.5)",
+        },
+      ],
     };
-  } else if (viewMode === 'yearly') {
+  } else if (viewMode === "yearly") {
     barData = {
-      labels: revenueData.yearlyData.map(item => {
+      labels: revenueData.yearlyData.map((item) => {
         const date = new Date(item.date);
         return getMonthName(date.getMonth() + 1);
       }),
-      datasets: [{
-        label: "Total Monthly Revenue (VND)",
-        data: revenueData.yearlyData.map(item => item.revenue),
-        backgroundColor: "rgba(54, 162, 235, 0.5)",
-      }]
+      datasets: [
+        {
+          label: "Total Monthly Revenue (VND)",
+          data: revenueData.yearlyData.map((item) => item.revenue),
+          backgroundColor: "rgba(54, 162, 235, 0.5)",
+        },
+      ],
     };
   }
 
@@ -174,7 +216,8 @@ export default function DashboardStaff() {
           const index = legendItem.datasetIndex;
           const ci = legend.chart;
           const meta = ci.getDatasetMeta(index);
-          meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+          meta.hidden =
+            meta.hidden === null ? !ci.data.datasets[index].hidden : null;
           ci.update();
         },
         labels: {
@@ -185,14 +228,15 @@ export default function DashboardStaff() {
               hidden: chart.getDatasetMeta(index).hidden,
               datasetIndex: index,
             }));
-          }
-        }
+          },
+        },
       },
       title: {
         display: true,
-        text: viewMode === "monthly"
-          ? "Daily Revenue This Month"
-          : viewMode === "yearly"
+        text:
+          viewMode === "monthly"
+            ? "Daily Revenue This Month"
+            : viewMode === "yearly"
             ? "Total Revenue by Month"
             : "Revenue by Year ",
       },
@@ -209,9 +253,9 @@ export default function DashboardStaff() {
           label: (context) => {
             const value = context.parsed.y;
             return `Revenue: ${value.toLocaleString()} VND`;
-          }
-        }
-      }
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -219,39 +263,121 @@ export default function DashboardStaff() {
         ticks: {
           callback: function (value) {
             return value.toLocaleString() + " VND";
-          }
-        }
-      }
-    }
+          },
+        },
+      },
+    },
   };
 
   return (
-    <div style={{ height: "95vh", overflow: "hidden", display: "flex", flexDirection: "column", padding: "10px", boxSizing: "border-box" }}>
+    <div
+      style={{
+        height: "95vh",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        padding: "10px",
+        boxSizing: "border-box",
+      }}
+    >
       {/* Highlight Cards */}
-      <div style={{ display: "flex", justifyContent: "space-around", alignItems: "center", marginBottom: "20px" }}>
-        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            flex: 1,
+            margin: "0 10px",
+            textAlign: "center",
+          }}
+        >
           <h3>Total Revenue</h3>
           <p>{dashboardData.revenue?.toLocaleString() || "0"} VND</p>
         </div>
-        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            flex: 1,
+            margin: "0 10px",
+            textAlign: "center",
+          }}
+        >
           <h3>Orders</h3>
           <p>{dashboardData.orders?.toLocaleString() || "0"}</p>
         </div>
-        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            flex: 1,
+            margin: "0 10px",
+            textAlign: "center",
+          }}
+        >
           <h3>Customers</h3>
           <p>{dashboardData.customers?.toLocaleString() || "0"}</p>
         </div>
-        <div style={{ backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)", flex: 1, margin: "0 10px", textAlign: "center" }}>
+        <div
+          style={{
+            backgroundColor: "#fff",
+            padding: "15px",
+            borderRadius: "8px",
+            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            flex: 1,
+            margin: "0 10px",
+            textAlign: "center",
+          }}
+        >
           <h3>Products</h3>
           <p>{dashboardData.products?.toLocaleString() || "0"}</p>
         </div>
       </div>
 
       {/* Charts */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        <div style={{ flex: 1, display: "flex", gap: "20px", flexWrap: "wrap" }}>
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", backgroundColor: "#fff", padding: "15px", borderRadius: "8px", boxShadow: "0 2px 4px rgba(0,0,0,0.1)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{ flex: 1, display: "flex", gap: "20px", flexWrap: "wrap" }}
+        >
+          <div
+            style={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              backgroundColor: "#fff",
+              padding: "15px",
+              borderRadius: "8px",
+              boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "1rem",
+              }}
+            >
               <h2 style={{ margin: 0 }}>Revenue Trends</h2>
               <div>
                 <button
@@ -259,11 +385,12 @@ export default function DashboardStaff() {
                   style={{
                     padding: "5px 10px",
                     marginRight: "10px",
-                    backgroundColor: viewMode === "monthly" ? "#36A2EB" : "#f0f0f0",
+                    backgroundColor:
+                      viewMode === "monthly" ? "#36A2EB" : "#f0f0f0",
                     color: viewMode === "monthly" ? "white" : "black",
                     border: "none",
                     borderRadius: "4px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Daily View
@@ -273,11 +400,12 @@ export default function DashboardStaff() {
                   style={{
                     padding: "5px 10px",
                     marginRight: "10px",
-                    backgroundColor: viewMode === "yearly" ? "#36A2EB" : "#f0f0f0",
+                    backgroundColor:
+                      viewMode === "yearly" ? "#36A2EB" : "#f0f0f0",
                     color: viewMode === "yearly" ? "white" : "black",
                     border: "none",
                     borderRadius: "4px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Monthly View
@@ -286,11 +414,12 @@ export default function DashboardStaff() {
                   onClick={() => setViewMode("multiYear")}
                   style={{
                     padding: "5px 10px",
-                    backgroundColor: viewMode === "multiYear" ? "#36A2EB" : "#f0f0f0",
+                    backgroundColor:
+                      viewMode === "multiYear" ? "#36A2EB" : "#f0f0f0",
                     color: viewMode === "multiYear" ? "white" : "black",
                     border: "none",
                     borderRadius: "4px",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                 >
                   Yearly View

@@ -20,7 +20,7 @@ import Paper from "@mui/material/Paper";
 import { styled } from "@mui/material/styles";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { getAllBlogs } from "../../store/blog.api";
+import { getAllBlogs } from "../../../store/blog.api";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -47,7 +47,7 @@ export default function ListAllBlog() {
   const navigate = useNavigate();
 
   const handleCreateNewBlog = () => {
-    navigate("/admin/createBlog");
+    navigate("/staff/createBlog");
   };
 
   useEffect(() => {
@@ -57,13 +57,11 @@ export default function ListAllBlog() {
         console.log("Data từ API:", data);
         setBlogs(data);
       })
-      .catch((error) =>
-        console.error("Error fetching blog from API:", error)
-      );
+      .catch((error) => console.error("Error fetching blog from API:", error));
   }, [token]);
 
   const handleRowClick = (blogId) => {
-    navigate(`/admin/blogs/${blogId}`);
+    navigate(`/staff/blogs/${blogId}`);
   };
 
   return (

@@ -43,7 +43,6 @@ export default function OurBlog() {
 
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
-
       {loading ? (
         <Typography textAlign="center">Đang tải danh sách blog...</Typography>
       ) : blogs.length === 0 ? (
@@ -51,14 +50,19 @@ export default function OurBlog() {
       ) : (
         <Grid container spacing={3}>
           {blogs.map((blog) => (
-            <Grid item xs={12} sm={6} md={4} key={blog.blogId}
-            hover
-            onClick={() => handleViewDetail(blog.blogId)}
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={4}
+              key={blog.blogId}
+              hover
+              onClick={() => handleViewDetail(blog.blogId)}
             >
               <Card sx={{ maxWidth: 345, mx: "auto" }}>
                 <CardMedia
                   component="img"
-                  height="140"
+                  height="250"
                   image={blog.blogImage || "https://via.placeholder.com/140"}
                   alt={blog.blogTitle}
                 />
@@ -78,4 +82,3 @@ export default function OurBlog() {
     </Box>
   );
 }
-

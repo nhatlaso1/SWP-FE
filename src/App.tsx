@@ -8,10 +8,8 @@ import { useStore } from "./store";
 import { useMemo, useEffect } from "react";
 import AdminLayout from "./layouts/AdminLayout";
 import StaffLayout from "./layouts/StaffLayout";
-import ProductManagement from "./pages/staff/product/ProductManagement";
-import CategoryManagement from "./pages/staff/category/CategoryManagement";
-import DashboardAdmin from "./pages/admin/dashboard/DashboardAdmin";
-import DashboardStaff from "./pages/staff/dashboard/DashboardStaff";
+import ProductManagement from "./pages/admin/product/ProductManagement";
+import CategoryManagement from "./pages/admin/category/CategoryManagement";
 import CustomerLayout from "./layouts/CustomerLayout";
 import Cart from "./pages/cart/Cart";
 import Register from "./pages/register/Register";
@@ -23,13 +21,11 @@ import Routine from "./pages/admin/routine/Routine";
 import RoutineDetail from "./pages/admin/routine/RoutineDetail";
 import CreateRoutine from "./pages/admin/routine/CreateRoutine";
 import OrderManagement from "./pages/staff/order/OrderManagement";
-import BrandManagement from "./pages/staff/brand/BrandManagement";
+import BrandManagement from "./pages/admin/brand/BrandManagement";
 import BrandList from "./pages/brand/BrandList";
 import Notification from "./components/notification/Notification";
 import Purchase from "./pages/purchase/Purchase";
 import PurchaseDetail from "./pages/purchase/PurchaseDetail";
-import OurBlog from "./components/our-blog/OurBlog";
-import SerumMoisturizerArticle from "./pages/blog/SerumMoisturizerArticle";
 import UserPage from "./pages/admin/user/UserPage";
 import SkinType from "./pages/admin/skintype/SkinType";
 import Voucher from "./pages/admin/voucher/Voucher";
@@ -44,9 +40,12 @@ import CreateSkinType from "./pages/admin/skintype/CreateSkinType";
 import Login from "./pages/login/Login";
 import SkinTestQuiz from "./pages/quiz/SkinTestQuiz";
 import SkinTestResult from "./pages/skin-test-result/SkinTestResult";
-import ListAllBlog from "./pages/blog/ListAllBlog";
-import BlogDetail from "./components/our-blog/BlogDetail";
-import CreateBlog from "./pages/blog/CreateBlog";
+import ListAllBlog from "./pages/staff/blog/ListAllBlog";
+import CreateBlog from "./pages/staff/blog/CreateBlog";
+import BlogDetail from "./pages/blog/BlogDetail";
+import OurBlog from "./pages/blog/OurBlog";
+import Dashboard from "./pages/admin/dashboard/Dashboard";
+import Compare from "./pages/compare/Compare";
 
 
 function App() {
@@ -79,7 +78,7 @@ function App() {
         { path: "brands", element: <BrandList /> },
         { path: "purchase", element: <Purchase /> },
         { path: "purchase/:id", element: <PurchaseDetail /> },
-        { path: "SerumMoisturizerArticle", element: <SerumMoisturizerArticle /> },
+        { path: "compare", element: <Compare /> },
         {
           path: "cart",
           element: (
@@ -115,7 +114,7 @@ function App() {
         </ProtectedRoute>
       ),
       children: [
-        { path: "dashboard", element: <DashboardAdmin /> },
+        { path: "dashboard", element: <Dashboard /> },
         { path: "createskintest", element: <CreateSkinTest /> },
         { path: "createroutine", element: <CreateRoutine /> },
         { path: "skintests", element: <SkinTest /> },
@@ -131,9 +130,10 @@ function App() {
         { path: "user/:id", element: <UserInfo /> },
         { path: "createvoucher", element: <CreateVoucher /> },
         { path: "createskintype", element: <CreateSkinType /> },
-        { path: "blogs", element: <ListAllBlog /> },
-        { path: "createBlog", element: <CreateBlog /> },
-        { path: "blogs/:blogId", element: <CreateBlog /> },
+        
+        { path: "brands", element: <BrandManagement /> },
+        { path: "categories", element: <CategoryManagement /> },
+        { path: "products", element: <ProductManagement /> },
       ],
     }, {
       path: "staff",
@@ -143,11 +143,10 @@ function App() {
         </ProtectedRoute>
       ),
       children: [
-        { path: "dashboard", element: <DashboardStaff /> },
         { path: "orders", element: <OrderManagement /> },
-        { path: "categories", element: <CategoryManagement /> },
-        { path: "products", element: <ProductManagement /> },
-        { path: "brands", element: <BrandManagement /> },
+        { path: "blogs", element: <ListAllBlog /> },
+        { path: "blogs/:blogId", element: <CreateBlog /> },
+        { path: "createBlog", element: <CreateBlog /> },
       ],
     },
   ]);

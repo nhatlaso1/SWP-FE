@@ -16,14 +16,14 @@ import {
   getBlogByIdAdmin,
   mapApiToBlog,
   updateBlog,
-} from "../../store/blog.api";
+} from "../../../store/blog.api";
 
 const CreateBlog = () => {
   const navigate = useNavigate();
-  const { blogId } = useParams(); // Lấy blogId từ URL nếu có
+  const { blogId } = useParams(); // Get blogId from URL if available
   const token = localStorage.getItem("token");
 
-  // Khởi tạo state theo cấu trúc nội bộ
+  // Initialize state with blog data structure
   const [blogPost, setBlogPost] = useState({
     blogTitle: "",
     blogImage: "",
@@ -31,7 +31,14 @@ const CreateBlog = () => {
     blogDetails: [],
   });
 
-  // Nếu có blogId, tải dữ liệu blog để cập nhật
+  // State for form errors
+  const [errors, setErrors] = useState({
+    blogTitle: "",
+    blogImage: "",
+    blogDetails: {},
+  });
+
+  // If blogId exists, fetch blog data to edit
   useEffect(() => {
     if (blogId) {
       fetchBlog();
@@ -48,21 +55,21 @@ const CreateBlog = () => {
     }
   };
 
-  // Hàm thay đổi dữ liệu blog chung
+  // General change handler for blog fields
   const handleChange = (field, value) => {
     setBlogPost((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Thêm Blog Detail mới
+  // Add a new Blog Detail
   const handleAddBlogPostDetail = () => {
     setBlogPost((prev) => ({
       ...prev,
       blogDetails: [
         ...prev.blogDetails,
         {
-          id: Date.now(),         // Dùng cho React key
-          blogDetailId: null,       // Mới tạo, chưa có định danh từ backend
-          title: "",              // Dùng trong UI
+          id: Date.now(), // Used for React key
+          blogDetailId: null, // Not yet created on backend
+          title: "",
           description: "",
           image: "",
         },
@@ -70,15 +77,21 @@ const CreateBlog = () => {
     }));
   };
 
-  // Xóa Blog Detail theo id (sử dụng id dùng cho UI)
+  // Delete Blog Detail by UI id
   const handleDeleteBlogPostDetail = (detailId) => {
     setBlogPost((prev) => ({
       ...prev,
       blogDetails: prev.blogDetails.filter((detail) => detail.id !== detailId),
     }));
+    // Also remove error for that detail if exists
+    setErrors((prev) => {
+      const newDetailErrors = { ...prev.blogDetails };
+      delete newDetailErrors[detailId];
+      return { ...prev, blogDetails: newDetailErrors };
+    });
   };
 
-  // Cập nhật nội dung của từng Blog Detail dựa trên key UI (title, description, image)
+  // Update individual Blog Detail based on UI key (title, description, image)
   const handleDetailChange = (detailId, field, value) => {
     setBlogPost((prev) => ({
       ...prev,
@@ -86,25 +99,108 @@ const CreateBlog = () => {
         detail.id === detailId ? { ...detail, [field]: value } : detail
       ),
     }));
+    // Clear error for the field just changed
+    setErrors((prev) => ({
+      ...prev,
+      blogDetails: {
+        ...prev.blogDetails,
+        [detailId]: { ...prev.blogDetails[detailId], [field]: "" },
+      },
+    }));
   };
 
-  // Xử lý tạo mới hoặc cập nhật blog
+  // Check if an image exists by creating a new Image object
+  const checkImage = (url) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(true);
+      img.onerror = () => reject(new Error("Image load error"));
+      img.src = url;
+    });
+  };
+
+  // Validate form fields before submitting
+  const validateForm = async () => {
+    let valid = true;
+    let newErrors = {
+      blogTitle: "",
+      blogImage: "",
+      blogDetails: {},
+    };
+
+    // Validate blogTitle
+    if (!blogPost.blogTitle.trim()) {
+      newErrors.blogTitle = "Blog title cannot be empty";
+      valid = false;
+    }
+
+    // Validate blogImage
+    if (!blogPost.blogImage.trim()) {
+      newErrors.blogImage = "Blog image URL cannot be empty";
+      valid = false;
+    } else {
+      try {
+        await checkImage(blogPost.blogImage);
+      } catch (error) {
+        newErrors.blogImage = "Blog image does not exist or is invalid";
+        valid = false;
+      }
+    }
+
+    // Validate each blogDetail
+    for (const detail of blogPost.blogDetails) {
+      let detailErrors = {};
+      if (!detail.title.trim()) {
+        detailErrors.title = "Detail title cannot be empty";
+        valid = false;
+      }
+      if (!detail.description.trim()) {
+        detailErrors.description = "Description cannot be empty";
+        valid = false;
+      }
+      if (!detail.image.trim()) {
+        detailErrors.image = "Image URL cannot be empty";
+        valid = false;
+      } else {
+        try {
+          await checkImage(detail.image);
+        } catch (error) {
+          detailErrors.image = "Detail image does not exist or is invalid";
+          valid = false;
+        }
+      }
+      if (Object.keys(detailErrors).length > 0) {
+        newErrors.blogDetails[detail.id] = detailErrors;
+      }
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+
+  // Handle create or update blog
   const handleSubmit = async () => {
+    const isValid = await validateForm();
+    if (!isValid) {
+      // If form is not valid, notify user to check the fields
+      console.log("Form errors exist. Please check the fields.");
+      return;
+    }
+
     try {
-      // Xây dựng payload theo định dạng API yêu cầu:
-      // API yêu cầu: blogTitle, blogImage, status, blogDetails: [ { blogDetailId, blogDetailTitle, description, blogDetailImage } ]
+      // Build payload as required by the API:
+      // API requires: blogTitle, blogImage, status, blogDetails: [ { blogDetailId, blogDetailTitle, description, blogDetailImage } ]
       const payload = {
         blogTitle: blogPost.blogTitle,
         blogImage: blogPost.blogImage,
         status: blogPost.status,
         blogDetails: blogPost.blogDetails.map((detail) => {
-          // Dùng các giá trị trong UI để tạo payload
           const detailPayload = {
             blogDetailTitle: detail.title,
             description: detail.description,
             blogDetailImage: detail.image,
           };
-          // Nếu mục đã có định danh từ backend, thêm vào payload để cập nhật
+          // If detail has an id from the backend, include it in the payload
           if (detail.blogDetailId != null) {
             detailPayload.blogDetailId = detail.blogDetailId;
           }
@@ -129,7 +225,7 @@ const CreateBlog = () => {
         {blogId ? "Edit Blog" : "Create Blog"}
       </Typography>
 
-      {/* Form nhập Blog Title, Status và Image URL */}
+      {/* Form for Blog Title, Status, and Image URL */}
       <Grid container spacing={2} sx={{ marginBottom: 2 }}>
         <Grid item xs={9}>
           <TextField
@@ -137,6 +233,8 @@ const CreateBlog = () => {
             fullWidth
             value={blogPost.blogTitle}
             onChange={(e) => handleChange("blogTitle", e.target.value)}
+            error={!!errors.blogTitle}
+            helperText={errors.blogTitle}
           />
         </Grid>
         <Grid item xs={3}>
@@ -157,6 +255,8 @@ const CreateBlog = () => {
             fullWidth
             value={blogPost.blogImage}
             onChange={(e) => handleChange("blogImage", e.target.value)}
+            error={!!errors.blogImage}
+            helperText={errors.blogImage}
           />
         </Grid>
         {blogPost.blogImage && (
@@ -176,7 +276,7 @@ const CreateBlog = () => {
         )}
       </Grid>
 
-      {/* Render danh sách Blog Details */}
+      {/* Render list of Blog Details */}
       {blogPost.blogDetails.map((detail) => (
         <Box
           key={detail.id}
@@ -191,9 +291,17 @@ const CreateBlog = () => {
               <TextField
                 label="Detail Title"
                 fullWidth
-                value={detail.title} // Sử dụng field title
+                value={detail.title}
                 onChange={(e) =>
                   handleDetailChange(detail.id, "title", e.target.value)
+                }
+                error={
+                  errors.blogDetails[detail.id] &&
+                  !!errors.blogDetails[detail.id].title
+                }
+                helperText={
+                  errors.blogDetails[detail.id] &&
+                  errors.blogDetails[detail.id].title
                 }
               />
             </Grid>
@@ -218,15 +326,31 @@ const CreateBlog = () => {
                 onChange={(e) =>
                   handleDetailChange(detail.id, "description", e.target.value)
                 }
+                error={
+                  errors.blogDetails[detail.id] &&
+                  !!errors.blogDetails[detail.id].description
+                }
+                helperText={
+                  errors.blogDetails[detail.id] &&
+                  errors.blogDetails[detail.id].description
+                }
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
                 label="Image URL"
                 fullWidth
-                value={detail.image} // Sử dụng field image
+                value={detail.image}
                 onChange={(e) =>
                   handleDetailChange(detail.id, "image", e.target.value)
+                }
+                error={
+                  errors.blogDetails[detail.id] &&
+                  !!errors.blogDetails[detail.id].image
+                }
+                helperText={
+                  errors.blogDetails[detail.id] &&
+                  errors.blogDetails[detail.id].image
                 }
               />
             </Grid>
@@ -249,7 +373,7 @@ const CreateBlog = () => {
         </Box>
       ))}
 
-      {/* Nút Thêm Detail */}
+      {/* Button to add a new Detail */}
       <Box sx={{ marginBottom: 2 }}>
         <Button
           variant="contained"
@@ -261,7 +385,7 @@ const CreateBlog = () => {
         </Button>
       </Box>
 
-      {/* Nút Submit */}
+      {/* Submit Button */}
       <Button variant="contained" color="secondary" onClick={handleSubmit}>
         {blogId ? "Update Blog" : "Create Blog"}
       </Button>

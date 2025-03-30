@@ -4,13 +4,11 @@ import Hero from "../../components/hero/Hero";
 import ProductCategories from "../../components/categories/product-categories/ProductCategories";
 import Advertisement from "../../components/advertisement/Advertisement";
 import OurBestSeller from "../../components/our-best-seller/OurBestSeller";
-// import SpecialOffer from "../../components/special-offer/SpecialOffer";
-import OurBranch from "../../components/our-branch/OurBranch";
-import OurBlog from "../../components/our-blog/OurBlog";
 import NewIn from "../../components/new-in/NewIn";
 
 import "./Home.scss";
 import { useStore } from "../../store";
+import HomeBlog from "../../components/our-blog/HomeBlog";
 
 const Home: React.FC = () => {
   const token = useStore((state) => state.profile.user?.token);
@@ -28,7 +26,7 @@ const Home: React.FC = () => {
         <div className="section-container">
           {/* <SpecialOffer /> */}
           {/* <OurBranch /> */}
-          <OurBlog />
+          <HomeBlog />
         </div>
       </div>
 
