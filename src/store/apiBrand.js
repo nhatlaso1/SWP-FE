@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api';
+const BASE_URL = '';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -26,8 +26,8 @@ export const BrandAPI = {
   // Lấy tất cả nhãn hiệu
   getAll: async () => {
     try {
-      const response = await api.get('/Brand/get-brands');
-
+      const response = await api.get('https://beautysc-api.purpleforest-f01817f2.southeastasia.azurecontainerapps.io/api/Brand/get-brands');
+      console.log("lay brand",response);
       if (response?.data) {
         const data = response.data;
         let brands = [];

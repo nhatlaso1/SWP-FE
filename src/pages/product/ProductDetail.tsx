@@ -129,11 +129,11 @@ const ProductDetail: React.FC = () => {
           return;
         }
 
-        const productId = parseInt(id);
-        if (isNaN(productId)) {
-          setError('Invalid product ID');
-          return;
-        }
+        const productId = id;
+        // if (isNaN(productId)) {
+        //   setError('Invalid product ID');
+        //   return;
+        // }
 
         const data = await ProductAPI.getDetail(productId);
         if (!data) {

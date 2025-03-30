@@ -37,6 +37,7 @@ const ProductCategories: React.FC = () => {
       setLoading(true);
       setError(null);
       const brandsData = await BrandAPI.getAll();
+      console.log("brandsData",brandsData);
       setBrands(brandsData);
     } catch (err) {
       setError("Failed to load brands. Please try again later.");

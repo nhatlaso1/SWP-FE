@@ -378,6 +378,7 @@ const Checkout: React.FC = () => {
         alert("You need to log in to make a payment.");
         return;
       }
+      console.log("sdadsadasdasdadsd",shippingFee);
       const paymentUrl = await createPayment(orderIdRef.current, token);
       console.log("Received payment URL:", paymentUrl);
       if (paymentUrl && paymentUrl.startsWith("http")) {
@@ -653,6 +654,7 @@ const Checkout: React.FC = () => {
                   <ListItemText primary="Discount" secondary={`${discount.toLocaleString("en-US")} ₫`} />
                 </ListItem>
                 <ListItem className="price-end">
+                  
                   <ListItemText primary="Shipping Fee" secondary={`${shippingFee.toLocaleString("en-US")} ₫`} />
                 </ListItem>
               </List>

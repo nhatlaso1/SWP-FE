@@ -51,6 +51,7 @@ export function productsActions(set: StoreSet, get: StoreGet): ProductsActions {
       });
       try {
         const response = await apiClient.get(`${apiEndpoints.Product}/get-new-product`);
+        console.log("New In Products:", response.data?.$values);
         set((state) => {
           state.products.newInProducts = response.data?.$values || [];
         });

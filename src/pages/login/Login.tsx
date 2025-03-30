@@ -35,7 +35,7 @@ const Login: React.FC = () => {
       }
     },
   });
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (user && token) {
