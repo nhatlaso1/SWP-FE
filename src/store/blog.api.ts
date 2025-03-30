@@ -2,15 +2,12 @@
 import { Blog, BlogPost, Blogs } from "../types/blog";
 import { apiClient, apiEndpoints } from "./utils.api";
 
-export const getAllBlogs = async (token: string | null): Promise<Blogs[]> => {
+export const getAllBlogs = async (): Promise<Blogs[]> => {
   try {
-    if (!token) {
-      console.error("Token is missing");
-      return [];
-    }
+
 
     const response = await apiClient.get(`${apiEndpoints.blogs}/blogs`, {
-      headers: { Authorization: `Bearer ${token}` },
+      // headers: { Authorization: `Bearer ${token}` },
     });
 
     console.log("API Response:", response.data); // Debug API Response
@@ -64,6 +61,25 @@ export const createBlog = async (blog: any, token: string): Promise<void> => {
     throw new Error("Failed to create blog");
   }
 };
+
+export const mapApiToBlog = (data: Blog) => {
+  return {
+    blogTitle: data.blogTitle || "",
+    blogImage: data.blogImage || "",
+    status: data.status,
+    blogDetails:
+      data.blogDetails && Array.isArray(data.blogDetails.$values)
+        ? data.blogDetails.$values.map((detail, index) => ({
+          blogDetailId: detail.blogDetailId || Date.now() + index, // Định danh của backend
+          id: detail.blogDetailId || Date.now() + index,             // Dùng làm key cho UI
+          title: detail.blogDetailTitle || "",                      // Đổi key thành title
+          description: detail.description || "",
+          image: detail.blogDetailImage || "",                      // Đổi key thành image
+        }))
+        : [],
+  };
+};
+
 
 // Cập nhật Blog
 export const updateBlog = async (blogId: number, blog: any, token: string): Promise<void> => {

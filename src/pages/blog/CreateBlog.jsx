@@ -11,7 +11,12 @@ import {
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { createBlog, getBlogByIdAdmin, updateBlog } from "../../store/blog.api";
+import {
+  createBlog,
+  getBlogByIdAdmin,
+  mapApiToBlog,
+  updateBlog,
+} from "../../store/blog.api";
 
 const CreateBlog = () => {
   const navigate = useNavigate();
@@ -28,7 +33,6 @@ const CreateBlog = () => {
 
   // Nếu có blogId, tải dữ liệu blog để cập nhật
   useEffect(() => {
-    console.log(blogId);
     if (blogId) {
       fetchBlog();
     }
@@ -36,41 +40,29 @@ const CreateBlog = () => {
 
   const fetchBlog = async () => {
     try {
-      const data = await getBlogByIdAdmin(blogId, token);
-      // Chuyển đổi dữ liệu từ API sang cấu trúc nội bộ
-      const formattedData = {
-        blogTitle: data.blogTitle || "",
-        blogImage: data.blogImage || "",
-        status: data.status,
-        blogDetails: Array.isArray(data.blogDetails)
-          ? data.blogDetails.map((detail, index) => ({
-              id: detail.blogDetailId || Date.now() + index, // tạo id nếu API không trả về
-              title: detail.blogDetailTitle || "",
-              description: detail.description || "",
-              image: detail.blogDetailImage || "",
-            }))
-          : [],
-      };
+      const data = await getBlogByIdAdmin(Number(blogId), token);
+      const formattedData = mapApiToBlog(data);
       setBlogPost(formattedData);
     } catch (error) {
       console.error("Error fetching blog:", error);
     }
   };
 
-  // Hàm thay đổi dữ liệu blog
+  // Hàm thay đổi dữ liệu blog chung
   const handleChange = (field, value) => {
     setBlogPost((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Thêm Blog Detail mới với id được tạo tự động
+  // Thêm Blog Detail mới
   const handleAddBlogPostDetail = () => {
     setBlogPost((prev) => ({
       ...prev,
       blogDetails: [
         ...prev.blogDetails,
         {
-          id: Date.now(),
-          title: "",
+          id: Date.now(),         // Dùng cho React key
+          blogDetailId: null,       // Mới tạo, chưa có định danh từ backend
+          title: "",              // Dùng trong UI
           description: "",
           image: "",
         },
@@ -78,22 +70,20 @@ const CreateBlog = () => {
     }));
   };
 
-  // Xóa Blog Detail theo id
-  const handleDeleteBlogPostDetail = (blogDetailId) => {
+  // Xóa Blog Detail theo id (sử dụng id dùng cho UI)
+  const handleDeleteBlogPostDetail = (detailId) => {
     setBlogPost((prev) => ({
       ...prev,
-      blogDetails: prev.blogDetails.filter(
-        (detail) => detail.id !== blogDetailId
-      ),
+      blogDetails: prev.blogDetails.filter((detail) => detail.id !== detailId),
     }));
   };
 
-  // Chỉnh sửa nội dung của từng Blog Detail
-  const handleDetailChange = (blogDetailId, field, value) => {
+  // Cập nhật nội dung của từng Blog Detail dựa trên key UI (title, description, image)
+  const handleDetailChange = (detailId, field, value) => {
     setBlogPost((prev) => ({
       ...prev,
       blogDetails: prev.blogDetails.map((detail) =>
-        detail.id === blogDetailId ? { ...detail, [field]: value } : detail
+        detail.id === detailId ? { ...detail, [field]: value } : detail
       ),
     }));
   };
@@ -101,16 +91,25 @@ const CreateBlog = () => {
   // Xử lý tạo mới hoặc cập nhật blog
   const handleSubmit = async () => {
     try {
-      // Chuyển đổi dữ liệu state sang payload theo định dạng API yêu cầu:
+      // Xây dựng payload theo định dạng API yêu cầu:
+      // API yêu cầu: blogTitle, blogImage, status, blogDetails: [ { blogDetailId, blogDetailTitle, description, blogDetailImage } ]
       const payload = {
         blogTitle: blogPost.blogTitle,
         blogImage: blogPost.blogImage,
         status: blogPost.status,
-        blogDetails: blogPost.blogDetails.map((detail) => ({
-          blogDetailTitle: detail.title,
-          description: detail.description,
-          blogDetailImage: detail.image,
-        })),
+        blogDetails: blogPost.blogDetails.map((detail) => {
+          // Dùng các giá trị trong UI để tạo payload
+          const detailPayload = {
+            blogDetailTitle: detail.title,
+            description: detail.description,
+            blogDetailImage: detail.image,
+          };
+          // Nếu mục đã có định danh từ backend, thêm vào payload để cập nhật
+          if (detail.blogDetailId != null) {
+            detailPayload.blogDetailId = detail.blogDetailId;
+          }
+          return detailPayload;
+        }),
       };
 
       if (blogId) {
@@ -192,7 +191,7 @@ const CreateBlog = () => {
               <TextField
                 label="Detail Title"
                 fullWidth
-                value={detail.title}
+                value={detail.title} // Sử dụng field title
                 onChange={(e) =>
                   handleDetailChange(detail.id, "title", e.target.value)
                 }
@@ -225,7 +224,7 @@ const CreateBlog = () => {
               <TextField
                 label="Image URL"
                 fullWidth
-                value={detail.image}
+                value={detail.image} // Sử dụng field image
                 onChange={(e) =>
                   handleDetailChange(detail.id, "image", e.target.value)
                 }
