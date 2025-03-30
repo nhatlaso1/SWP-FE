@@ -1,4 +1,15 @@
-import { styled } from "@mui/material/styles";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Button,
+  Typography,
+  TextField,
+  Box,
+  Grid,
+  Select,
+  MenuItem,
+  Container,
+} from "@mui/material";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell, { tableCellClasses } from "@mui/material/TableCell";
@@ -6,7 +17,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import React from "react";
+import { styled } from "@mui/material/styles";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { getAllBlogs } from "../../store/blog.api";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -23,7 +36,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
     backgroundColor: theme.palette.action.hover,
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
@@ -31,47 +43,89 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 export default function ListAllBlog() {
   const token = localStorage.getItem("token");
-  const [blogs, setBlogs] = React.useState([]);
+  const [blogs, setBlogs] = useState([]);
+  const navigate = useNavigate();
 
-  React.useEffect(() => {
+  const handleCreateNewBlog = () => {
+    navigate("/admin/createBlog");
+  };
+
+  useEffect(() => {
     getAllBlogs(token)
-      .then((data) => setBlogs(data))
-      .catch((error) => console.error("Error fetching blog from API:", error));
-  }, []);
+      .then((data) => {
+        // Nếu API trả về { data: [...] } hãy thay đổi thành data.data
+        console.log("Data từ API:", data);
+        setBlogs(data);
+      })
+      .catch((error) =>
+        console.error("Error fetching blog from API:", error)
+      );
+  }, [token]);
+
+  const handleRowClick = (blogId) => {
+    navigate(`/admin/blogs/${blogId}`);
+  };
+
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 700 }} aria-label="customized table">
-        <TableHead>
-          <TableRow>
-            <StyledTableCell>Blog Id</StyledTableCell>
-            <StyledTableCell align="right">Blog Title</StyledTableCell>
-            <StyledTableCell align="right">Blog Image</StyledTableCell>
-            <StyledTableCell align="right">Created Date</StyledTableCell>
-            <StyledTableCell align="right">Status</StyledTableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {blogs.map((blogs) => (
-            <StyledTableRow key={blogs.blogId}>
-              <StyledTableCell component="th" scope="row">
-                {blogs.blogId}
-              </StyledTableCell>
-              <StyledTableCell align="right">{blogs.blogTitle}</StyledTableCell>
-              <StyledTableCell align="right">
-                <img
-                  src={blogs.blogImage}
-                  alt={blogs.blogTitle}
-                  style={{ width: "100px", height: "auto" }}
-                />
-              </StyledTableCell>
-              <StyledTableCell align="right">
-                {blogs.createdDate}
-              </StyledTableCell>
-              <StyledTableCell align="right">{blogs.status}</StyledTableCell>
-            </StyledTableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+    <Container>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        marginBottom={2}
+      >
+        <Typography variant="h4">Blog List</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleCreateNewBlog}
+        >
+          Create New Blog
+        </Button>
+      </Box>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 700 }} aria-label="customized table">
+          <TableHead>
+            <TableRow>
+              <StyledTableCell>Blog Id</StyledTableCell>
+              <StyledTableCell align="right">Blog Title</StyledTableCell>
+              <StyledTableCell align="right">Blog Image</StyledTableCell>
+              <StyledTableCell align="right">Created Date</StyledTableCell>
+              <StyledTableCell align="right">Status</StyledTableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {blogs.map((blog) => (
+              <StyledTableRow
+                key={blog.blogId}
+                hover
+                onClick={() => handleRowClick(blog.blogId)}
+                style={{ cursor: "pointer" }}
+              >
+                <StyledTableCell component="th" scope="row">
+                  {blog.blogId}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {blog.blogTitle}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  <img
+                    src={blog.blogImage}
+                    alt={blog.blogTitle}
+                    style={{ width: "50px", height: "50px" }}
+                  />
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {blog.createdDate}
+                </StyledTableCell>
+                <StyledTableCell align="right">
+                  {blog.status ? "Active" : "Inactive"}
+                </StyledTableCell>
+              </StyledTableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Container>
   );
 }
