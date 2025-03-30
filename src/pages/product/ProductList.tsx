@@ -298,6 +298,22 @@ const ProductList: React.FC = () => {
         Product List
       </Typography>
 
+      {/* Compare Products Button */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/compare')}
+          sx={{
+            minWidth: '200px',
+            height: '45px',
+            fontSize: '1.1rem'
+          }}
+        >
+          Compare Products
+        </Button>
+      </Box>
+
       {/* Filter block */}
       <Box sx={{ mb: 2 }}>
         <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
