@@ -22,6 +22,7 @@ const Item = styled(Paper)(({ theme }) => ({
 export default function OurBlog() {
   const token = localStorage.getItem("token");
   const [blogs, setBlogs] = React.useState([]);
+  const [activeBlogs, setActiveBlogs] = React.useState([]); // Danh sách blog có status Active
   const [loading, setLoading] = React.useState(true);
 
   const navigate = useNavigate();
@@ -36,6 +37,10 @@ export default function OurBlog() {
       .then((data) => {
         console.log("Fetched Blogs:", data); // Debug dữ liệu blogs
         setBlogs(data);
+        
+        // Lọc danh sách blog có status Active
+        const activeBlogsData = data.filter(blog => blog.status === true);
+        setActiveBlogs(activeBlogsData);
       })
       .catch((error) => console.error("Error fetching blog from API:", error))
       .finally(() => setLoading(false));
@@ -44,12 +49,12 @@ export default function OurBlog() {
   return (
     <Box sx={{ flexGrow: 1, p: 2 }}>
       {loading ? (
-        <Typography textAlign="center">Đang tải danh sách blog...</Typography>
-      ) : blogs.length === 0 ? (
-        <Typography textAlign="center">Không có bài viết nào.</Typography>
+        <Typography textAlign="center">Loading...</Typography>
+      ) : activeBlogs.length === 0 ? (
+        <Typography textAlign="center">No Blog.</Typography>
       ) : (
         <Grid container spacing={3}>
-          {blogs.map((blog) => (
+          {activeBlogs.map((blog) => (
             <Grid
               item
               xs={12}

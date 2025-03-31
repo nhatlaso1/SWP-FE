@@ -248,7 +248,7 @@ export default function Purchase() {
                 </div>
                 <div className="actions">
                   <button
-                    className="btn btn-rating"
+                    className="btn btn-detail"
                     onClick={() =>
                       handleOrderAction("/purchase", order.orderId)
                     }
