@@ -30,3 +30,44 @@ export const getAllCustomer = async (token: string): Promise<Customer[]> => {
     }
   };
   
+  export const activeAccount = async (token: string,userId :number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<string>(`${apiEndpoints.Customer}/active-customer?userId=${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+       );
+  
+      console.log("API Response:", response.data);
+  
+      if (!response.data) {
+        throw new Error("Invalid API response format");
+      }
+  
+      return response.data;
+    
+  
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      throw error;
+    }
+  };
+  export const deActiveAccount = async (token: string,userId :number): Promise<string> => {
+    try {
+      const response = await apiClient.patch<string>(`${apiEndpoints.Customer}/deactive-customer?userId=${userId}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+       );
+  
+      console.log("API Response:", response.data);
+  
+      if (!response.data) {
+        throw new Error("Invalid API response format");
+      }
+  
+      return response.data;
+    
+  
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      throw error;
+    }
+  };
+  
