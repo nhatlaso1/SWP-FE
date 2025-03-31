@@ -54,7 +54,7 @@ const Footer: React.FC = () => {
             and skincare advice
           </p>
 
-          <div className="subscribe">
+          {/* <div className="subscribe">
             <TextField
               id="email-address"
               label="Email Address"
@@ -75,7 +75,7 @@ const Footer: React.FC = () => {
             >
               Subscribe
             </Button>
-          </div>
+          </div> */}
 
           <FormControlLabel
             control={<Checkbox defaultChecked />}
