@@ -21,27 +21,27 @@ import { useStore } from '../../store';
 // Define interfaces for Brand, Category, and SkinType
 interface Brand {
   $id: string;
-  brandId: number;
+  brandId: string;
   brandName: string;
   brandImage: string;
 }
 
 interface Category {
   $id: string;
-  categoryId: number;
+  categoryId: string;
   categoryName: string;
 }
 
 interface SkinType {
   $id: string;
-  skinTypeId: number;
+  skinTypeId: string;
   skinTypeName: string;
 }
 
 // Update Product interface to include category and skinTypes with proper formatting
 interface Product {
   $id: string;
-  productId: number;
+  productId: string;
   productName: string;
   summary: string;
   quantity: number;
@@ -106,9 +106,9 @@ const BrandList: React.FC = () => {
         const response = await ProductAPI.getAll({
           pageIndex: currentPage,
           pageSize: 100,
-          SortTypes: [""],
+          SortTypes: [],
           CategoryIds: [],
-          SizeTypes: [""],
+          SizeTypes: [],
           Ingredients: [],
           BrandIds: [],
           FunctionIds: [],
@@ -116,7 +116,7 @@ const BrandList: React.FC = () => {
           MaxPrice: 999999999,
           Status: true
         });
-
+        console.log('Fetched products: brandlist', response); // For debugging
         if (response && response.products) {
           const activeProducts = response.products.filter(product => product.status === true);
           allFetchedProducts = [...allFetchedProducts, ...activeProducts];

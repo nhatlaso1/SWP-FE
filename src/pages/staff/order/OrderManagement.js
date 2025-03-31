@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 import { useNavigate } from 'react-router-dom';
 
@@ -56,6 +56,8 @@ import {
 
   Stack,
 
+  Pagination,
+
 } from '@mui/material';
 
 
@@ -78,7 +80,17 @@ const OrderManagement = () => {
 
   const [isDetailDialogOpen, setDetailDialogOpen] = useState(false);
 
+  const [rejectConfirmDialog, setRejectConfirmDialog] = useState({ open: false, orderId: null });
+
+  const [lastViewedOrderId, setLastViewedOrderId] = useState(null);
+
+  const orderRowRefs = useRef({});
+
   const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [ordersPerPage, setOrdersPerPage] = useState(10);
 
 
 
@@ -198,6 +210,8 @@ const OrderManagement = () => {
 
       const detailedOrder = await getOrderById(order.orderId);
 
+      setLastViewedOrderId(order.orderId);
+
       setSelectedOrder(detailedOrder);
 
     } catch (error) {
@@ -215,6 +229,22 @@ const OrderManagement = () => {
   const handleBackToList = () => {
 
     setSelectedOrder(null);
+
+    setTimeout(() => {
+
+      if (lastViewedOrderId && orderRowRefs.current[lastViewedOrderId]) {
+
+        orderRowRefs.current[lastViewedOrderId].scrollIntoView({
+
+          behavior: 'smooth',
+
+          block: 'center'
+
+        });
+
+      }
+
+    }, 100);
 
   };
 
@@ -691,6 +721,46 @@ const OrderManagement = () => {
 
 
 
+  const handleRejectOrder = async (orderId) => {
+    setRejectConfirmDialog({ open: true, orderId });
+  };
+
+  const handleConfirmReject = async () => {
+    try {
+      const success = await denyOrder(rejectConfirmDialog.orderId);
+      if (success) {
+        setNotification({
+          open: true,
+          message: 'Order has been rejected successfully',
+          severity: 'success'
+        });
+        await fetchOrders();
+        if (selectedOrder && selectedOrder.orderId === rejectConfirmDialog.orderId) {
+          setSelectedOrder(prev => ({ ...prev, status: 'Denied' }));
+        }
+      }
+    } catch (error) {
+      console.error('Error rejecting order:', error);
+      setNotification({
+        open: true,
+        message: 'Failed to reject order. Please try again.',
+        severity: 'error'
+      });
+    } finally {
+      setRejectConfirmDialog({ open: false, orderId: null });
+    }
+  };
+
+  const handleCloseRejectDialog = () => {
+    setRejectConfirmDialog({ open: false, orderId: null });
+  };
+
+
+
+  const paginatedOrders = orders.slice((currentPage - 1) * ordersPerPage, currentPage * ordersPerPage);
+
+
+
   return (
 
     <Box p={3}>
@@ -737,9 +807,16 @@ const OrderManagement = () => {
 
                 <TableBody>
 
-                  {orders.map(order => (
+                  {paginatedOrders.map(order => (
 
-                    <TableRow key={order.orderId} sx={{ cursor: 'pointer' }}>
+                    <TableRow
+                      key={order.orderId}
+                      sx={{
+                        cursor: 'pointer',
+                        bgcolor: lastViewedOrderId === order.orderId ? 'action.hover' : 'inherit'
+                      }}
+                      ref={el => orderRowRefs.current[order.orderId] = el}
+                    >
 
                       <TableCell onClick={() => handleRowClick(order)}>{order.orderId}</TableCell>
 
@@ -758,6 +835,17 @@ const OrderManagement = () => {
               </Table>
 
             </TableContainer>
+
+          </Grid>
+
+          <Grid item xs={12}>
+
+            <Pagination
+              count={Math.ceil(orders.length / ordersPerPage)}
+              page={currentPage}
+              onChange={(event, value) => setCurrentPage(value)}
+              color="primary"
+            />
 
           </Grid>
 
@@ -827,7 +915,7 @@ const OrderManagement = () => {
 
                       <>
 
-                        <Button onClick={() => handleStatusChange('Denied', selectedOrder.orderId)} variant="contained" color="error" sx={{ mr: 1 }}>
+                        <Button onClick={() => handleRejectOrder(selectedOrder.orderId)} variant="contained" color="error" sx={{ mr: 1 }}>
 
                           Reject
 
@@ -1147,6 +1235,26 @@ const OrderManagement = () => {
 
             </DialogActions>
 
+          </Dialog>
+
+
+
+          <Dialog
+            open={rejectConfirmDialog.open}
+            onClose={handleCloseRejectDialog}
+          >
+            <DialogTitle>Confirm Reject Order</DialogTitle>
+            <DialogContent>
+              <Typography>
+                Are you sure you want to reject this order?
+              </Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseRejectDialog}>Cancel</Button>
+              <Button onClick={handleConfirmReject} variant="contained" color="error">
+                Reject Order
+              </Button>
+            </DialogActions>
           </Dialog>
 
         </Box>

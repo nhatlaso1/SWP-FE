@@ -34,11 +34,11 @@ api.interceptors.request.use(
 
     const token = localStorage.getItem('token');
 
-    if (token) {
+    // if (token) {
 
-      config.headers.Authorization = `Bearer ${token}`;
+    //   config.headers.Authorization = `Bearer ${token}`;
 
-    }
+    // }
 
     return config;
 
@@ -108,33 +108,23 @@ const callApi = async (method, url, data = null, params = {}) => {
 
 export const ProductAPI = {
 
-  // Lấy tất cả sản phẩm
-
   getAll: async (payload = {}) => {
-
+    console.log('getAll payload:', payload);
     try {
 
-      console.log('Calling getAll products with params:', payload);
 
 
       // Gọi API với POST method và parameters để lấy tất cả sản phẩm
 
       const response = await api.post('/Product/get-all-product', null, {
-
         params: {
-
           pageIndex: 1,
-
           pageSize: 999,
-
           sortColumn: 'productId',
-
           sortOrder: 'asc'
-
         }
-
       });
-
+      
 
 
       console.log('Raw API Response:', response);

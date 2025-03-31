@@ -168,11 +168,7 @@ const SkinTestResult = () => {
                                           <div
                                             key={product.productId}
                                             className="other-product-item"
-                                            onClick={() =>
-                                              navigate(
-                                                `/product/${product.productId}`
-                                              )
-                                            }
+                                            
                                           >
                                             <img
                                               src={
@@ -181,7 +177,14 @@ const SkinTestResult = () => {
                                               }
                                               alt="category-item"
                                             />
-                                            <div className="product-info">
+                                            <div className="product-info"
+                                            onClick={() =>
+                                              navigate(
+                                                `/product/${product.productId}`
+                                              )
+                                            }
+                                            >
+                                              
                                               <p className="name">
                                                 {product.productName}
                                               </p>
@@ -189,6 +192,34 @@ const SkinTestResult = () => {
                                                 {product.price.toLocaleString()}VND
                                               </p>
                                             </div>
+                                            <Button
+                                    fullWidth
+                                    variant="contained"
+                                    style={{
+                                      color: "#fff",
+                                      width: "fit-content",
+                                    }}
+                                    onClick={() => {
+                                      const producta = {
+                                        productId:
+                                          product.productId,
+                                        productName:
+                                          product.productName,
+                                        productImage:                                          
+                                          product.productImages.$values[0]
+                                            .url,
+                                        price:
+                                          product.price,
+                                        category:
+                                          product.category,
+                                        skinType: skinType.skinTypeName,
+                                        quantity: 1
+                                      };
+                                      addItem(producta);
+                                    }}
+                                  >
+                                    Add to Cart
+                                  </Button>
                                           </div>
                                         ))}
                                   </div>
@@ -322,7 +353,46 @@ const SkinTestResult = () => {
                                                 ${product.price}
                                               </p>
                                             </div>
+                                            <Button
+                                    fullWidth
+                                    variant="contained"
+                                    style={{
+                                      color: "#fff",
+                                      width: "fit-content",
+                                    }}
+                                    onClick={() => {
+                                      const product = {
+                                        productId:
+                                          step
+                                            .category.products
+                                            .$values[0].productId,
+                                        productName:
+                                          step
+                                            .category.products
+                                            .$values[0].productName,
+                                        productImage:
+                                          step
+                                            .category.products
+                                            .$values[0].productImages.$values[0]
+                                            .url,
+                                        price:
+                                          step
+                                            .category.products
+                                            .$values[0].price,
+                                        category:
+                                          step.
+                                            category.categoryName,
+                                        skinType: skinType.skinTypeName,
+                                        quantity: 1
+                                      };
+                                      addItem(product);
+                                    }}
+                                  >
+                                    Add to Cart
+                                  </Button>
                                           </div>
+
+                                          
                                         ))}
                                   </div>
                                 </div>

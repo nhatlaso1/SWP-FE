@@ -20,7 +20,7 @@ const CategoryManagement = () => {
       const results = await Promise.all(promises);
       setCategories(results);
     } catch (err) {
-      setError('Không thể kết nối đến server. Vui lòng thử lại sau.');
+      setError('Cannot connect to the server. Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -29,7 +29,7 @@ const CategoryManagement = () => {
   return (
     <div className="category-management">
       <div className="management-header">
-        <h1>Quản lý Danh mục</h1>
+        <h1>Category Management</h1>
       </div>
 
       {error && (
@@ -40,15 +40,15 @@ const CategoryManagement = () => {
       )}
 
       {loading ? (
-        <div className="loading-spinner">Đang tải dữ liệu...</div>
+        <div className="loading-spinner">Loading data...</div>
       ) : (
         <div className="categories-table">
           <table>
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Tên danh mục</th>
-                <th>Số lượng sản phẩm</th>
+                <th>Category Name</th>
+                <th>Product Count</th>
               </tr>
             </thead>
             <tbody>
@@ -62,7 +62,7 @@ const CategoryManagement = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="3" style={{ textAlign: 'center' }}>Không có danh mục nào</td>
+                  <td colSpan="3" style={{ textAlign: 'center' }}>No categories available</td>
                 </tr>
               )}
             </tbody>

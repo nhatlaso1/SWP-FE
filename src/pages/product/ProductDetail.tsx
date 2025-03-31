@@ -129,11 +129,11 @@ const ProductDetail: React.FC = () => {
           return;
         }
 
-        const productId = parseInt(id);
-        if (isNaN(productId)) {
-          setError('Invalid product ID');
-          return;
-        }
+        const productId = id;
+        // if (isNaN(productId)) {
+        //   setError('Invalid product ID');
+        //   return;
+        // }
 
         const data = await ProductAPI.getDetail(productId);
         if (!data) {
@@ -265,13 +265,34 @@ const ProductDetail: React.FC = () => {
 
             <List>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1">Size</Typography>} secondary={<Typography variant="body1">{product.size}</Typography>} />
+                <ListItemText
+                  primary={
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'primary.main' }}>
+                      Size
+                    </Typography>
+                  }
+                  secondary={<Typography variant="body1">{product.size}</Typography>}
+                />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1">Brand</Typography>} secondary={<Typography variant="body1">{product.brand.brandName}</Typography>} />
+                <ListItemText
+                  primary={
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'primary.main' }}>
+                      Brand
+                    </Typography>
+                  }
+                  secondary={<Typography variant="body1">{product.brand.brandName}</Typography>}
+                />
               </ListItem>
               <ListItem>
-                <ListItemText primary={<Typography variant="subtitle1">Category</Typography>} secondary={<Typography variant="body1">{product.category.categoryName}</Typography>} />
+                <ListItemText
+                  primary={
+                    <Typography variant="subtitle1" sx={{ fontWeight: 'bold', fontSize: '1.1rem', color: 'primary.main' }}>
+                      Category
+                    </Typography>
+                  }
+                  secondary={<Typography variant="body1">{product.category.categoryName}</Typography>}
+                />
               </ListItem>
             </List>
 

@@ -6,7 +6,9 @@ import QuizIcon from "@mui/icons-material/Quiz";
 import RouteIcon from "@mui/icons-material/Route";
 import AddReactionIcon from "@mui/icons-material/AddReaction";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import ChromeReaderModeIcon from '@mui/icons-material/ChromeReaderMode';
+import CategoryIcon from "@mui/icons-material/Category";
+import LayersIcon from "@mui/icons-material/Layers";
+import BrandingWatermarkIcon from "@mui/icons-material/BrandingWatermark";
 import "./SideBarAdmin.css";
 
 const NAVIGATION = [
@@ -51,11 +53,24 @@ const NAVIGATION = [
     icon: <QuizIcon />,
     navigate: "/admin/skintests",
   },
+  
   {
-    segment: "Blog",
-    title: "Blog",
-    icon: <ChromeReaderModeIcon />,
-    navigate: "/admin/blog",
+    segment: "categories",
+    title: "Categories",
+    icon: <CategoryIcon />,
+    navigate: "/admin/categories",
+  },
+  {
+    segment: "products",
+    title: "Products",
+    icon: <LayersIcon />,
+    navigate: "/admin/products",
+  },
+  {
+    segment: "brands",
+    title: "Brands",
+    icon: <BrandingWatermarkIcon />,
+    navigate: "/admin/brands",
   },
 ];
 

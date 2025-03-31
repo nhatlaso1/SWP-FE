@@ -35,7 +35,7 @@ const Login: React.FC = () => {
       }
     },
   });
-
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (user && token) {
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
 
       const redirectPath = location.state?.from || 
         (role === "Manager" ? "/admin/dashboard" :
-        role === "Staff" ? "/staff/dashboard" : "/");
+        role === "Staff" ? "/staff/orders" : "/");
 
       navigate(redirectPath); // Điều hướng về trang trước đó hoặc theo vai trò
       window.location.reload();

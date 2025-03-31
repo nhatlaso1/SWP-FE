@@ -85,7 +85,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
           }
         );
         const { token } = response.data || {};
-
+        console.log("Token:", token);
         if (token) {
           const payload = JSON.parse(atob(token.split(".")[1]));
           const role =
@@ -119,7 +119,7 @@ export function profileActions(set: StoreSet, get: StoreGet): ProfileActions {
         state.loading.isLoading = true;
       });
       try {
-        await apiClient.delete(`${apiEndpoints.Authentication}/logout`);
+        localStorage.removeItem("email");
         localStorage.removeItem("token");
         localStorage.removeItem("role");
         set((state) => {
