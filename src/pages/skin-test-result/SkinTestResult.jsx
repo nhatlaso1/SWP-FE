@@ -305,11 +305,6 @@ const SkinTestResult = () => {
                                           <div
                                             key={product.productId}
                                             className="other-product-item"
-                                            onClick={() =>
-                                              navigate(
-                                                `/product/${product.productId}`
-                                              )
-                                            }
                                           >
                                             <img
                                               src={
