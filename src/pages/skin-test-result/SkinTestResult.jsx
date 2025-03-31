@@ -90,7 +90,7 @@ const SkinTestResult = () => {
                                     }
                                   </p>
                                   <p className="product-price">
-                                    {step.category.products.$values[0].price}
+                                    {step.category.products.$values[0].price.toLocaleString()}
                                     VND
                                   </p>
                                   <Button
@@ -244,7 +244,7 @@ const SkinTestResult = () => {
                                     }
                                   </p>
                                   <p className="product-price">
-                                    {step.category.products.$values[0].price}
+                                    {step.category.products.$values[0].price.toLocaleString()}
                                     VND
                                   </p>
                                   <Button
@@ -323,7 +323,8 @@ const SkinTestResult = () => {
                                                 {product.productName}
                                               </p>
                                               <p className="price">
-                                                {product.price}VND
+                                                {product.price.toLocaleString()}
+                                                VND
                                               </p>
                                             </div>
                                             <Button
