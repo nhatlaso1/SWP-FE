@@ -213,7 +213,7 @@ const CreateBlog = () => {
       } else {
         await createBlog(payload, token);
       }
-      navigate("/admin/blogs");
+      navigate("/staff/blogs");
     } catch (error) {
       console.error("Error saving blog:", error);
     }

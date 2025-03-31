@@ -46,7 +46,7 @@
   /* Product info section */
   .product-info {
     display: flex;
-    align-items: center;
+    align-items: left;
     gap: 10px;
     margin-bottom: 15px;
   }

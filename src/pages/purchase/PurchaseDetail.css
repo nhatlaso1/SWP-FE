@@ -72,7 +72,7 @@
   padding: 16px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ */
-  border-left: 5px solid #007bff; /* Viền màu xanh */
+  border-left: 5px solid #fe82823d; /* Viền màu xanh */
   width: 100%;
   max-width: 1000px;
   margin: 20px auto; /* Căn giữa */
@@ -80,7 +80,7 @@
 
 .customer-info h3 {
   font-size: 20px;
-  color: #007bff; /* Xanh dương */
+  color: #0c0c0c; /* Xanh dương */
   margin-bottom: 12px;
 }
 

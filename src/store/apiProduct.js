@@ -34,11 +34,11 @@ api.interceptors.request.use(
 
     const token = localStorage.getItem('token');
 
-    // if (token) {
+    if (token) {
 
-    //   config.headers.Authorization = `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
 
-    // }
+    }
 
     return config;
 
@@ -124,7 +124,7 @@ export const ProductAPI = {
           sortOrder: 'asc'
         }
       });
-      
+
 
 
       console.log('Raw API Response:', response);
@@ -368,80 +368,51 @@ export const ProductAPI = {
     try {
 
       console.log('Updating product with ID:', productId);
-
       console.log('Update data:', productData);
 
-
       // Đảm bảo productId là số nguyên
-
       const numericProductId = parseInt(productId);
-
       if (isNaN(numericProductId)) {
-
         throw new Error('ID sản phẩm không hợp lệ');
-
       }
 
-
+      // Xử lý dữ liệu hình ảnh
+      const images = productData.images?.map(img => {
+        if (typeof img === 'string') return img;
+        return img.url || img.productImage || '';
+      }).filter(url => url !== '');
 
       const response = await api.put(`/Product/update-product`, {
-
         productName: productData.productName,
-
         size: productData.size,
-
         price: productData.price,
-
         quantity: productData.quantity,
-
         discount: productData.discount,
-
         summary: productData.summary,
-
         isRecommended: productData.isRecommended,
-
         brandId: productData.brandId,
-
         categoryId: productData.categoryId,
-
-        skinTypes: productData.skinTypeIds || [],
-
-        ingredients: productData.ingredientConcentrations || [],
-
-        functions: productData.functionIds || [],
-
-        images: productData.imageUrls || []
-
+        skinTypes: productData.skinTypes || [],
+        ingredients: productData.ingredients || [],
+        functions: productData.functions || [],
+        images: images
       }, {
-
         params: { productId: numericProductId }
-
       });
 
-
-
       console.log('Update response:', response.data);
-
       return response.data;
 
     } catch (error) {
 
       console.error('Error updating product:', error.response || error);
-
       if (error.response?.status === 404) {
-
         throw new Error('Không tìm thấy sản phẩm để cập nhật');
-
       } else if (error.response?.status === 400) {
-
         const errorDetail = error.response?.data?.detail || error.response?.data?.message;
-
         throw new Error(errorDetail || 'Dữ liệu cập nhật không hợp lệ');
-
       }
-
       throw new Error('Không thể cập nhật sản phẩm');
-
     }
 
   },
