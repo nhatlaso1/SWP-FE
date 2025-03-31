@@ -16,7 +16,7 @@ import * as Yup from "yup";
 import PersonIcon from "@mui/icons-material/Person";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
 import DriveFileRenameOutlineOutlinedIcon from "@mui/icons-material/DriveFileRenameOutlineOutlined";
-import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
+// import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import ArticleOutlinedIcon from "@mui/icons-material/ArticleOutlined";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
@@ -119,8 +119,7 @@ const HeaderGuest: React.FC = () => {
         </div>
 
         <div className="searchbar-wrap">
-          <SearchOutlinedIcon />
-          |<div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
+          <div style={{ cursor: "pointer" }} onClick={() => navigate("/cart")}>
             <ShoppingCartOutlinedIcon />
           </div>
           <Button variant="text" onClick={() => navigate("/login")}>

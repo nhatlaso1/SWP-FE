@@ -47,7 +47,6 @@ import OurBlog from "./pages/blog/OurBlog";
 import Dashboard from "./pages/admin/dashboard/Dashboard";
 import Compare from "./pages/compare/Compare";
 
-
 function App() {
   const user = useStore((store) => store.profile.user);
   const token = localStorage.getItem("token");
@@ -70,7 +69,17 @@ function App() {
         { path: "/", element: <Home /> },
         { path: "take-quiz", element: <SkinTestQuiz /> },
         { path: "products", element: <ProductList /> },
-        { path: "quiz-result", element: <SkinTestResult /> },
+        {
+          path: "quiz-result",
+          element: (
+            <ProtectedRoute
+              isAllowed={isAuthenticated && role === "Customer"}
+              redirectPath="/login"
+            >
+              <SkinTestResult />
+            </ProtectedRoute>
+          ),
+        },
         { path: "product/:id", element: <ProductDetail /> },
         { path: "sales", element: <SaleProducts /> },
         { path: "blogs", element: <OurBlog /> },
@@ -82,34 +91,46 @@ function App() {
         {
           path: "cart",
           element: (
-            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+            <ProtectedRoute
+              isAllowed={isAuthenticated && role === "Customer"}
+              redirectPath="/login"
+            >
               <Cart />
             </ProtectedRoute>
-          )
+          ),
         },
         { path: "checkout", element: <Checkout /> },
         {
           path: "profile",
           element: (
-            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+            <ProtectedRoute
+              isAllowed={isAuthenticated && role === "Customer"}
+              redirectPath="/login"
+            >
               <Profile />
             </ProtectedRoute>
-          )
-        }, {
+          ),
+        },
+        {
           path: "order-success",
           element: (
-            <ProtectedRoute isAllowed={isAuthenticated && role === "Customer"} redirectPath="/login">
+            <ProtectedRoute
+              isAllowed={isAuthenticated && role === "Customer"}
+              redirectPath="/login"
+            >
               <CheckoutSuccess />
             </ProtectedRoute>
-          )
+          ),
         },
-
       ],
     },
     {
       path: "admin",
       element: (
-        <ProtectedRoute isAllowed={isAuthenticated && role === "Manager"} redirectPath="/">
+        <ProtectedRoute
+          isAllowed={isAuthenticated && role === "Manager"}
+          redirectPath="/"
+        >
           <AdminLayout />
         </ProtectedRoute>
       ),
@@ -130,15 +151,19 @@ function App() {
         { path: "user/:id", element: <UserInfo /> },
         { path: "createvoucher", element: <CreateVoucher /> },
         { path: "createskintype", element: <CreateSkinType /> },
-        
+
         { path: "brands", element: <BrandManagement /> },
         { path: "categories", element: <CategoryManagement /> },
         { path: "products", element: <ProductManagement /> },
       ],
-    }, {
+    },
+    {
       path: "staff",
       element: (
-        <ProtectedRoute isAllowed={isAuthenticated && role === "Staff"} redirectPath="/">
+        <ProtectedRoute
+          isAllowed={isAuthenticated && role === "Staff"}
+          redirectPath="/"
+        >
           <StaffLayout />
         </ProtectedRoute>
       ),

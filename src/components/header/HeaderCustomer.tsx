@@ -128,7 +128,6 @@ const HeaderCustomer: React.FC = () => {
         </div>
 
         <div className="searchbar-wrap">
-          {/* <SearchOutlinedIcon />| */}
           <div style={{ cursor: "pointer" }} onClick={() => setOpenCart(true)}>
             <ShoppingCartOutlinedIcon />
           </div>

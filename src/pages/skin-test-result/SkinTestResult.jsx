@@ -13,10 +13,10 @@ const SkinTestResult = () => {
   const fetchRoutine = useStore((state) => state.fetchRoutine);
   const skinType = useStore((state) => state.routine.skinType);
   const routineDetail = useStore((state) => state.routine.routineDetail);
-  console.log('skinType', skinType);
-  console.log('routineDetail', routineDetail);
+  console.log("skinType", skinType);
+  console.log("routineDetail", routineDetail);
   const userProfile = useStore((state) => state.profile.userProfile);
-  
+
   const scrollToTop = () => {
     if (skinRef.current) {
       skinRef.current.scrollIntoView({ behavior: "smooth" });
@@ -74,29 +74,24 @@ const SkinTestResult = () => {
                           (step, index) => (
                             <div className="section-use" key={index}>
                               {/* sản phẩm chính */}
-                              {step.category
-                                .products.$values.length > 0 && (
+                              {step.category.products.$values.length > 0 && (
                                 <div className="product-item">
                                   <img
                                     src={
-                                      step
-                                        .category.products.$values[0]
+                                      step.category.products.$values[0]
                                         .productImages.$values[0].url
                                     }
                                     alt=""
                                   />
                                   <p className="product-name">
                                     {
-                                      step
-                                        .category.products.$values[0]
+                                      step.category.products.$values[0]
                                         .productName
                                     }
                                   </p>
                                   <p className="product-price">
-                                    {
-                                      step
-                                        .category.products.$values[0].price.toLocaleString()
-                                    }VND
+                                    {step.category.products.$values[0].price}
+                                    VND
                                   </p>
                                   <Button
                                     fullWidth
@@ -108,33 +103,27 @@ const SkinTestResult = () => {
                                     onClick={() => {
                                       const product = {
                                         productId:
-                                          step
-                                            .category.products
-                                            .$values[0].productId,
+                                          step.category.products.$values[0]
+                                            .productId,
                                         productName:
-                                          step
-                                            .category.products
-                                            .$values[0].productName,
+                                          step.category.products.$values[0]
+                                            .productName,
                                         productImage:
-                                          step
-                                            .category.products
-                                            .$values[0].productImages.$values[0]
-                                            .url,
+                                          step.category.products.$values[0]
+                                            .productImages.$values[0].url,
                                         price:
-                                          step
-                                            .category.products
-                                            .$values[0].price,
-                                        category:
-                                          step.category.categoryName
+                                          step.category.products.$values[0]
+                                            .price,
+                                        category: step.category.categoryName,
                                       };
                                       addItem({
-                                        productId : product.productId,
-                                        productName : product.productName,
-                                        productImage : product.productImage,
-                                        price : product.price,
+                                        productId: product.productId,
+                                        productName: product.productName,
+                                        productImage: product.productImage,
+                                        price: product.price,
                                         category: product.category,
                                         skinType: skinType.skinTypeName,
-                                        quantity: 1
+                                        quantity: 1,
                                       });
                                     }}
                                   >
@@ -160,15 +149,14 @@ const SkinTestResult = () => {
                                   <div className="other-products-list">
                                     {routineDetail[0].routineSteps.$values
                                       .length > 0 &&
-                                      step
-                                        .category.products.$values.length > 0 &&
+                                      step.category.products.$values.length >
+                                        0 &&
                                       step.category.products.$values
                                         .slice(1)
                                         .map((product) => (
                                           <div
                                             key={product.productId}
                                             className="other-product-item"
-                                            
                                           >
                                             <img
                                               src={
@@ -177,49 +165,48 @@ const SkinTestResult = () => {
                                               }
                                               alt="category-item"
                                             />
-                                            <div className="product-info"
-                                            onClick={() =>
-                                              navigate(
-                                                `/product/${product.productId}`
-                                              )
-                                            }
+                                            <div
+                                              className="product-info"
+                                              onClick={() =>
+                                                navigate(
+                                                  `/product/${product.productId}`
+                                                )
+                                              }
                                             >
-                                              
                                               <p className="name">
                                                 {product.productName}
                                               </p>
                                               <p className="price">
-                                                {product.price.toLocaleString()}VND
+                                                {product.price.toLocaleString()}
+                                                VND
                                               </p>
                                             </div>
                                             <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const producta = {
-                                        productId:
-                                          product.productId,
-                                        productName:
-                                          product.productName,
-                                        productImage:                                          
-                                          product.productImages.$values[0]
-                                            .url,
-                                        price:
-                                          product.price,
-                                        category:
-                                          product.category,
-                                        skinType: skinType.skinTypeName,
-                                        quantity: 1
-                                      };
-                                      addItem(producta);
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
+                                              fullWidth
+                                              variant="contained"
+                                              style={{
+                                                color: "#fff",
+                                                width: "fit-content",
+                                              }}
+                                              onClick={() => {
+                                                const producta = {
+                                                  productId: product.productId,
+                                                  productName:
+                                                    product.productName,
+                                                  productImage:
+                                                    product.productImages
+                                                      .$values[0].url,
+                                                  price: product.price,
+                                                  category: product.category,
+                                                  skinType:
+                                                    skinType.skinTypeName,
+                                                  quantity: 1,
+                                                };
+                                                addItem(producta);
+                                              }}
+                                            >
+                                              Add to Cart
+                                            </Button>
                                           </div>
                                         ))}
                                   </div>
@@ -241,30 +228,24 @@ const SkinTestResult = () => {
                         routineDetail[1].routineSteps.$values.map(
                           (step, index) => (
                             <div className="section-use" key={index}>
-                              {step.category
-                                .products.$values.length > 0 && (
+                              {step.category.products.$values.length > 0 && (
                                 <div className="product-item">
                                   <img
                                     src={
-                                      step
-                                        .category.products.$values[0]
+                                      step.category.products.$values[0]
                                         .productImages.$values[0].url
                                     }
                                     alt=""
                                   />
                                   <p className="product-name">
                                     {
-                                      step
-                                        .category.products.$values[0]
+                                      step.category.products.$values[0]
                                         .productName
                                     }
                                   </p>
                                   <p className="product-price">
-                                    $
-                                    {
-                                      step
-                                        .category.products.$values[0].price
-                                    }
+                                    {step.category.products.$values[0].price}
+                                    VND
                                   </p>
                                   <Button
                                     fullWidth
@@ -276,27 +257,20 @@ const SkinTestResult = () => {
                                     onClick={() => {
                                       const product = {
                                         productId:
-                                          step
-                                            .category.products
-                                            .$values[0].productId,
+                                          step.category.products.$values[0]
+                                            .productId,
                                         productName:
-                                          step
-                                            .category.products
-                                            .$values[0].productName,
+                                          step.category.products.$values[0]
+                                            .productName,
                                         productImage:
-                                          step
-                                            .category.products
-                                            .$values[0].productImages.$values[0]
-                                            .url,
+                                          step.category.products.$values[0]
+                                            .productImages.$values[0].url,
                                         price:
-                                          step
-                                            .category.products
-                                            .$values[0].price,
-                                        category:
-                                          step.
-                                            category.categoryName,
+                                          step.category.products.$values[0]
+                                            .price,
+                                        category: step.category.categoryName,
                                         skinType: skinType.skinTypeName,
-                                        quantity: 1
+                                        quantity: 1,
                                       };
                                       addItem(product);
                                     }}
@@ -323,10 +297,9 @@ const SkinTestResult = () => {
                                   <div className="other-products-list">
                                     {routineDetail[1].routineSteps.$values
                                       .length > 0 &&
-                                      step
-                                        .category.products.$values.length > 0 &&
-                                      step
-                                        .category.products.$values
+                                      step.category.products.$values.length >
+                                        0 &&
+                                      step.category.products.$values
                                         .slice(1)
                                         .map((product) => (
                                           <div
@@ -350,49 +323,43 @@ const SkinTestResult = () => {
                                                 {product.productName}
                                               </p>
                                               <p className="price">
-                                                ${product.price}
+                                                {product.price}VND
                                               </p>
                                             </div>
                                             <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const product = {
-                                        productId:
-                                          step
-                                            .category.products
-                                            .$values[0].productId,
-                                        productName:
-                                          step
-                                            .category.products
-                                            .$values[0].productName,
-                                        productImage:
-                                          step
-                                            .category.products
-                                            .$values[0].productImages.$values[0]
-                                            .url,
-                                        price:
-                                          step
-                                            .category.products
-                                            .$values[0].price,
-                                        category:
-                                          step.
-                                            category.categoryName,
-                                        skinType: skinType.skinTypeName,
-                                        quantity: 1
-                                      };
-                                      addItem(product);
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
+                                              fullWidth
+                                              variant="contained"
+                                              style={{
+                                                color: "#fff",
+                                                width: "fit-content",
+                                              }}
+                                              onClick={() => {
+                                                const product = {
+                                                  productId:
+                                                    step.category.products
+                                                      .$values[0].productId,
+                                                  productName:
+                                                    step.category.products
+                                                      .$values[0].productName,
+                                                  productImage:
+                                                    step.category.products
+                                                      .$values[0].productImages
+                                                      .$values[0].url,
+                                                  price:
+                                                    step.category.products
+                                                      .$values[0].price,
+                                                  category:
+                                                    step.category.categoryName,
+                                                  skinType:
+                                                    skinType.skinTypeName,
+                                                  quantity: 1,
+                                                };
+                                                addItem(product);
+                                              }}
+                                            >
+                                              Add to Cart
+                                            </Button>
                                           </div>
-
-                                          
                                         ))}
                                   </div>
                                 </div>

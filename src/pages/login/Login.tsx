@@ -128,24 +128,6 @@ const Login: React.FC = () => {
             Register
           </Button>
         </div>
-
-        <div className="sign-up-w-line">
-          <span></span>
-          <p>Or sign up with</p>
-          <span></span>
-        </div>
-
-        <div className="other-login">
-          <div className="login-item">
-            <img src="/icons/fb-icon.svg" alt="fb" />
-          </div>
-          <div className="login-item">
-            <img src="/icons/google-icon.svg" alt="google" />
-          </div>
-          <div className="login-item">
-            <img src="/icons/apple-icon.svg" alt="apple" />
-          </div>
-        </div>
       </div>
     </div>
   );

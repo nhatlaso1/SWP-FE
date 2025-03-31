@@ -77,10 +77,10 @@ const Footer: React.FC = () => {
             </Button>
           </div> */}
 
-          <FormControlLabel
+          {/* <FormControlLabel
             control={<Checkbox defaultChecked />}
             label="By submitting your email, you agree to receive advertising emails from Beautya. Please review our Privacy Policy, which includes our Financial Incentive Notice for CA residents."
-          />
+          /> */}
         </div>
       </div>
 
