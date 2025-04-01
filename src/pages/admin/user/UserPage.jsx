@@ -24,7 +24,7 @@ import KeyboardArrowLeft from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRight from "@mui/icons-material/KeyboardArrowRight";
 import LastPageIcon from "@mui/icons-material/LastPage";
 import "./UserPage.css";
-import { getAllCustomer } from "../../../store/user.api";
+import { getAllCustomer,activeAccount, deActiveAccount } from "../../../store/user.api";
 
 // Styled components cho TableCell và TableRow
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -145,7 +145,36 @@ export default function UserPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-
+  const handleActive = (userId) => {
+    console.log("userId",userId)
+    activeAccount(token, userId)
+      .then(() => {
+        // Cập nhật lại danh sách khách hàng sau khi kích hoạt tài khoản
+        getAllCustomer(token)
+          .then((data) => setCustomers(data))
+          .catch((error) =>
+            console.error("Error fetching customers from API:", error)
+          );
+      })
+      .catch((error) => {
+        console.error("Error activating account:", error);
+      });
+  }
+  const handleDeActive = (userId) => {
+    console.log("userId",userId)
+    deActiveAccount(token, userId)
+      .then(() => {
+        // Cập nhật lại danh sách khách hàng sau khi kích hoạt tài khoản
+        getAllCustomer(token)
+          .then((data) => setCustomers(data))
+          .catch((error) =>
+            console.error("Error fetching customers from API:", error)
+          );
+      })
+      .catch((error) => {
+        console.error("Error activating account:", error);
+      });
+  }
 
 
   return (
@@ -160,23 +189,26 @@ export default function UserPage() {
               <StyledTableCell sx={{ width: "8%" }}>
                 Customer Id
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }}>
+              <StyledTableCell sx={{ width: "13%" }}>
                 Full Name
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }} align="right">
+              <StyledTableCell sx={{ width: "13%" }} align="right">
                 Phone Number
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }} align="right">
+              <StyledTableCell sx={{ width: "13%" }} align="right">
                 Email
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "12%" }} align="right">
+              <StyledTableCell sx={{ width: "13%" }} align="right">
                 Birthday
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }} align="center">
+              <StyledTableCell sx={{ width: "13%" }} align="center">
                 Skin Type
               </StyledTableCell>
-              <StyledTableCell sx={{ width: "20%" }} align="center">
+              <StyledTableCell sx={{ width: "13%" }} align="center">
                 Status
+              </StyledTableCell>
+              <StyledTableCell sx={{ width: "13%" }} align="center">
+                
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -206,6 +238,18 @@ export default function UserPage() {
                 </StyledTableCell>
                 <StyledTableCell align="center">
                   {row.status ? "Active" : "Inactive"}
+                </StyledTableCell>
+                <StyledTableCell align="center">
+                <div className="header-actions">
+                  {row.status ? 
+                  <button onClick={() => { handleDeActive(row.customerId)  }}>
+                    Inactive
+                  </button> : <button onClick={() => { handleActive(row.customerId)  }}>
+                    Active
+                  </button>}
+
+                  
+                </div>
                 </StyledTableCell>
               </StyledTableRow>
             ))}
