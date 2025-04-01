@@ -47,12 +47,12 @@ const Footer: React.FC = () => {
         </div>
 
         <div className="section-3">
-          <h3>Keep In Touch With Beautya</h3>
+          {/* <h3>Keep In Touch With Beautya</h3>
 
           <p>
             Join the Beautya newsletter and be first to hear about news, offers
             and skincare advice
-          </p>
+          </p> */}
 
           {/* <div className="subscribe">
             <TextField
