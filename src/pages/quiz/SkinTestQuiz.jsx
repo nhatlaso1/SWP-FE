@@ -10,10 +10,9 @@ import {
   FormControlLabel,
   FormHelperText,
   LinearProgress,
-  Radio,
-  RadioGroup,
   Typography,
   CircularProgress,
+  Checkbox,
 } from "@mui/material";
 
 import { useStore } from "../../store";
@@ -57,25 +56,29 @@ const SkinTestQuiz = () => {
 
   const validationSchema = Yup.object(
     (quizQuestions || []).reduce((schema, _, index) => {
-      schema[`q${index}`] = Yup.string().required("This question is required");
+      schema[`q${index}`] = Yup.array()
+        .min(1, "Please select at least one option")
+        .required("This question is required");
       return schema;
     }, {})
   );
 
   const formik = useFormik({
     initialValues: (quizQuestions || []).reduce((values, _, index) => {
-      values[`q${index}`] = "";
+      values[`q${index}`] = [];
       return values;
     }, {}),
     validationSchema,
     enableReinitialize: true,
     onSubmit: async (values) => {
+      console.log("values", values);
       setStep(2);
       scrollToTop();
-      await determineSkinType(
-        Object.values(values).map((ans) => parseInt(ans))
-      );
-      navigate("/quiz-result");
+      const valuesArray = Object.values(values).flatMap((ans) => ans);
+      if (valuesArray.length > 0) {
+        await determineSkinType(valuesArray.map((ans) => parseInt(ans)));
+        navigate("/quiz-result");
+      }
     },
   });
 
@@ -135,22 +138,38 @@ const SkinTestQuiz = () => {
                             Boolean(formik.errors[`q${index}`])
                           }
                         >
-                          <RadioGroup
-                            name={`q${index}`}
-                            value={formik.values[`q${index}`]}
-                            onChange={formik.handleChange}
-                          >
-                            {q.options.map((value) =>
-                              Object.entries(value).map(([key, value]) => (
-                                <FormControlLabel
-                                  key={key}
-                                  value={key}
-                                  control={<Radio />}
-                                  label={value}
-                                />
-                              ))
-                            )}
-                          </RadioGroup>
+                          {q.options.map((value) =>
+                            Object.entries(value).map(([key, label]) => (
+                              <FormControlLabel
+                                key={key}
+                                control={
+                                  <Checkbox
+                                    checked={formik.values[
+                                      `q${index}`
+                                    ].includes(key)}
+                                    onChange={(e) => {
+                                      const selectedOptions = [
+                                        ...formik.values[`q${index}`],
+                                      ];
+                                      if (e.target.checked) {
+                                        selectedOptions.push(key);
+                                      } else {
+                                        selectedOptions.splice(
+                                          selectedOptions.indexOf(key),
+                                          1
+                                        );
+                                      }
+                                      formik.setFieldValue(
+                                        `q${index}`,
+                                        selectedOptions
+                                      );
+                                    }}
+                                  />
+                                }
+                                label={label}
+                              />
+                            ))
+                          )}
                           <FormHelperText>
                             {formik.touched[`q${index}`] &&
                               formik.errors[`q${index}`]}
@@ -161,7 +180,12 @@ const SkinTestQuiz = () => {
                   ))}
 
                   <Box mt={2} display="flex" justifyContent="center">
-                    <Button type="submit" variant="contained" color="primary">
+                    <Button
+                      sx={{ color: "#fff" }}
+                      type="submit"
+                      variant="contained"
+                      color="primary"
+                    >
                       Submit Quiz
                     </Button>
                   </Box>

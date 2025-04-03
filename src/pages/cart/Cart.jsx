@@ -151,6 +151,10 @@ const Cart = () => {
                       name={`products[${index}].quantity`}
                       value={formik.values.products[index].quantity}
                       onChange={formik.handleChange}
+                      onBlur={(e) => {
+                        const newQuantity = parseInt(e.target.value, 10) || 1;
+                        updateQuantity(index, newQuantity);
+                      }}
                       inputProps={{ min: 1 }}
                     />
                     <IconButton
