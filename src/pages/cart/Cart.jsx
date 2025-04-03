@@ -183,7 +183,7 @@ const Cart = () => {
                     <CloseIcon />
                   </IconButton>
                   <Typography variant="caption" fontWeight={"bold"}>
-                    {product.price} đ
+                    {product.price.toFixed(1)} đ
                   </Typography>
                 </Box>
               </CardContent>
