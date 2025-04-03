@@ -244,7 +244,7 @@ const SkinTestResult = () => {
                                     }
                                   </p>
                                   <p className="product-price">
-                                    {step.category.products.$values[0].price.toLocaleString()}
+                                    {step.category.products.$values[0].price.toLocaleString()}{" "}
                                     VND
                                   </p>
                                   <Button
@@ -318,7 +318,7 @@ const SkinTestResult = () => {
                                                 {product.productName}
                                               </p>
                                               <p className="price">
-                                                {product.price.toLocaleString()}
+                                                {product.price.toLocaleString()}{" "}
                                                 VND
                                               </p>
                                             </div>
@@ -330,27 +330,21 @@ const SkinTestResult = () => {
                                                 width: "fit-content",
                                               }}
                                               onClick={() => {
-                                                const product = {
-                                                  productId:
-                                                    step.category.products
-                                                      .$values[0].productId,
+                                                const productToAdd = {
+                                                  productId: product.productId,
                                                   productName:
-                                                    step.category.products
-                                                      .$values[0].productName,
+                                                    product.productName,
                                                   productImage:
-                                                    step.category.products
-                                                      .$values[0].productImages
+                                                    product.productImages
                                                       .$values[0].url,
-                                                  price:
-                                                    step.category.products
-                                                      .$values[0].price,
+                                                  price: product.price,
                                                   category:
                                                     step.category.categoryName,
                                                   skinType:
                                                     skinType.skinTypeName,
                                                   quantity: 1,
                                                 };
-                                                addItem(product);
+                                                addItem(productToAdd); // Thêm sản phẩm phụ vào giỏ hàng
                                               }}
                                             >
                                               Add to Cart
