@@ -81,9 +81,9 @@ const SkinTestQuiz = () => {
       }
     },
   });
-
+  
   const answeredQuestions = Object.values(formik.values).filter(
-    (val) => val !== ""
+    (val) => Array.isArray(val) && val.length > 0 // Kiểm tra nếu mảng không rỗng
   ).length;
   const totalQuestions = quizQuestions ? quizQuestions.length : 0;
   const progress =
