@@ -63,302 +63,235 @@ const SkinTestResult = () => {
 
             <div className="quiz-result-content">
               <div className="guide-to-use-wrap">
-                {routineDetail &&
-                  routineDetail[0].routineDetailName === "Morning" && (
-                    <>
-                      <div className="divider">
-                        Morning routine <img src="/am_sticker.png" alt="" />
+              {routineDetail &&
+  routineDetail[0].routineDetailName === "Morning" && (
+    <>
+      <div className="divider">
+        Morning routine <img src="/am_sticker.png" alt="" />
+      </div>
+      {routineDetail[0].routineSteps.$values.length > 0 &&
+        routineDetail[0].routineSteps.$values.map((step, index) => (
+          <div className="section-use" key={index}>
+            {/* Sản phẩm chính */}
+            {step.category.products.$values.length > 0 && (
+              <div className="product-item">
+                <img
+                  src={
+                    step.category.products.$values[0].productImages.$values[0]
+                      .url
+                  }
+                  alt=""
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    navigate(
+                      `/product/${step.category.products.$values[0].productId}`
+                    )
+                  }
+                />
+                <p className="product-name">
+                  {step.category.products.$values[0].productName}
+                </p>
+                <p className="product-price">
+                  {step.category.products.$values[0].price.toLocaleString()} VND
+                </p>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  style={{
+                    color: "#fff",
+                    width: "fit-content",
+                  }}
+                  onClick={() => {
+                    const product = {
+                      productId: step.category.products.$values[0].productId,
+                      productName: step.category.products.$values[0].productName,
+                      productImage:
+                        step.category.products.$values[0].productImages
+                          .$values[0].url,
+                      price: step.category.products.$values[0].price,
+                      category: step.category.categoryName,
+                      skinType: skinType.skinTypeName,
+                      quantity: 1,
+                    };
+                    addItem(product);
+                  }}
+                >
+                  Add to Cart
+                </Button>
+              </div>
+            )}
+
+            {/* Sản phẩm phụ */}
+            <div className="other-products">
+              <p className="title">
+                Replace with one of the Approved options below
+              </p>
+              <div className="other-products-list">
+                {step.category.products.$values.length > 1 &&
+                  step.category.products.$values.slice(1).map((product) => (
+                    <div
+                      key={product.productId}
+                      className="other-product-item"
+                    >
+                      <img
+                        src={product.productImages.$values[0].url}
+                        alt="category-item"
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate(`/product/${product.productId}`)
+                        }
+                      />
+                      <div className="product-info">
+                        <p className="name">{product.productName}</p>
+                        <p className="price">
+                          {product.price.toLocaleString()} VND
+                        </p>
                       </div>
-                      {routineDetail[0].routineSteps.$values.length > 0 &&
-                        routineDetail[0].routineSteps.$values.map(
-                          (step, index) => (
-                            <div className="section-use" key={index}>
-                              {/* sản phẩm chính */}
-                              {step.category.products.$values.length > 0 && (
-                                <div className="product-item">
-                                  <img
-                                    src={
-                                      step.category.products.$values[0]
-                                        .productImages.$values[0].url
-                                    }
-                                    alt=""
-                                  />
-                                  <p className="product-name">
-                                    {
-                                      step.category.products.$values[0]
-                                        .productName
-                                    }
-                                  </p>
-                                  <p className="product-price">
-                                    {step.category.products.$values[0].price.toLocaleString()}
-                                    VND
-                                  </p>
-                                  <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const product = {
-                                        productId:
-                                          step.category.products.$values[0]
-                                            .productId,
-                                        productName:
-                                          step.category.products.$values[0]
-                                            .productName,
-                                        productImage:
-                                          step.category.products.$values[0]
-                                            .productImages.$values[0].url,
-                                        price:
-                                          step.category.products.$values[0]
-                                            .price,
-                                        category: step.category.categoryName,
-                                      };
-                                      addItem({
-                                        productId: product.productId,
-                                        productName: product.productName,
-                                        productImage: product.productImage,
-                                        price: product.price,
-                                        category: product.category,
-                                        skinType: skinType.skinTypeName,
-                                        quantity: 1,
-                                      });
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
-                                </div>
-                              )}
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        style={{
+                          color: "#fff",
+                          width: "fit-content",
+                        }}
+                        onClick={() => {
+                          const productToAdd = {
+                            productId: product.productId,
+                            productName: product.productName,
+                            productImage: product.productImages.$values[0].url,
+                            price: product.price,
+                            category: step.category.categoryName,
+                            skinType: skinType.skinTypeName,
+                            quantity: 1,
+                          };
+                          addItem(productToAdd);
+                        }}
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        ))}
+    </>
+  )}
 
-                              <div>
-                                <div className="how-to-use">
-                                  <p className="title">
-                                    {step.step} - {step.category.categoryName}
-                                  </p>
-                                  <p className="sub-title">
-                                    {step.instruction}
-                                  </p>
-                                </div>
-                                <div className="other-products">
-                                  <p className="title">
-                                    Replace with one of the Approved options
-                                    below
-                                  </p>
-                                  <div className="other-products-list">
-                                    {routineDetail[0].routineSteps.$values
-                                      .length > 0 &&
-                                      step.category.products.$values.length >
-                                        0 &&
-                                      step.category.products.$values
-                                        .slice(1)
-                                        .map((product) => (
-                                          <div
-                                            key={product.productId}
-                                            className="other-product-item"
-                                          >
-                                            <img
-                                              src={
-                                                product.productImages.$values[0]
-                                                  .url
-                                              }
-                                              alt="category-item"
-                                            />
-                                            <div
-                                              className="product-info"
-                                              onClick={() =>
-                                                navigate(
-                                                  `/product/${product.productId}`
-                                                )
-                                              }
-                                            >
-                                              <p className="name">
-                                                {product.productName}
-                                              </p>
-                                              <p className="price">
-                                                {product.price.toLocaleString()}
-                                                VND
-                                              </p>
-                                            </div>
-                                            <Button
-                                              fullWidth
-                                              variant="contained"
-                                              style={{
-                                                color: "#fff",
-                                                width: "fit-content",
-                                              }}
-                                              onClick={() => {
-                                                const producta = {
-                                                  productId: product.productId,
-                                                  productName:
-                                                    product.productName,
-                                                  productImage:
-                                                    product.productImages
-                                                      .$values[0].url,
-                                                  price: product.price,
-                                                  category: product.category,
-                                                  skinType:
-                                                    skinType.skinTypeName,
-                                                  quantity: 1,
-                                                };
-                                                addItem(producta);
-                                              }}
-                                            >
-                                              Add to Cart
-                                            </Button>
-                                          </div>
-                                        ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        )}
-                    </>
-                  )}
+{routineDetail &&
+  routineDetail[1].routineDetailName === "Evening" && (
+    <>
+      <div className="divider">
+        Evening routine <img src="/pm_sticker.avif" alt="" />
+      </div>
+      {routineDetail[1].routineSteps.$values.length > 0 &&
+        routineDetail[1].routineSteps.$values.map((step, index) => (
+          <div className="section-use" key={index}>
+            {/* Sản phẩm chính */}
+            {step.category.products.$values.length > 0 && (
+              <div className="product-item">
+                <img
+                  src={
+                    step.category.products.$values[0].productImages.$values[0]
+                      .url
+                  }
+                  alt=""
+                  style={{ cursor: "pointer" }}
+                  onClick={() =>
+                    navigate(
+                      `/product/${step.category.products.$values[0].productId}`
+                    )
+                  }
+                />
+                <p className="product-name">
+                  {step.category.products.$values[0].productName}
+                </p>
+                <p className="product-price">
+                  {step.category.products.$values[0].price.toLocaleString()} VND
+                </p>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  style={{
+                    color: "#fff",
+                    width: "fit-content",
+                  }}
+                  onClick={() => {
+                    const product = {
+                      productId: step.category.products.$values[0].productId,
+                      productName: step.category.products.$values[0].productName,
+                      productImage:
+                        step.category.products.$values[0].productImages
+                          .$values[0].url,
+                      price: step.category.products.$values[0].price,
+                      category: step.category.categoryName,
+                      skinType: skinType.skinTypeName,
+                      quantity: 1,
+                    };
+                    addItem(product);
+                  }}
+                >
+                  Add to Cart
+                </Button>
+              </div>
+            )}
 
-                {routineDetail &&
-                  routineDetail[1].routineDetailName === "Evening" && (
-                    <>
-                      <div className="divider">
-                        Evening routine <img src="/pm_sticker.avif" alt="" />
+            {/* Sản phẩm phụ */}
+            <div className="other-products">
+              <p className="title">
+                Replace with one of the Approved options below
+              </p>
+              <div className="other-products-list">
+                {step.category.products.$values.length > 1 &&
+                  step.category.products.$values.slice(1).map((product) => (
+                    <div
+                      key={product.productId}
+                      className="other-product-item"
+                    >
+                      <img
+                        src={product.productImages.$values[0].url}
+                        alt="category-item"
+                        style={{ cursor: "pointer" }}
+                        onClick={() =>
+                          navigate(`/product/${product.productId}`)
+                        }
+                      />
+                      <div className="product-info">
+                        <p className="name">{product.productName}</p>
+                        <p className="price">
+                          {product.price.toLocaleString()} VND
+                        </p>
                       </div>
-                      {routineDetail[1].routineSteps.$values.length > 0 &&
-                        routineDetail[1].routineSteps.$values.map(
-                          (step, index) => (
-                            <div className="section-use" key={index}>
-                              {step.category.products.$values.length > 0 && (
-                                <div className="product-item">
-                                  <img
-                                    src={
-                                      step.category.products.$values[0]
-                                        .productImages.$values[0].url
-                                    }
-                                    alt=""
-                                  />
-                                  <p className="product-name">
-                                    {
-                                      step.category.products.$values[0]
-                                        .productName
-                                    }
-                                  </p>
-                                  <p className="product-price">
-                                    {step.category.products.$values[0].price.toLocaleString()}{" "}
-                                    VND
-                                  </p>
-                                  <Button
-                                    fullWidth
-                                    variant="contained"
-                                    style={{
-                                      color: "#fff",
-                                      width: "fit-content",
-                                    }}
-                                    onClick={() => {
-                                      const product = {
-                                        productId:
-                                          step.category.products.$values[0]
-                                            .productId,
-                                        productName:
-                                          step.category.products.$values[0]
-                                            .productName,
-                                        productImage:
-                                          step.category.products.$values[0]
-                                            .productImages.$values[0].url,
-                                        price:
-                                          step.category.products.$values[0]
-                                            .price,
-                                        category: step.category.categoryName,
-                                        skinType: skinType.skinTypeName,
-                                        quantity: 1,
-                                      };
-                                      addItem(product);
-                                    }}
-                                  >
-                                    Add to Cart
-                                  </Button>
-                                </div>
-                              )}
-
-                              <div>
-                                <div className="how-to-use">
-                                  <p className="title">
-                                    {step.step} - {step.category.categoryName}
-                                  </p>
-                                  <p className="sub-title">
-                                    {step.instruction}
-                                  </p>
-                                </div>
-                                <div className="other-products">
-                                  <p className="title">
-                                    Replace with one of the Approved options
-                                    below
-                                  </p>
-                                  <div className="other-products-list">
-                                    {routineDetail[1].routineSteps.$values
-                                      .length > 0 &&
-                                      step.category.products.$values.length >
-                                        0 &&
-                                      step.category.products.$values
-                                        .slice(1)
-                                        .map((product) => (
-                                          <div
-                                            key={product.productId}
-                                            className="other-product-item"
-                                          >
-                                            <img
-                                              src={
-                                                product.productImages.$values[0]
-                                                  .url
-                                              }
-                                              alt="category-item"
-                                            />
-                                            <div className="product-info">
-                                              <p className="name">
-                                                {product.productName}
-                                              </p>
-                                              <p className="price">
-                                                {product.price.toLocaleString()}{" "}
-                                                VND
-                                              </p>
-                                            </div>
-                                            <Button
-                                              fullWidth
-                                              variant="contained"
-                                              style={{
-                                                color: "#fff",
-                                                width: "fit-content",
-                                              }}
-                                              onClick={() => {
-                                                const productToAdd = {
-                                                  productId: product.productId,
-                                                  productName:
-                                                    product.productName,
-                                                  productImage:
-                                                    product.productImages
-                                                      .$values[0].url,
-                                                  price: product.price,
-                                                  category:
-                                                    step.category.categoryName,
-                                                  skinType:
-                                                    skinType.skinTypeName,
-                                                  quantity: 1,
-                                                };
-                                                addItem(productToAdd); // Thêm sản phẩm phụ vào giỏ hàng
-                                              }}
-                                            >
-                                              Add to Cart
-                                            </Button>
-                                          </div>
-                                        ))}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )
-                        )}
-                    </>
-                  )}
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        style={{
+                          color: "#fff",
+                          width: "fit-content",
+                        }}
+                        onClick={() => {
+                          const productToAdd = {
+                            productId: product.productId,
+                            productName: product.productName,
+                            productImage: product.productImages.$values[0].url,
+                            price: product.price,
+                            category: step.category.categoryName,
+                            skinType: skinType.skinTypeName,
+                            quantity: 1,
+                          };
+                          addItem(productToAdd);
+                        }}
+                      >
+                        Add to Cart
+                      </Button>
+                    </div>
+                  ))}
+              </div>
+            </div>
+          </div>
+        ))}
+    </>
+  )}
               </div>
             </div>
           </div>
