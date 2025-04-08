@@ -103,6 +103,14 @@ const SkinTestResult = () => {
                                           .discount)
                                     ).toLocaleString()}{" "}
                                     VND
+                                    <p></p>
+                                    {step.category.products.$values[0]
+                                      .discount > 0 && (
+                                      <span className="original-price">
+                                        {step.category.products.$values[0].price.toLocaleString()}{" "}
+                                        VND
+                                      </span>
+                                    )}
                                   </p>
                                   <Button
                                     fullWidth
@@ -172,11 +180,19 @@ const SkinTestResult = () => {
                                               {product.productName}
                                             </p>
                                             <p className="price">
+                                              
                                               {(
                                                 product.price *
                                                 (1 - product.discount)
                                               ).toLocaleString()}{" "}
                                               VND
+                                              <p></p>
+                                              {product.discount > 0 && (
+                                                <span className="original-price">
+                                                  {product.price.toLocaleString()}{" "}
+                                                  VND
+                                                </span>
+                                              )}
                                             </p>
                                           </div>
                                           <Button
@@ -257,6 +273,14 @@ const SkinTestResult = () => {
                                           .discount)
                                     ).toLocaleString()}{" "}
                                     VND
+                                    <p></p>
+                                    {step.category.products.$values[0]
+                                      .discount > 0 && (
+                                      <span className="original-price">
+                                        {step.category.products.$values[0].price.toLocaleString()}{" "}
+                                        VND
+                                      </span>
+                                    )}
                                   </p>
                                   <Button
                                     fullWidth
@@ -326,11 +350,19 @@ const SkinTestResult = () => {
                                               {product.productName}
                                             </p>
                                             <p className="price">
+                                              
                                               {(
                                                 product.price *
                                                 (1 - product.discount)
                                               ).toLocaleString()}{" "}
                                               VND
+                                              <p></p>
+                                              {product.discount > 0 && (
+                                                <span className="original-price">
+                                                  {product.price.toLocaleString()}{" "}
+                                                  VND
+                                                </span>
+                                              )}
                                             </p>
                                           </div>
                                           <Button
