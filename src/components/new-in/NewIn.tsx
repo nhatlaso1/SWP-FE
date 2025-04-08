@@ -86,7 +86,15 @@ const NewIn: React.FC = () => {
                 <div className="product-info">
                   <p className="name">{product.productName}</p>
                   <p className="desc">{product.summary}</p>
-                  <p className="price">{product.price.toLocaleString()}VND</p>
+                  <p className="discount">
+                    {(product.price * (1 - product.discount)).toLocaleString()}
+                    VND
+                  </p>
+                  {product.discount > 0 && (
+                    <span className="original-price">
+                      {product.price.toLocaleString()} VND
+                    </span>
+                  )}
                 </div>
               </div>
             ))}
