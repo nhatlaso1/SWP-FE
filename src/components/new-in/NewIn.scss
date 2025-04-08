@@ -10,14 +10,23 @@
   }
 
   .new-in-list {
-    // display: flex;
-    // justify-content: center;
-    // gap: 16px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
 
     .product-item {
+      // margin: 0 16px;
+      // border: 1px solid #e0e0e0;
+      // background: white;
+
       margin: 0 16px;
       border: 1px solid #e0e0e0;
       background: white;
+      width: 308px; // Đặt chiều rộng cố định
+      height: 500px; // Đặt chiều cao cố định để đồng nhất
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between; 
 
       img {
         width: 100%;
@@ -27,10 +36,15 @@
       }
 
       .product-info {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0;
+        // flex-direction: column;
+        // align-items: flex-start;
+        // gap: 0;
+        // padding: 16px;
+        flex-grow: 1;
         padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
 
         .name {
           font-size: 16px;
